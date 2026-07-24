@@ -9,7 +9,9 @@
 # (/workspace) and are fetched on first boot by /download_models.sh.
 # ============================================================================
 
-FROM runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04
+# CUDA 12.8 / torch 2.8 → runs on Blackwell (RTX PRO 6000, B200/B300),
+# Hopper (H100/H200) and Ampere (A100) alike.
+FROM runpod/pytorch:1.1.0-cu1281-torch280-ubuntu2204
 
 ENV DEBIAN_FRONTEND=noninteractive \
     PIP_NO_CACHE_DIR=1 \
@@ -17,7 +19,7 @@ ENV DEBIAN_FRONTEND=noninteractive \
     PYTHONUNBUFFERED=1
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ffmpeg libgl1 libglib2.0-0 aria2 curl \
+        ffmpeg libgl1 libglib2.0-0 aria2 curl build-essential python3-dev \
     && rm -rf /var/lib/apt/lists/*
 
 # ---------------------------------------------------------------------------

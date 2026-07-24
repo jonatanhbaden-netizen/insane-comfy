@@ -74,11 +74,16 @@ fi
 
 # --- launch ComfyUI ------------------------------------------------------------
 AUTO_FLAGS="--preview-method auto"
-if python3 -c "import sageattention" 2>/dev/null; then
+# sage attention: enable only on pre-Blackwell GPUs (SageAttention 1.x has no
+# sm_100/sm_120 kernels; Blackwell runs great on default SDPA)
+if python3 -c "
+import sys, torch, sageattention
+cc = torch.cuda.get_device_capability()
+sys.exit(0 if cc[0] < 10 else 1)" 2>/dev/null; then
   AUTO_FLAGS="$AUTO_FLAGS --use-sage-attention"
-  echo "sageattention available → --use-sage-attention enabled"
+  echo "sageattention enabled (pre-Blackwell GPU)"
 else
-  echo "sageattention not importable → running with default SDPA attention"
+  echo "running with default SDPA attention (Blackwell GPU or sageattention unavailable)"
 fi
 
 cd "$COMFY"
