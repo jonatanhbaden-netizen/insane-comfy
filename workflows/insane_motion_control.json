@@ -1,0 +1,2060 @@
+{
+ "last_node_id": 37,
+ "last_link_id": 44,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "UNETLoader",
+   "pos": [
+    -1560,
+    40
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_fun_control_high_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "Fun-Control HIGH-noise expert"
+  },
+  {
+   "id": 2,
+   "type": "UNETLoader",
+   "pos": [
+    -1560,
+    190
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_fun_control_low_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "Fun-Control LOW-noise expert"
+  },
+  {
+   "id": 3,
+   "type": "CLIPLoader",
+   "pos": [
+    -1560,
+    340
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      7,
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+    "wan"
+   ],
+   "title": "UMT5-XXL text encoder"
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    -1560,
+    490
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      9,
+      10,
+      33,
+      42
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "wan_2.1_vae.safetensors"
+   ],
+   "title": "Wan VAE"
+  },
+  {
+   "id": 5,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1150,
+    40
+   ],
+   "size": [
+    360,
+    82
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "wan2.2_t2v_A14b_high_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+    1.0
+   ],
+   "title": "\u26a1 Lightning LoRA HIGH (bypassed = max quality)"
+  },
+  {
+   "id": 6,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1150,
+    190
+   ],
+   "size": [
+    360,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "wan2.2_t2v_A14b_low_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+    1.0
+   ],
+   "title": "\u26a1 Lightning LoRA LOW (bypassed = max quality)"
+  },
+  {
+   "id": 7,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -740,
+    40
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift HIGH (8.0 \u00b7 lightning: 5.0)"
+  },
+  {
+   "id": 8,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -740,
+    190
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift LOW (8.0 \u00b7 lightning: 5.0)"
+  },
+  {
+   "id": 9,
+   "type": "LoadImage",
+   "pos": [
+    -1560,
+    700
+   ],
+   "size": [
+    320,
+    314
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      11
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "character_reference.png",
+    "image"
+   ],
+   "title": "CHARACTER reference image"
+  },
+  {
+   "id": 10,
+   "type": "ImageScale",
+   "pos": [
+    -1150,
+    700
+   ],
+   "size": [
+    315,
+    130
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      12,
+      34
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScale"
+   },
+   "widgets_values": [
+    "lanczos",
+    1280,
+    720,
+    "center"
+   ],
+   "title": "Ref \u2192 target size"
+  },
+  {
+   "id": 11,
+   "type": "VHS_LoadVideo",
+   "pos": [
+    -1560,
+    1120
+   ],
+   "size": [
+    320,
+    340
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      13
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "frame_count",
+     "type": "INT",
+     "links": [],
+     "slot_index": 1
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": [],
+     "slot_index": 2
+    },
+    {
+     "name": "video_info",
+     "type": "VHS_VIDEOINFO",
+     "links": [],
+     "slot_index": 3
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_LoadVideo"
+   },
+   "widgets_values": {
+    "video": "motion_reference.mp4",
+    "force_rate": 16,
+    "custom_width": 0,
+    "custom_height": 0,
+    "frame_load_cap": 81,
+    "skip_first_frames": 0,
+    "select_every_nth": 1,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   },
+   "title": "MOTION reference video (16fps \u00b7 81 frames)"
+  },
+  {
+   "id": 12,
+   "type": "DWPreprocessor",
+   "pos": [
+    -1150,
+    1120
+   ],
+   "size": [
+    330,
+    200
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 13
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      14
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "POSE_KEYPOINT",
+     "type": "POSE_KEYPOINT",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "DWPreprocessor"
+   },
+   "widgets_values": [
+    "enable",
+    "enable",
+    "enable",
+    1024,
+    "yolox_l.onnx",
+    "dw-ll_ucoco_384_bs5.torchscript.pt"
+   ],
+   "title": "DWPose skeleton extraction"
+  },
+  {
+   "id": 13,
+   "type": "ImageScale",
+   "pos": [
+    -740,
+    1120
+   ],
+   "size": [
+    315,
+    130
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 14
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      15
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScale"
+   },
+   "widgets_values": [
+    "lanczos",
+    1280,
+    720,
+    "center"
+   ],
+   "title": "Pose frames \u2192 target size"
+  },
+  {
+   "id": 14,
+   "type": "CLIPTextEncode",
+   "pos": [
+    -740,
+    380
+   ],
+   "size": [
+    400,
+    200
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      16,
+      31
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "A photorealistic cinematic shot of a young woman in streetwear dancing in a neon-lit studio, smooth confident choreography, fluid natural motion, dramatic rim lighting, camera slowly orbiting, sharp focus, natural skin texture, film grain, 4k detail"
+   ],
+   "title": "POSITIVE \u2014 describe character, scene AND motion"
+  },
+  {
+   "id": 15,
+   "type": "CLIPTextEncode",
+   "pos": [
+    -740,
+    640
+   ],
+   "size": [
+    400,
+    160
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      17,
+      32
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "\u8272\u8c03\u8273\u4e3d\uff0c\u8fc7\u66dd\uff0c\u9759\u6001\uff0c\u7ec6\u8282\u6a21\u7cca\u4e0d\u6e05\uff0c\u5b57\u5e55\uff0c\u98ce\u683c\uff0c\u4f5c\u54c1\uff0c\u753b\u4f5c\uff0c\u753b\u9762\uff0c\u9759\u6b62\uff0c\u6574\u4f53\u53d1\u7070\uff0c\u6700\u5dee\u8d28\u91cf\uff0c\u4f4e\u8d28\u91cf\uff0cJPEG\u538b\u7f29\u6b8b\u7559\uff0c\u4e11\u964b\u7684\uff0c\u6b8b\u7f3a\u7684\uff0c\u591a\u4f59\u7684\u624b\u6307\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u624b\u90e8\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u8138\u90e8\uff0c\u7578\u5f62\u7684\uff0c\u6bc1\u5bb9\u7684\uff0c\u5f62\u6001\u7578\u5f62\u7684\u80a2\u4f53\uff0c\u624b\u6307\u878d\u5408\uff0c\u9759\u6b62\u4e0d\u52a8\u7684\u753b\u9762\uff0c\u6742\u4e71\u7684\u80cc\u666f\uff0c\u4e09\u6761\u817f\uff0c\u80cc\u666f\u4eba\u5f88\u591a\uff0c\u5012\u7740\u8d70"
+   ],
+   "title": "NEGATIVE (canonical Wan \u2014 keep)"
+  },
+  {
+   "id": 16,
+   "type": "Wan22FunControlToVideo",
+   "pos": [
+    -290,
+    620
+   ],
+   "size": [
+    280,
+    230
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 16
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 17
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 9
+    },
+    {
+     "name": "ref_image",
+     "type": "IMAGE",
+     "link": 12
+    },
+    {
+     "name": "control_video",
+     "type": "IMAGE",
+     "link": 15
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      18,
+      21
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      19,
+      22
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "links": [
+      20
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "Wan22FunControlToVideo"
+   },
+   "widgets_values": [
+    1280,
+    720,
+    81,
+    1
+   ],
+   "title": "Wan 2.2 Fun-Control (identity + motion)"
+  },
+  {
+   "id": 17,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    60,
+    300
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 18
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 19
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 20
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      23
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "enable",
+    77770001,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    0,
+    10,
+    "enable"
+   ],
+   "title": "SAMPLER 1/2 \u2014 HIGH expert (steps 0\u219210)"
+  },
+  {
+   "id": 18,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    430,
+    300
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 6
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 21
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 22
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      24
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "disable",
+    0,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    10,
+    10000,
+    "disable"
+   ],
+   "title": "SAMPLER 2/2 \u2014 LOW expert (steps 10\u219220)"
+  },
+  {
+   "id": 19,
+   "type": "VAEDecode",
+   "pos": [
+    800,
+    300
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 24
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      25
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   }
+  },
+  {
+   "id": 20,
+   "type": "RIFE VFI",
+   "pos": [
+    800,
+    420
+   ],
+   "size": [
+    315,
+    198
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "frames",
+     "type": "IMAGE",
+     "link": 25
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      26
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RIFE VFI"
+   },
+   "widgets_values": [
+    "rife49.pth",
+    10,
+    2,
+    true,
+    true,
+    1.0
+   ],
+   "title": "RIFE \u00d72 \u2192 32 fps"
+  },
+  {
+   "id": 21,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    1170,
+    300
+   ],
+   "size": [
+    360,
+    340
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 26
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "widgets_values": {
+    "frame_rate": 32,
+    "loop_count": 0,
+    "filename_prefix": "insane_motion/fun_control",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 17,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   },
+   "title": "EXPORT \u2014 h264 mp4, crf 17"
+  },
+  {
+   "id": 22,
+   "type": "UNETLoader",
+   "pos": [
+    -1560,
+    1750
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 2,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      27
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "I2V HIGH-noise expert"
+  },
+  {
+   "id": 23,
+   "type": "UNETLoader",
+   "pos": [
+    -1560,
+    1900
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 2,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      29
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "I2V LOW-noise expert"
+  },
+  {
+   "id": 24,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -1150,
+    1750
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 27
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      28
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift HIGH 8.0"
+  },
+  {
+   "id": 25,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -1150,
+    1900
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 29
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      30
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift LOW 8.0"
+  },
+  {
+   "id": 26,
+   "type": "WanImageToVideo",
+   "pos": [
+    -740,
+    1800
+   ],
+   "size": [
+    280,
+    230
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 31
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 32
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 33
+    },
+    {
+     "name": "clip_vision_output",
+     "type": "CLIP_VISION_OUTPUT",
+     "link": null
+    },
+    {
+     "name": "start_image",
+     "type": "IMAGE",
+     "link": 34
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      35,
+      38
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      36,
+      39
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "links": [
+      37
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WanImageToVideo"
+   },
+   "widgets_values": [
+    1280,
+    720,
+    81,
+    1
+   ],
+   "title": "Wan 2.2 Image-to-Video"
+  },
+  {
+   "id": 27,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    60,
+    1750
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 28
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 35
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 36
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 37
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      40
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "enable",
+    77770001,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    0,
+    10,
+    "enable"
+   ],
+   "title": "I2V SAMPLER 1/2 \u2014 HIGH (0\u219210)"
+  },
+  {
+   "id": 28,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    430,
+    1750
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 30
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 38
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 39
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 40
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      41
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "disable",
+    0,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    10,
+    10000,
+    "disable"
+   ],
+   "title": "I2V SAMPLER 2/2 \u2014 LOW (10\u219220)"
+  },
+  {
+   "id": 29,
+   "type": "VAEDecode",
+   "pos": [
+    800,
+    1750
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 41
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 42
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      43
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   }
+  },
+  {
+   "id": 30,
+   "type": "RIFE VFI",
+   "pos": [
+    800,
+    1870
+   ],
+   "size": [
+    315,
+    198
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "frames",
+     "type": "IMAGE",
+     "link": 43
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      44
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RIFE VFI"
+   },
+   "widgets_values": [
+    "rife49.pth",
+    10,
+    2,
+    true,
+    true,
+    1.0
+   ],
+   "title": "RIFE \u00d72 \u2192 32 fps"
+  },
+  {
+   "id": 31,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    1170,
+    1750
+   ],
+   "size": [
+    360,
+    340
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 2,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 44
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "widgets_values": {
+    "frame_rate": 32,
+    "loop_count": 0,
+    "filename_prefix": "insane_motion/i2v",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 17,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   },
+   "title": "EXPORT I2V"
+  },
+  {
+   "id": 32,
+   "type": "Note",
+   "pos": [
+    -1560,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "INSANE MOTION CONTROL \u2014 Wan 2.2 Fun-Control (native nodes)\n\nWHAT THIS DOES\nAnimates YOUR character with motion taken from a reference clip.\nDWPose extracts a pose skeleton from the motion video; Wan 2.2\nFun-Control renders your character following that exact motion.\nIdentity comes from the character reference image (+ optional\ncharacter LoRA added after the UNET loaders).\n\nQUICK START\n1) INPUTS group: upload character_reference.png (clean, well-lit,\n   framing similar to the motion clip) and motion_reference.mp4.\n2) Positive prompt: describe character, outfit, scene, camera \u2014\n   AND describe the motion in words. It helps adherence.\n3) Queue. Output \u2192 output/insane_motion/.\n\nDEFAULTS = MAX QUALITY (20 steps, cfg 3.5).\n~8\u201312 min per 5 s clip on A100 80GB @ 720p with sage attention.\nFor 10\u00d7 faster drafts see note \u2462 QUALITY VS SPEED.\n\nThe bottom group is a plain Image-to-Video branch (no pose\ncontrol), muted by default \u2014 see note \u2464."
+   ],
+   "title": "\u2460 READ ME \u2014 INSANE MOTION CONTROL",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 33,
+   "type": "Note",
+   "pos": [
+    -1040,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "REQUIRED FILES \u2014 download_models.sh fetches everything.\n\ndiffusion_models/\n  wan2.2_fun_control_high_noise_14B_fp8_scaled.safetensors\n  wan2.2_fun_control_low_noise_14B_fp8_scaled.safetensors\n  wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors  (alt branch)\n  wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors   (alt branch)\ntext_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors\nvae/wan_2.1_vae.safetensors\nloras/wan2.2_t2v_A14b_{high,low}_noise_..._4step_1217.safetensors\nloras/wan2.2_i2v_lightx2v_4steps_lora_v1_{high,low}_noise.safetensors\n\nDWPose (yolox_l + dw-ll torchscript) and RIFE (rife49.pth)\nauto-download on the FIRST queue \u2014 the first run is slower.\n\nWHY TWO DIFFUSION MODELS?\nWan 2.2 A14B is a two-expert MoE: the HIGH-noise expert lays out\nmotion + composition (steps 0\u201310), the LOW-noise expert refines\ndetail (10\u201320). Keep pairs matched: high\u2192high, low\u2192low. The two\nsamplers below implement exactly this split."
+   ],
+   "title": "\u2461 MODELS",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 34,
+   "type": "Note",
+   "pos": [
+    -520,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "PRESET A \u2014 MAX QUALITY (current defaults; use for finals)\n  Lightning LoRA nodes: BYPASSED (purple)\n  HIGH sampler: steps 20 \u00b7 cfg 3.5 \u00b7 start 0 \u00b7 end 10\n  LOW  sampler: steps 20 \u00b7 cfg 3.5 \u00b7 start 10 \u00b7 end 10000\n  ModelSampling shift (both): 8.0\n  A100 80GB @ 1280\u00d7720\u00d781f: \u2248 8\u201312 min\n\nPRESET B \u2014 LIGHTNING (drafts / iteration, \u224810\u00d7 faster)\n  Select both \u26a1 LoRA nodes \u2192 Ctrl+B to activate\n  HIGH sampler: steps 4 \u00b7 cfg 1.0 \u00b7 start 0 \u00b7 end 2\n  LOW  sampler: steps 4 \u00b7 cfg 1.0 \u00b7 start 2 \u00b7 end 10000\n  ModelSampling shift (both): 5.0\n  A100 @ 720p: \u2248 60\u2013120 s\n\nIterate with B, then render the final with A (same seed).\nLightning trades some motion nuance + texture for speed.\nThis Fun-Control branch uses the t2v-based 4-step LoRAs;\nthe I2V branch pairs with the i2v_..._v1 LoRAs instead."
+   ],
+   "title": "\u2462 QUALITY VS SPEED",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 35,
+   "type": "Note",
+   "pos": [
+    0,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "\u2022 force_rate 16 + frame_load_cap 81 \u2192 exactly 81 frames = 5.0 s.\n  Longer clips get cut \u2014 trim to the exact move you want.\n\u2022 Match framing: full-body motion clip \u2192 full-body character\n  reference. Mismatched crops are the #1 cause of warped anatomy.\n\u2022 ONE person in the motion clip; clean background helps DWPose.\n\u2022 DWPose resolution 1024 is a good ceiling. If the skeleton\n  flickers frame-to-frame, drop to 512.\n\u2022 Vertical video (Reels): swap W/H to 720\u00d71280 in BOTH ImageScale\n  nodes AND the Fun-Control node.\n\u2022 Drafts: 832\u00d7480 runs ~3\u00d7 faster; upscale winners later.\n\u2022 RIFE doubles 16\u219232 fps. For 24 fps deliverables: multiplier 3\n  (\u219248 fps) + frame_rate 48, or remove RIFE and export at 16.\n\nUse motion clips you have the rights to, driving YOUR original\ncharacter \u2014 this rig is not for replicating real people."
+   ],
+   "title": "\u2463 MOTION REFERENCE TIPS",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 36,
+   "type": "Note",
+   "pos": [
+    520,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "The bottom group is plain Wan 2.2 Image-to-Video: no pose\ncontrol, the model invents motion from your start image + prompt.\nUse it when you have no motion reference, or for subtle idle /\nb-roll / ambient shots.\n\nENABLE: drag-select every node in the bottom group \u2192 Ctrl+M.\nWhile testing it, mute the Fun-Control samplers (same trick)\nso you don't render both branches per queue.\n\nSame two presets apply. For Lightning here, insert\nLoraLoaderModelOnly nodes with the i2v_lightx2v_4steps_v1\nhigh/low LoRAs after each UNET loader.\n\nPrompt tip: describe the motion explicitly and keep camera verbs\nsimple \u2014 'slow dolly-in', 'gentle handheld sway', 'hair moving\nin the wind'."
+   ],
+   "title": "\u2464 ALT BRANCH \u2014 PURE I2V (muted)",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 37,
+   "type": "Note",
+   "pos": [
+    1040,
+    -620
+   ],
+   "size": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "BEST IDENTITY RESULTS\nBuild a perfect character still FIRST in\ninsane_image_to_image.json (PuLID + character LoRA + upscale),\nthen feed that render in here as character_reference.png.\nThe video model can only hold an identity as well as the\nreference you hand it.\n\nLONGER CLIPS\nGenerate 5 s segments; use the last frame of segment N as the\nreference for segment N+1; concat afterwards (ffmpeg). Expect\nslight identity drift \u2014 re-anchor with your best still every\n2\u20133 segments.\n\nCHARACTER LORA (optional, strongest identity lock)\nTrain a Wan 2.2 LoRA on 20\u201350 stills of your character (the\nimg2img workflow is the still-factory), then add\nLoraLoaderModelOnly after BOTH UNET loaders, strength 0.6\u20130.9.\nStack order: UNET \u2192 character LoRA \u2192 Lightning LoRA \u2192 shift."
+   ],
+   "title": "\u2465 SYSTEM SYNERGY",
+   "color": "#432",
+   "bgcolor": "#653"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   5,
+   0,
+   7,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   7,
+   0,
+   17,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   2,
+   0,
+   6,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   6,
+   0,
+   8,
+   0,
+   "MODEL"
+  ],
+  [
+   6,
+   8,
+   0,
+   18,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   3,
+   0,
+   14,
+   0,
+   "CLIP"
+  ],
+  [
+   8,
+   3,
+   0,
+   15,
+   0,
+   "CLIP"
+  ],
+  [
+   9,
+   4,
+   0,
+   16,
+   2,
+   "VAE"
+  ],
+  [
+   10,
+   4,
+   0,
+   19,
+   1,
+   "VAE"
+  ],
+  [
+   11,
+   9,
+   0,
+   10,
+   0,
+   "IMAGE"
+  ],
+  [
+   12,
+   10,
+   0,
+   16,
+   3,
+   "IMAGE"
+  ],
+  [
+   13,
+   11,
+   0,
+   12,
+   0,
+   "IMAGE"
+  ],
+  [
+   14,
+   12,
+   0,
+   13,
+   0,
+   "IMAGE"
+  ],
+  [
+   15,
+   13,
+   0,
+   16,
+   4,
+   "IMAGE"
+  ],
+  [
+   16,
+   14,
+   0,
+   16,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   17,
+   15,
+   0,
+   16,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   18,
+   16,
+   0,
+   17,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   19,
+   16,
+   1,
+   17,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   20,
+   16,
+   2,
+   17,
+   3,
+   "LATENT"
+  ],
+  [
+   21,
+   16,
+   0,
+   18,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   22,
+   16,
+   1,
+   18,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   23,
+   17,
+   0,
+   18,
+   3,
+   "LATENT"
+  ],
+  [
+   24,
+   18,
+   0,
+   19,
+   0,
+   "LATENT"
+  ],
+  [
+   25,
+   19,
+   0,
+   20,
+   0,
+   "IMAGE"
+  ],
+  [
+   26,
+   20,
+   0,
+   21,
+   0,
+   "IMAGE"
+  ],
+  [
+   27,
+   22,
+   0,
+   24,
+   0,
+   "MODEL"
+  ],
+  [
+   28,
+   24,
+   0,
+   27,
+   0,
+   "MODEL"
+  ],
+  [
+   29,
+   23,
+   0,
+   25,
+   0,
+   "MODEL"
+  ],
+  [
+   30,
+   25,
+   0,
+   28,
+   0,
+   "MODEL"
+  ],
+  [
+   31,
+   14,
+   0,
+   26,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   32,
+   15,
+   0,
+   26,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   33,
+   4,
+   0,
+   26,
+   2,
+   "VAE"
+  ],
+  [
+   34,
+   10,
+   0,
+   26,
+   4,
+   "IMAGE"
+  ],
+  [
+   35,
+   26,
+   0,
+   27,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   36,
+   26,
+   1,
+   27,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   37,
+   26,
+   2,
+   27,
+   3,
+   "LATENT"
+  ],
+  [
+   38,
+   26,
+   0,
+   28,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   39,
+   26,
+   1,
+   28,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   40,
+   27,
+   0,
+   28,
+   3,
+   "LATENT"
+  ],
+  [
+   41,
+   28,
+   0,
+   29,
+   0,
+   "LATENT"
+  ],
+  [
+   42,
+   4,
+   0,
+   29,
+   1,
+   "VAE"
+  ],
+  [
+   43,
+   29,
+   0,
+   30,
+   0,
+   "IMAGE"
+  ],
+  [
+   44,
+   30,
+   0,
+   31,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 \u00b7 MODELS \u2014 Wan 2.2 two-expert MoE",
+   "bounding": [
+    -1600,
+    -40,
+    1180,
+    620
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 \u00b7 INPUTS \u2014 character + motion",
+   "bounding": [
+    -1600,
+    620,
+    1200,
+    880
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "3 \u00b7 PROMPTS",
+   "bounding": [
+    -780,
+    300,
+    470,
+    530
+   ],
+   "color": "#b58b2a",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "4 \u00b7 MOTION-CONTROL LATENT",
+   "bounding": [
+    -310,
+    540,
+    320,
+    340
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "5 \u00b7 SAMPLING \u2014 HIGH \u2192 LOW expert",
+   "bounding": [
+    40,
+    230,
+    730,
+    430
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 6,
+   "title": "6 \u00b7 DECODE \u00b7 RIFE \u00b7 EXPORT",
+   "bounding": [
+    780,
+    230,
+    780,
+    420
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 7,
+   "title": "7 \u00b7 ALT \u2014 PURE I2V (muted, Ctrl+M to enable)",
+   "bounding": [
+    -1600,
+    1680,
+    3160,
+    570
+   ],
+   "color": "#444",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.4,
+   "offset": [
+    2100,
+    900
+   ]
+  }
+ },
+ "version": 0.4
+}

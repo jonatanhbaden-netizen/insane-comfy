@@ -1,0 +1,25 @@
+# Maps ComfyUI model folders onto the RunPod network volume so models
+# survive pod restarts and can be shared across pods in the same region.
+runpod_volume:
+  base_path: /workspace/models
+  is_default: true
+  checkpoints: checkpoints
+  diffusion_models: |
+    diffusion_models
+    unet
+  text_encoders: |
+    text_encoders
+    clip
+  vae: vae
+  loras: loras
+  controlnet: controlnet
+  clip_vision: clip_vision
+  style_models: style_models
+  upscale_models: upscale_models
+  embeddings: embeddings
+  pulid: pulid
+  insightface: insightface
+  ultralytics: ultralytics
+  ultralytics_bbox: ultralytics/bbox
+  ultralytics_segm: ultralytics/segm
+  sams: sams

@@ -1,0 +1,2465 @@
+{
+ "last_node_id": 43,
+ "last_link_id": 58,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "UNETLoader",
+   "pos": [
+    -1900,
+    40
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "flux1-dev-fp8-e4m3fn.safetensors",
+    "fp8_e4m3fn"
+   ],
+   "title": "Flux.1-dev fp8"
+  },
+  {
+   "id": 2,
+   "type": "DualCLIPLoader",
+   "pos": [
+    -1900,
+    190
+   ],
+   "size": [
+    340,
+    106
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      3,
+      4,
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "DualCLIPLoader"
+   },
+   "widgets_values": [
+    "clip_l.safetensors",
+    "t5xxl_fp8_e4m3fn_scaled.safetensors",
+    "flux"
+   ],
+   "title": "CLIP-L + T5-XXL fp8"
+  },
+  {
+   "id": 3,
+   "type": "VAELoader",
+   "pos": [
+    -1900,
+    370
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      8,
+      21,
+      26,
+      31,
+      42,
+      46,
+      56
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "ae.safetensors"
+   ],
+   "title": "Flux VAE"
+  },
+  {
+   "id": 4,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1520,
+    40
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "character_lora.safetensors",
+    0.8
+   ],
+   "title": "CHARACTER LoRA (bypassed \u2014 enable if trained)"
+  },
+  {
+   "id": 5,
+   "type": "LoadImage",
+   "pos": [
+    -1900,
+    560
+   ],
+   "size": [
+    320,
+    314
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "input_image.png",
+    "image"
+   ],
+   "title": "SOURCE image (composition)"
+  },
+  {
+   "id": 6,
+   "type": "ImageScaleToTotalPixels",
+   "pos": [
+    -1520,
+    560
+   ],
+   "size": [
+    315,
+    106
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      7,
+      9,
+      10,
+      11
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScaleToTotalPixels"
+   },
+   "widgets_values": [
+    "lanczos",
+    1.5
+   ],
+   "title": "\u2192 1.5 MP working size"
+  },
+  {
+   "id": 7,
+   "type": "VAEEncode",
+   "pos": [
+    -1180,
+    560
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 7
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      40
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   }
+  },
+  {
+   "id": 8,
+   "type": "DepthAnythingV2Preprocessor",
+   "pos": [
+    -1520,
+    760
+   ],
+   "size": [
+    330,
+    82
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 9
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      20
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "DepthAnythingV2Preprocessor"
+   },
+   "widgets_values": [
+    "depth_anything_v2_vitl.pth",
+    1024
+   ],
+   "title": "Depth Anything V2"
+  },
+  {
+   "id": 9,
+   "type": "Canny",
+   "pos": [
+    -1520,
+    920
+   ],
+   "size": [
+    315,
+    82
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 10
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      25
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "Canny"
+   },
+   "widgets_values": [
+    0.4,
+    0.8
+   ],
+   "title": "Canny edges"
+  },
+  {
+   "id": 10,
+   "type": "DWPreprocessor",
+   "pos": [
+    -1520,
+    1080
+   ],
+   "size": [
+    330,
+    200
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 11
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      30
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "POSE_KEYPOINT",
+     "type": "POSE_KEYPOINT",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "DWPreprocessor"
+   },
+   "widgets_values": [
+    "enable",
+    "enable",
+    "enable",
+    1024,
+    "yolox_l.onnx",
+    "dw-ll_ucoco_384_bs5.torchscript.pt"
+   ],
+   "title": "DWPose (for the bypassed pose stage)"
+  },
+  {
+   "id": 11,
+   "type": "CLIPTextEncode",
+   "pos": [
+    -1120,
+    40
+   ],
+   "size": [
+    400,
+    200
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      12
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "RAW photo, editorial portrait of a woman in a sunlit loft, natural window light, shallow depth of field, 85mm lens, detailed skin texture with visible pores, soft film grain, cinematic color grade, masterpiece quality"
+   ],
+   "title": "POSITIVE \u2014 describe the RESULT, not the input"
+  },
+  {
+   "id": 12,
+   "type": "CLIPTextEncode",
+   "pos": [
+    -1120,
+    300
+   ],
+   "size": [
+    400,
+    110
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      18
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    ""
+   ],
+   "title": "NEGATIVE (ignored at cfg 1.0 \u2014 leave empty)"
+  },
+  {
+   "id": 13,
+   "type": "CLIPVisionLoader",
+   "pos": [
+    -1900,
+    1330
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP_VISION",
+     "type": "CLIP_VISION",
+     "links": [
+      15
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPVisionLoader"
+   },
+   "widgets_values": [
+    "sigclip_vision_patch14_384.safetensors"
+   ],
+   "title": "sigCLIP vision"
+  },
+  {
+   "id": 14,
+   "type": "LoadImage",
+   "pos": [
+    -1900,
+    1450
+   ],
+   "size": [
+    320,
+    314
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      16
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "style_reference.png",
+    "image"
+   ],
+   "title": "STYLE reference (Redux)"
+  },
+  {
+   "id": 15,
+   "type": "CLIPVisionEncode",
+   "pos": [
+    -1520,
+    1330
+   ],
+   "size": [
+    290,
+    82
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip_vision",
+     "type": "CLIP_VISION",
+     "link": 15
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 16
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CLIP_VISION_OUTPUT",
+     "type": "CLIP_VISION_OUTPUT",
+     "links": [
+      14
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPVisionEncode"
+   },
+   "widgets_values": [
+    "center"
+   ]
+  },
+  {
+   "id": 16,
+   "type": "StyleModelLoader",
+   "pos": [
+    -1520,
+    1470
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "STYLE_MODEL",
+     "type": "STYLE_MODEL",
+     "links": [
+      13
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "StyleModelLoader"
+   },
+   "widgets_values": [
+    "flux1-redux-dev.safetensors"
+   ],
+   "title": "Redux style model"
+  },
+  {
+   "id": 17,
+   "type": "StyleModelApply",
+   "pos": [
+    -1160,
+    1370
+   ],
+   "size": [
+    315,
+    106
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 12
+    },
+    {
+     "name": "style_model",
+     "type": "STYLE_MODEL",
+     "link": 13
+    },
+    {
+     "name": "clip_vision_output",
+     "type": "CLIP_VISION_OUTPUT",
+     "link": 14
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      17
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "StyleModelApply"
+   },
+   "widgets_values": [
+    0.5,
+    "multiply"
+   ],
+   "title": "REDUX apply (bypassed \u2014 see note \u2465)"
+  },
+  {
+   "id": 18,
+   "type": "ControlNetLoader",
+   "pos": [
+    -740,
+    360
+   ],
+   "size": [
+    380,
+    58
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CONTROL_NET",
+     "type": "CONTROL_NET",
+     "links": [
+      19,
+      24,
+      29
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ControlNetLoader"
+   },
+   "widgets_values": [
+    "FLUX.1-dev-ControlNet-Union-Pro-2.0.safetensors"
+   ],
+   "title": "Union Pro 2.0 (all modes, no selector needed)"
+  },
+  {
+   "id": 19,
+   "type": "ControlNetApplyAdvanced",
+   "pos": [
+    -740,
+    560
+   ],
+   "size": [
+    315,
+    190
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 17
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 18
+    },
+    {
+     "name": "control_net",
+     "type": "CONTROL_NET",
+     "link": 19
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 20
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 21
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      22
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      23
+     ],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ControlNetApplyAdvanced"
+   },
+   "widgets_values": [
+    0.6,
+    0.0,
+    0.6
+   ],
+   "title": "CN 1 \u00b7 DEPTH  0.60 / end 0.60"
+  },
+  {
+   "id": 20,
+   "type": "ControlNetApplyAdvanced",
+   "pos": [
+    -740,
+    820
+   ],
+   "size": [
+    315,
+    190
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 22
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 23
+    },
+    {
+     "name": "control_net",
+     "type": "CONTROL_NET",
+     "link": 24
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 25
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 26
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      27
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      28
+     ],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ControlNetApplyAdvanced"
+   },
+   "widgets_values": [
+    0.45,
+    0.0,
+    0.5
+   ],
+   "title": "CN 2 \u00b7 CANNY  0.45 / end 0.50"
+  },
+  {
+   "id": 21,
+   "type": "ControlNetApplyAdvanced",
+   "pos": [
+    -740,
+    1080
+   ],
+   "size": [
+    315,
+    190
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 27
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 28
+    },
+    {
+     "name": "control_net",
+     "type": "CONTROL_NET",
+     "link": 29
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 30
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 31
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      32
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      39,
+      48,
+      55
+     ],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ControlNetApplyAdvanced"
+   },
+   "widgets_values": [
+    0.65,
+    0.0,
+    0.7
+   ],
+   "title": "CN 3 \u00b7 POSE (bypassed \u2014 Ctrl+B for people)"
+  },
+  {
+   "id": 22,
+   "type": "FluxGuidance",
+   "pos": [
+    -340,
+    560
+   ],
+   "size": [
+    315,
+    58
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      38,
+      47,
+      54
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FluxGuidance"
+   },
+   "widgets_values": [
+    3.5
+   ],
+   "title": "Flux guidance 3.5"
+  },
+  {
+   "id": 23,
+   "type": "PulidFluxModelLoader",
+   "pos": [
+    -740,
+    1380
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "PULIDFLUX",
+     "type": "PULIDFLUX",
+     "links": [
+      33
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PulidFluxModelLoader"
+   },
+   "widgets_values": [
+    "pulid_flux_v0.9.1.safetensors"
+   ]
+  },
+  {
+   "id": 24,
+   "type": "PulidFluxEvaClipLoader",
+   "pos": [
+    -740,
+    1500
+   ],
+   "size": [
+    340,
+    46
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "EVA_CLIP",
+     "type": "EVA_CLIP",
+     "links": [
+      34
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PulidFluxEvaClipLoader"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 25,
+   "type": "PulidFluxInsightFaceLoader",
+   "pos": [
+    -740,
+    1610
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "FACEANALYSIS",
+     "type": "FACEANALYSIS",
+     "links": [
+      35
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "PulidFluxInsightFaceLoader"
+   },
+   "widgets_values": [
+    "CUDA"
+   ]
+  },
+  {
+   "id": 26,
+   "type": "LoadImage",
+   "pos": [
+    -340,
+    1380
+   ],
+   "size": [
+    320,
+    314
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      36
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "face_reference.png",
+    "image"
+   ],
+   "title": "FACE reference (your character)"
+  },
+  {
+   "id": 27,
+   "type": "ApplyPulidFlux",
+   "pos": [
+    30,
+    1380
+   ],
+   "size": [
+    315,
+    190
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    },
+    {
+     "name": "pulid_flux",
+     "type": "PULIDFLUX",
+     "link": 33
+    },
+    {
+     "name": "eva_clip",
+     "type": "EVA_CLIP",
+     "link": 34
+    },
+    {
+     "name": "face_analysis",
+     "type": "FACEANALYSIS",
+     "link": 35
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 36
+    },
+    {
+     "name": "attn_mask",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      37,
+      45,
+      53
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ApplyPulidFlux"
+   },
+   "widgets_values": [
+    0.85,
+    0.0,
+    1.0
+   ],
+   "title": "PuLID identity \u00b7 weight 0.85"
+  },
+  {
+   "id": 28,
+   "type": "KSampler",
+   "pos": [
+    30,
+    300
+   ],
+   "size": [
+    315,
+    262
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 37
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 38
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 39
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 40
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      41
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    77770002,
+    "fixed",
+    28,
+    1.0,
+    "euler",
+    "beta",
+    0.5
+   ],
+   "title": "KSampler \u2014 DENOISE is the master dial"
+  },
+  {
+   "id": 29,
+   "type": "VAEDecode",
+   "pos": [
+    390,
+    300
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 41
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 42
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      43,
+      44
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   }
+  },
+  {
+   "id": 30,
+   "type": "SaveImage",
+   "pos": [
+    390,
+    420
+   ],
+   "size": [
+    315,
+    290
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 43
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "insane_i2i/01_base"
+   ],
+   "title": "SAVE 01 \u00b7 base render"
+  },
+  {
+   "id": 31,
+   "type": "UltralyticsDetectorProvider",
+   "pos": [
+    30,
+    820
+   ],
+   "size": [
+    340,
+    78
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "BBOX_DETECTOR",
+     "type": "BBOX_DETECTOR",
+     "links": [
+      49
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "SEGM_DETECTOR",
+     "type": "SEGM_DETECTOR",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UltralyticsDetectorProvider"
+   },
+   "widgets_values": [
+    "bbox/face_yolov8m.pt"
+   ]
+  },
+  {
+   "id": 32,
+   "type": "SAMLoader",
+   "pos": [
+    30,
+    960
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "SAM_MODEL",
+     "type": "SAM_MODEL",
+     "links": [
+      50
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SAMLoader"
+   },
+   "widgets_values": [
+    "sam_vit_b_01ec64.pth",
+    "AUTO"
+   ]
+  },
+  {
+   "id": 33,
+   "type": "FaceDetailer",
+   "pos": [
+    760,
+    300
+   ],
+   "size": [
+    400,
+    800
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 44
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 45
+    },
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 5
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 46
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 47
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 48
+    },
+    {
+     "name": "bbox_detector",
+     "type": "BBOX_DETECTOR",
+     "link": 49
+    },
+    {
+     "name": "sam_model_opt",
+     "type": "SAM_MODEL",
+     "link": 50
+    },
+    {
+     "name": "segm_detector_opt",
+     "type": "SEGM_DETECTOR",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      51,
+      52
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "cropped_refined",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 1
+    },
+    {
+     "name": "cropped_enhanced_alpha",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 2
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 3
+    },
+    {
+     "name": "detailer_pipe",
+     "type": "DETAILER_PIPE",
+     "links": [],
+     "slot_index": 4
+    },
+    {
+     "name": "cnet_images",
+     "type": "IMAGE",
+     "links": [],
+     "slot_index": 5
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "FaceDetailer"
+   },
+   "widgets_values": [
+    512,
+    true,
+    1024,
+    77770002,
+    "fixed",
+    20,
+    1.0,
+    "euler",
+    "beta",
+    0.45,
+    5,
+    true,
+    true,
+    0.5,
+    10,
+    3.0,
+    "center-1",
+    0,
+    0.93,
+    0,
+    0.7,
+    "False",
+    10,
+    "",
+    1,
+    false,
+    20
+   ],
+   "title": "FaceDetailer \u2014 same identity stack, denoise 0.45"
+  },
+  {
+   "id": 34,
+   "type": "SaveImage",
+   "pos": [
+    1220,
+    300
+   ],
+   "size": [
+    315,
+    290
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 51
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "insane_i2i/02_face_detailed"
+   ],
+   "title": "SAVE 02 \u00b7 face detailed"
+  },
+  {
+   "id": 35,
+   "type": "UpscaleModelLoader",
+   "pos": [
+    760,
+    1180
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
+     "links": [
+      57
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UpscaleModelLoader"
+   },
+   "widgets_values": [
+    "4x-UltraSharp.pth"
+   ]
+  },
+  {
+   "id": 36,
+   "type": "UltimateSDUpscale",
+   "pos": [
+    1220,
+    680
+   ],
+   "size": [
+    340,
+    650
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 52
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 53
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 54
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 55
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 56
+    },
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 57
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      58
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UltimateSDUpscale"
+   },
+   "widgets_values": [
+    2.0,
+    77770002,
+    "fixed",
+    18,
+    1.0,
+    "euler",
+    "beta",
+    0.22,
+    "Linear",
+    1024,
+    1024,
+    8,
+    32,
+    "None",
+    1.0,
+    64,
+    8,
+    16,
+    true,
+    false
+   ],
+   "title": "Ultimate Upscale \u2014 2\u00d7 tiled refine @ 0.22"
+  },
+  {
+   "id": 37,
+   "type": "SaveImage",
+   "pos": [
+    1620,
+    680
+   ],
+   "size": [
+    315,
+    290
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 58
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "Node name for S&R": "SaveImage"
+   },
+   "widgets_values": [
+    "insane_i2i/03_final_upscaled"
+   ],
+   "title": "SAVE 03 \u00b7 FINAL (~6 MP)"
+  },
+  {
+   "id": 38,
+   "type": "Note",
+   "pos": [
+    -1900,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 37,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "INSANE IMAGE-TO-IMAGE \u2014 Flux.1-dev fp8\n\nPIPELINE\ninput \u2192 (depth + canny [+ pose]) via ControlNet Union Pro 2.0\n\u2192 PuLID identity \u2192 img2img KSampler \u2192 FaceDetailer \u2192\n4\u00d7-UltraSharp + 2\u00d7 tiled refine. Saves at every stage:\n01_base / 02_face_detailed / 03_final_upscaled.\n\nQUICK START\n1) Upload input_image.png (composition source) and\n   face_reference.png (clean frontal face of YOUR character).\n2) Positive prompt: describe the RESULT you want, not the input.\n3) The single most important dial \u2014 KSampler DENOISE:\n   0.25\u20130.35  keep structure, change surface (relight/retexture)\n   0.40\u20130.55  balanced re-render (default 0.50)\n   0.60\u20130.75  heavy reimagining; ControlNets hold pose/layout\n4) Queue. Full pipeline \u2248 2\u20133 min on A100 80GB @1.5 MP + 2\u00d7.\n\nNo face reference yet? Bypass (Ctrl+B) the ApplyPulidFlux node \u2014\neverything else runs identically."
+   ],
+   "title": "\u2460 READ ME \u2014 INSANE IMAGE-TO-IMAGE",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 39,
+   "type": "Note",
+   "pos": [
+    -1340,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 38,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "REQUIRED FILES \u2014 download_models.sh fetches everything.\n\ndiffusion_models/flux1-dev-fp8-e4m3fn.safetensors\ntext_encoders/clip_l.safetensors\ntext_encoders/t5xxl_fp8_e4m3fn_scaled.safetensors\nvae/ae.safetensors\ncontrolnet/FLUX.1-dev-ControlNet-Union-Pro-2.0.safetensors\npulid/pulid_flux_v0.9.1.safetensors\ninsightface/models/antelopev2/   (5 onnx files)\nultralytics/bbox/face_yolov8m.pt\nsams/sam_vit_b_01ec64.pth\nupscale_models/4x-UltraSharp.pth\nclip_vision/sigclip_vision_patch14_384.safetensors  (Redux)\nstyle_models/flux1-redux-dev.safetensors  (optional \u00b7 gated \u00b7\n  set WITH_REDUX=true + HF_TOKEN)\n\nEVA-CLIP (PuLID) + DepthAnythingV2 + DWPose weights auto-download\non the first queue \u2014 first run is slower than normal."
+   ],
+   "title": "\u2461 MODELS",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 40,
+   "type": "Note",
+   "pos": [
+    -780,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 39,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "CONTROLNET \u2014 Union Pro 2.0. One model, all modes (canny, soft\nedge, depth, pose, gray). v2.0 removed the mode embedding, so\nNO type-selector node is needed \u2014 the mode is implied by the\ncontrol image you feed each Apply stage.\n\nACTIVE:   DEPTH 0.60/end 0.60 \u00b7 CANNY 0.45/end 0.50\nBYPASSED: POSE stage \u2014 Ctrl+B it ON for people shots where the\n          pose must lock exactly (then consider canny \u2192 0.35).\n\nstrength    = how hard it steers\nend_percent = when it lets go. Releasing control at 0.5\u20130.7\nlets Flux invent clean detail in the final steps \u2014 leaving\ncontrol at 1.0 is the #1 cause of crunchy artifacts.\n\nHigh denoise (>0.6) \u2192 raise strengths ~+0.10.\nStructure-only restyle: depth 0.70/end 0.80, canny bypassed.\nLine-art faithful:      canny 0.60/end 0.70, depth 0.40."
+   ],
+   "title": "\u2462 CONTROL",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 41,
+   "type": "Note",
+   "pos": [
+    -220,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 40,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "PuLID-Flux + optional character LoRA.\n\nPuLID weight: 0.70\u20130.80 subtle \u00b7 0.85 default \u00b7 0.95\u20131.05 max\nlock (too high = pasted-on face that fights relighting).\nstart_at 0.0 / end_at 1.0 default; raise start_at to 0.1\u20130.2 if\nidentity overrides composition too early.\n\nface_reference: sharp, frontal-ish, evenly lit, ONE face,\nface \u2265 512 px. Renders from this same workflow are ideal.\n\nSTRONGEST STACK: character LoRA (un-bypass the LoRA node,\n0.7\u20130.9) for body/hair/overall identity + PuLID at 0.6\u20130.8 for\nthe face lock. Train the LoRA on stills this workflow produces.\n\nNOTE: your PuLID node pack may expose extra widgets (fusion\nmethod etc.) \u2014 defaults are correct; only weight/start/end\nmatter day-to-day.\n\nIdentity tools are for YOUR original character (or people who\nexplicitly consented) \u2014 never for replicating real people."
+   ],
+   "title": "\u2463 IDENTITY",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 42,
+   "type": "Note",
+   "pos": [
+    340,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 41,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "SAMPLER: 28 steps \u00b7 euler/beta \u00b7 FluxGuidance 3.5.\nGuidance 2.5\u20133.0 = softer, more photographic;\n4.0\u20134.5 = stricter prompt adherence, more contrast.\nFlux uses guidance, NOT cfg \u2014 keep KSampler cfg at 1.0 ALWAYS.\n\nFACEDETAILER: auto-detects the face, re-renders it at 1024 px\nwith the SAME identity stack. denoise 0.45 default\n(0.30 gentle fix \u00b7 0.55 full rebuild).\n\nULTIMATE UPSCALE: 4\u00d7-UltraSharp model pass, then 2\u00d7 tiled\nrefine at denoise 0.22 (0.15 safest \u00b7 0.30 adds texture but can\ndrift), 1024 px tiles. Final \u2248 6 MP / ~3000 px wide.\n\nINPUT SIZE: 1.5 MP working resolution (Flux sweet spot 1\u20132 MP).\n\nWORKFLOW RHYTHM: seed \u2192 randomize, queue 4\u20138, pick the winner,\nfix that seed, then tune denoise/weights around it."
+   ],
+   "title": "\u2464 QUALITY LADDER",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 43,
+   "type": "Note",
+   "pos": [
+    900,
+    -680
+   ],
+   "size": [
+    500,
+    560
+   ],
+   "flags": {},
+   "order": 42,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "REDUX = style/vibe transfer from a reference image, applied to\nthe positive conditioning before the ControlNets.\n\nENABLE: un-bypass the REDUX apply node (Ctrl+B) and load\nstyle_reference.png. Requires the gated flux1-redux-dev model\n(WITH_REDUX=true + HF_TOKEN in the pod env).\n\nstrength 0.3\u20130.5 = subtle palette/lighting/mood transfer\nstrength 0.6\u20130.8 = strong look transfer (starts to override\nyour text prompt).\n\nKILLER USE-CASE: lock one hero image's grade + lighting across\nan entire content set \u2014 same character, same look, dozens of\nposes/scenes."
+   ],
+   "title": "\u2465 REDUX STYLE (bypassed)",
+   "color": "#432",
+   "bgcolor": "#653"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   4,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   4,
+   0,
+   27,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   2,
+   0,
+   11,
+   0,
+   "CLIP"
+  ],
+  [
+   4,
+   2,
+   0,
+   12,
+   0,
+   "CLIP"
+  ],
+  [
+   5,
+   2,
+   0,
+   33,
+   2,
+   "CLIP"
+  ],
+  [
+   6,
+   5,
+   0,
+   6,
+   0,
+   "IMAGE"
+  ],
+  [
+   7,
+   6,
+   0,
+   7,
+   0,
+   "IMAGE"
+  ],
+  [
+   8,
+   3,
+   0,
+   7,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   6,
+   0,
+   8,
+   0,
+   "IMAGE"
+  ],
+  [
+   10,
+   6,
+   0,
+   9,
+   0,
+   "IMAGE"
+  ],
+  [
+   11,
+   6,
+   0,
+   10,
+   0,
+   "IMAGE"
+  ],
+  [
+   12,
+   11,
+   0,
+   17,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   13,
+   16,
+   0,
+   17,
+   1,
+   "STYLE_MODEL"
+  ],
+  [
+   14,
+   15,
+   0,
+   17,
+   2,
+   "CLIP_VISION_OUTPUT"
+  ],
+  [
+   15,
+   13,
+   0,
+   15,
+   0,
+   "CLIP_VISION"
+  ],
+  [
+   16,
+   14,
+   0,
+   15,
+   1,
+   "IMAGE"
+  ],
+  [
+   17,
+   17,
+   0,
+   19,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   18,
+   12,
+   0,
+   19,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   19,
+   18,
+   0,
+   19,
+   2,
+   "CONTROL_NET"
+  ],
+  [
+   20,
+   8,
+   0,
+   19,
+   3,
+   "IMAGE"
+  ],
+  [
+   21,
+   3,
+   0,
+   19,
+   4,
+   "VAE"
+  ],
+  [
+   22,
+   19,
+   0,
+   20,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   23,
+   19,
+   1,
+   20,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   24,
+   18,
+   0,
+   20,
+   2,
+   "CONTROL_NET"
+  ],
+  [
+   25,
+   9,
+   0,
+   20,
+   3,
+   "IMAGE"
+  ],
+  [
+   26,
+   3,
+   0,
+   20,
+   4,
+   "VAE"
+  ],
+  [
+   27,
+   20,
+   0,
+   21,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   28,
+   20,
+   1,
+   21,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   29,
+   18,
+   0,
+   21,
+   2,
+   "CONTROL_NET"
+  ],
+  [
+   30,
+   10,
+   0,
+   21,
+   3,
+   "IMAGE"
+  ],
+  [
+   31,
+   3,
+   0,
+   21,
+   4,
+   "VAE"
+  ],
+  [
+   32,
+   21,
+   0,
+   22,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   33,
+   23,
+   0,
+   27,
+   1,
+   "PULIDFLUX"
+  ],
+  [
+   34,
+   24,
+   0,
+   27,
+   2,
+   "EVA_CLIP"
+  ],
+  [
+   35,
+   25,
+   0,
+   27,
+   3,
+   "FACEANALYSIS"
+  ],
+  [
+   36,
+   26,
+   0,
+   27,
+   4,
+   "IMAGE"
+  ],
+  [
+   37,
+   27,
+   0,
+   28,
+   0,
+   "MODEL"
+  ],
+  [
+   38,
+   22,
+   0,
+   28,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   39,
+   21,
+   1,
+   28,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   40,
+   7,
+   0,
+   28,
+   3,
+   "LATENT"
+  ],
+  [
+   41,
+   28,
+   0,
+   29,
+   0,
+   "LATENT"
+  ],
+  [
+   42,
+   3,
+   0,
+   29,
+   1,
+   "VAE"
+  ],
+  [
+   43,
+   29,
+   0,
+   30,
+   0,
+   "IMAGE"
+  ],
+  [
+   44,
+   29,
+   0,
+   33,
+   0,
+   "IMAGE"
+  ],
+  [
+   45,
+   27,
+   0,
+   33,
+   1,
+   "MODEL"
+  ],
+  [
+   46,
+   3,
+   0,
+   33,
+   3,
+   "VAE"
+  ],
+  [
+   47,
+   22,
+   0,
+   33,
+   4,
+   "CONDITIONING"
+  ],
+  [
+   48,
+   21,
+   1,
+   33,
+   5,
+   "CONDITIONING"
+  ],
+  [
+   49,
+   31,
+   0,
+   33,
+   6,
+   "BBOX_DETECTOR"
+  ],
+  [
+   50,
+   32,
+   0,
+   33,
+   7,
+   "SAM_MODEL"
+  ],
+  [
+   51,
+   33,
+   0,
+   34,
+   0,
+   "IMAGE"
+  ],
+  [
+   52,
+   33,
+   0,
+   36,
+   0,
+   "IMAGE"
+  ],
+  [
+   53,
+   27,
+   0,
+   36,
+   1,
+   "MODEL"
+  ],
+  [
+   54,
+   22,
+   0,
+   36,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   55,
+   21,
+   1,
+   36,
+   3,
+   "CONDITIONING"
+  ],
+  [
+   56,
+   3,
+   0,
+   36,
+   4,
+   "VAE"
+  ],
+  [
+   57,
+   35,
+   0,
+   36,
+   5,
+   "UPSCALE_MODEL"
+  ],
+  [
+   58,
+   36,
+   0,
+   37,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 \u00b7 MODELS \u2014 Flux.1-dev fp8 + character LoRA slot",
+   "bounding": [
+    -1940,
+    -40,
+    800,
+    480
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 \u00b7 SOURCE IMAGE \u2192 LATENT",
+   "bounding": [
+    -1940,
+    490,
+    1000,
+    400
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "3 \u00b7 CONTROL PREP",
+   "bounding": [
+    -1560,
+    700,
+    420,
+    620
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "4 \u00b7 PROMPTS",
+   "bounding": [
+    -1150,
+    -40,
+    470,
+    480
+   ],
+   "color": "#b58b2a",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "5 \u00b7 REDUX STYLE (bypassed)",
+   "bounding": [
+    -1940,
+    1260,
+    1130,
+    540
+   ],
+   "color": "#444",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 6,
+   "title": "6 \u00b7 CONTROLNET UNION PRO 2.0",
+   "bounding": [
+    -780,
+    290,
+    480,
+    1020
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 7,
+   "title": "7 \u00b7 IDENTITY \u2014 PuLID-Flux",
+   "bounding": [
+    -780,
+    1320,
+    1170,
+    620
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 8,
+   "title": "8 \u00b7 SAMPLE + BASE OUTPUT",
+   "bounding": [
+    0,
+    230,
+    740,
+    510
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 9,
+   "title": "9 \u00b7 FACE DETECTORS",
+   "bounding": [
+    0,
+    750,
+    400,
+    330
+   ],
+   "color": "#88A",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 10,
+   "title": "10 \u00b7 FACE DETAIL",
+   "bounding": [
+    750,
+    230,
+    820,
+    900
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 11,
+   "title": "11 \u00b7 4\u00d7 UPSCALE + TILED REFINE",
+   "bounding": [
+    750,
+    1150,
+    380,
+    130
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 12,
+   "title": "12 \u00b7 FINAL",
+   "bounding": [
+    1200,
+    640,
+    770,
+    720
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.4,
+   "offset": [
+    2100,
+    900
+   ]
+  }
+ },
+ "version": 0.4
+}
