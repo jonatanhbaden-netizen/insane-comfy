@@ -73,10 +73,26 @@ if [ -n "${JUPYTER_PASSWORD:-}" ]; then
 fi
 
 # --- launch ComfyUI ------------------------------------------------------------
+# --- pick the interpreter that actually owns the ML stack --------------------
+# Some base images ship several pythons; bare `python3` may be a bare system
+# python. The right one is wherever torch lives — probe pip's shebang first,
+# then version-specific candidates.
+PYBIN=""
+PIP_SHEBANG=$(sed -n '1s/^#!//p' "$(command -v pip)" 2>/dev/null)
+for c in "$PIP_SHEBANG" python3.12 python3.11 python3; do
+  if [ -n "$c" ] && command -v "$c" >/dev/null 2>&1 && "$c" -c "import torch" 2>/dev/null; then
+    PYBIN="$c"; break
+  fi
+done
+if [ -z "$PYBIN" ]; then
+  echo "FATAL: no python with torch found"; exit 1
+fi
+echo "using interpreter: $PYBIN ($($PYBIN -V 2>&1))"
+
 AUTO_FLAGS="--preview-method auto"
 # sage attention: enable only on pre-Blackwell GPUs (SageAttention 1.x has no
 # sm_100/sm_120 kernels; Blackwell runs great on default SDPA)
-if python3 -c "
+if "$PYBIN" -c "
 import sys, torch, sageattention
 cc = torch.cuda.get_device_capability()
 sys.exit(0 if cc[0] < 10 else 1)" 2>/dev/null; then
@@ -88,4 +104,4 @@ fi
 
 cd "$COMFY"
 echo "=== starting ComfyUI on :8188 ==="
-exec python3 main.py --listen 0.0.0.0 --port 8188 ${COMFY_ARGS:-$AUTO_FLAGS}
+exec "$PYBIN" main.py --listen 0.0.0.0 --port 8188 ${COMFY_ARGS:-$AUTO_FLAGS}

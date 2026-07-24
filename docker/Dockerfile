@@ -75,6 +75,12 @@ RUN pip install \
         "huggingface_hub[cli,hf_transfer]" \
         sageattention==1.0.6
 
+# Build-time sanity check: the python that pip installs into must be able to
+# import the core stack. Fails the CI build if the env is ever split again.
+RUN PY=$(sed -n '1s/^#!//p' "$(command -v pip)") \
+    && echo "pip's python: $PY" \
+    && $PY -c "import torch, sqlalchemy, yaml, sageattention; print('env OK — torch', torch.__version__)"
+
 COPY docker/extra_model_paths.yaml /ComfyUI/extra_model_paths.yaml
 COPY scripts/download_models.sh /download_models.sh
 COPY workflows /workflows
