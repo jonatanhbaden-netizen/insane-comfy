@@ -104,8 +104,9 @@ if [ "${SKIP_FLUX:-false}" != "true" ]; then
   dl "Kijai/flux-fp8" "flux1-dev-fp8-e4m3fn.safetensors" "$MODELS_DIR/diffusion_models"
   dl "comfyanonymous/flux_text_encoders" "clip_l.safetensors" "$MODELS_DIR/text_encoders"
   dl "comfyanonymous/flux_text_encoders" "t5xxl_fp8_e4m3fn_scaled.safetensors" "$MODELS_DIR/text_encoders"
-  # Flux VAE — pulled from the ungated schnell repo (identical ae.safetensors)
-  dl "black-forest-labs/FLUX.1-schnell" "ae.safetensors" "$MODELS_DIR/vae"
+  # Flux VAE — BFL gated their repos (401 anonymous); Comfy-Org mirror serves
+  # the byte-identical ae.safetensors (335,304,388 bytes) openly
+  dl "Comfy-Org/Lumina_Image_2.0_Repackaged" "split_files/vae/ae.safetensors" "$MODELS_DIR/vae" "ae.safetensors"
 
   echo "=== [4/6] Control + identity stack (~8 GB) ==="
   # One ControlNet, all modes (canny / soft edge / depth / pose / gray),
