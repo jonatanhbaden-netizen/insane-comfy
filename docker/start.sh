@@ -90,16 +90,21 @@ fi
 echo "using interpreter: $PYBIN ($($PYBIN -V 2>&1))"
 
 AUTO_FLAGS="--preview-method auto"
-# sage attention: enable only on pre-Blackwell GPUs (SageAttention 1.x has no
-# sm_100/sm_120 kernels; Blackwell runs great on default SDPA)
+# sage attention: pre-Blackwell GPUs work with sage 1.x (Triton); Blackwell
+# (sm_120) needs SageAttention >= 2.x with compiled kernels.
 if "$PYBIN" -c "
 import sys, torch, sageattention
 cc = torch.cuda.get_device_capability()
-sys.exit(0 if cc[0] < 10 else 1)" 2>/dev/null; then
+try:
+    from importlib.metadata import version
+    major = int(version('sageattention').split('.')[0])
+except Exception:
+    major = 1
+sys.exit(0 if (cc[0] < 10 or major >= 2) else 1)" 2>/dev/null; then
   AUTO_FLAGS="$AUTO_FLAGS --use-sage-attention"
-  echo "sageattention enabled (pre-Blackwell GPU)"
+  echo "sage attention enabled"
 else
-  echo "running with default SDPA attention (Blackwell GPU or sageattention unavailable)"
+  echo "running with default SDPA attention (no compatible sageattention build)"
 fi
 
 cd "$COMFY"

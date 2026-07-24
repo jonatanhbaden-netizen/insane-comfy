@@ -75,6 +75,17 @@ RUN pip install \
         "huggingface_hub[cli,hf_transfer]" \
         sageattention==1.0.6
 
+# SageAttention 2.x built from source with Blackwell (sm_120) kernels —
+# quantized attention, big speedup on long video sequences, visually lossless.
+# Guarded: if the build fails the image still ships (SDPA fallback on
+# Blackwell; sage 1.0.6 above already covers Ampere/Hopper via Triton).
+RUN pip install ninja packaging \
+    && ( git clone --depth 1 https://github.com/thu-ml/SageAttention /tmp/sage \
+         && cd /tmp/sage \
+         && TORCH_CUDA_ARCH_LIST="12.0" MAX_JOBS=2 pip install --no-build-isolation . \
+         || echo "WARN: SageAttention2 build failed — SDPA fallback on Blackwell" ) \
+    && rm -rf /tmp/sage
+
 # Build-time sanity check: the python that pip installs into must be able to
 # import the core stack. Fails the CI build if the env is ever split again.
 RUN PY=$(sed -n '1s/^#!//p' "$(command -v pip)") \
