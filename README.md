@@ -66,13 +66,19 @@ comfyui-runpod/
 
 ### 1. Build & push the image
 
+**CI build (no Docker needed locally):** this repo lives at
+`github.com/jonatanhbaden-netizen/insane-comfy`; every push touching
+`docker/`, `workflows/`, or the model script rebuilds and publishes
+**`ghcr.io/jonatanhbaden-netizen/insane-comfy:1.0`** via
+`.github/workflows/build-image.yml` (also `:latest`).
+
+**Local build (alternative):**
+
 ```bash
 cd comfyui-runpod
-docker build -t YOURUSER/insane-comfy:1.0 -f docker/Dockerfile .
+docker build --platform linux/amd64 -t YOURUSER/insane-comfy:1.0 -f docker/Dockerfile .
 docker push YOURUSER/insane-comfy:1.0
 ```
-
-(Apple Silicon: add `--platform linux/amd64`.)
 
 ### 2. Create the network volume
 
@@ -83,7 +89,15 @@ is not. One volume can back many pods in the same region (scale-out workers).
 
 ### 3. Create the pod template
 
-- **Image:** `YOURUSER/insane-comfy:1.0`
+One command, once you have a RunPod API key (console → Settings → API Keys):
+
+```bash
+RUNPOD_API_KEY=rpa_xxx bash scripts/create_runpod_template.sh
+```
+
+Or manually in the console (My Templates → New Template):
+
+- **Image:** `ghcr.io/jonatanhbaden-netizen/insane-comfy:1.0`
 - **Volume:** attach the network volume at `/workspace`
 - **Expose HTTP ports:** `8188` (ComfyUI), `8888` (Jupyter, optional)
 - **Container disk:** 30 GB
