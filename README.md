@@ -10,12 +10,19 @@ Two production ComfyUI pipelines and the full RunPod environment to run them:
    (Flux.1-dev fp8) with multi-ControlNet (depth + canny + optional pose via
    ControlNet Union Pro 2.0), PuLID-Flux identity lock, optional Redux style
    transfer, FaceDetailer, and 4×-UltraSharp + 2× tiled refine.
+3. **`workflows/aiofm_talking_ltx23.json`** — 9:16 audio-conditioned talking
+   head (LTX-2.3 22B). Photo + voice audio in, vertical talking video out;
+   lipsync comes from the audio latent and the performance from the text
+   prompt, so **no driving video is involved**. See
+   [docs/MAKE_A_VIDEO.md](docs/MAKE_A_VIDEO.md) to use it and
+   [docs/TALKING_HEAD.md](docs/TALKING_HEAD.md) for the full reference.
 
 **Scope note:** this system generates and animates *your own synthetic
-character* (reference images, character LoRA, PuLID on your character's face).
-It deliberately contains no third-party-footage face replacement, no voice
-cloning, and no lipsync. Use motion clips you have rights to; don't point the
-identity tools at real people who haven't consented.
+characters*. Identity comes from your own reference images and character
+LoRAs; the talking-head pipeline is driven by audio you supply for your own
+character, not by cloning a real person's face or voice. Use motion clips you
+have rights to; don't point the identity tools at real people who haven't
+consented.
 
 ## Why Wan 2.2 (July 2026)
 
