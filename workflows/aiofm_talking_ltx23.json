@@ -623,7 +623,7 @@
      },
      {
       "id": 693,
-      "origin_id": 311,
+      "origin_id": 421,
       "origin_slot": 0,
       "target_id": 316,
       "target_slot": 0,
@@ -1076,6 +1076,30 @@
       "target_id": 404,
       "target_slot": 0,
       "type": "IMAGE"
+     },
+     {
+      "id": 920,
+      "origin_id": 311,
+      "origin_slot": 0,
+      "target_id": 421,
+      "target_slot": 0,
+      "type": "LATENT"
+     },
+     {
+      "id": 921,
+      "origin_id": 420,
+      "origin_slot": 0,
+      "target_id": 421,
+      "target_slot": 1,
+      "type": "LATENT_UPSCALE_MODEL"
+     },
+     {
+      "id": 922,
+      "origin_id": 300,
+      "origin_slot": 0,
+      "target_id": 421,
+      "target_slot": 2,
+      "type": "VAE"
      }
     ],
     "name": "AIOFM Talking Head (LTX-2.3)",
@@ -1693,7 +1717,8 @@
         "links": [
          662,
          663,
-         694
+         694,
+         922
         ],
         "name": "",
         "type": "VAE"
@@ -2086,7 +2111,7 @@
       "outputs": [
        {
         "links": [
-         693
+         920
         ],
         "localized_name": "video_latent",
         "name": "video_latent",
@@ -4278,6 +4303,105 @@
       "widgets_values": [
        "## Identity stack (read me)\n\n**Character LoRA** \u2014 bypassed. Un-bypass (Ctrl+B) and set\n`emma_ltx23_v1.safetensors` @ **0.85** once the LTX-2.3 LoRA is\ntrained. Your Wan `F1scher Wan Lora_*_{high,low}_noise` files do\n**NOT** work here \u2014 different architecture.\n\n**IC-LoRA Ingredients** \u2014 bypassed. Only enable for the A/B test.\nIt was trained at **768x448 landscape / 121f / 24fps**, so 1088x1920\nis out of distribution. If you enable it you must also switch the\nprompt to the two-part form:\n`Reference sheet: ... / Generated video: ...`\nand feed a reference-sheet image instead of a single portrait.\n\nNever run both LoRAs above 1.0 at the same time."
       ]
+     },
+     {
+      "id": 420,
+      "type": "LatentUpscaleModelLoader",
+      "pos": [
+       4180,
+       3550
+      ],
+      "flags": {},
+      "mode": 4,
+      "title": "Temporal upscaler x2 (24 -> 48fps)",
+      "order": 0,
+      "inputs": [],
+      "outputs": [
+       {
+        "name": "LATENT_UPSCALE_MODEL",
+        "type": "LATENT_UPSCALE_MODEL",
+        "links": [
+         921
+        ]
+       }
+      ],
+      "properties": {
+       "cnr_id": "comfy-core",
+       "Node name for S&R": "LatentUpscaleModelLoader"
+      },
+      "widgets_values": [
+       "ltx-2.3-temporal-upscaler-x2-1.0.safetensors"
+      ],
+      "color": "#223",
+      "bgcolor": "#335"
+     },
+     {
+      "id": 421,
+      "type": "LTXVLatentUpsampler",
+      "pos": [
+       4180,
+       3670
+      ],
+      "flags": {},
+      "mode": 4,
+      "title": "Temporal upsample (EXPERIMENTAL)",
+      "order": 0,
+      "inputs": [
+       {
+        "name": "samples",
+        "type": "LATENT",
+        "link": 920
+       },
+       {
+        "name": "upscale_model",
+        "type": "LATENT_UPSCALE_MODEL",
+        "link": 921
+       },
+       {
+        "name": "vae",
+        "type": "VAE",
+        "link": 922
+       }
+      ],
+      "outputs": [
+       {
+        "name": "LATENT",
+        "type": "LATENT",
+        "links": [
+         693
+        ]
+       }
+      ],
+      "properties": {
+       "cnr_id": "comfy-core",
+       "Node name for S&R": "LTXVLatentUpsampler"
+      },
+      "widgets_values": [],
+      "color": "#223",
+      "bgcolor": "#335"
+     },
+     {
+      "id": 422,
+      "type": "MarkdownNote",
+      "pos": [
+       4180,
+       3800
+      ],
+      "flags": {},
+      "mode": 0,
+      "order": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "size": [
+       420,
+       210
+      ],
+      "widgets_values": [
+       "## Temporal upscaler \u2014 EXPERIMENTAL, bypassed\n\nDoubles 24 -> 48 fps **in latent space**, which avoids the ghosting\nRIFE produces around fast hands and hair.\n\nTo enable: select BOTH blue nodes above and press Ctrl+B.\n\n**You must also change the fps math**, or the clip plays at half\nspeed: find the `ComfyMathExpression` feeding `CreateVideo.fps`\n(expression `a`) and change it to `a*2`.\n\nUntested \u2014 if it errors or the motion looks wrong, Ctrl+B both\nnodes again to disable and nothing else changes."
+      ],
+      "color": "#432",
+      "bgcolor": "#653"
      }
     ],
     "outputNode": {
@@ -4307,8 +4431,8 @@
     "revision": 0,
     "state": {
      "lastGroupId": 26,
-     "lastLinkId": 910,
-     "lastNodeId": 410,
+     "lastLinkId": 930,
+     "lastNodeId": 422,
      "lastRerouteId": 0
     },
     "version": 1,
@@ -4725,8 +4849,8 @@
  },
  "groups": [],
  "id": "07824bbb-6672-4bb0-ac36-4313a519e35b",
- "last_link_id": 910,
- "last_node_id": 410,
+ "last_link_id": 930,
+ "last_node_id": 422,
  "links": [
   [
    726,
