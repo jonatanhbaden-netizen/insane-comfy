@@ -56,7 +56,8 @@ RUN cd /ComfyUI/custom_nodes \
     && git clone https://github.com/ltdrdata/ComfyUI-Impact-Subpack.git \
     && git clone --recursive https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
     && git clone https://github.com/sipie800/ComfyUI-PuLID-Flux-Enhanced.git \
-    && git clone https://github.com/rgthree/rgthree-comfy.git
+    && git clone https://github.com/rgthree/rgthree-comfy.git \
+    && git clone https://github.com/EllangoK/ComfyUI-post-processing-nodes.git
 
 RUN for d in /ComfyUI/custom_nodes/*/ ; do \
         if [ -f "${d}requirements.txt" ]; then \

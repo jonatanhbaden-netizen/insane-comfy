@@ -16,6 +16,7 @@ runpod_volume:
   clip_vision: clip_vision
   style_models: style_models
   upscale_models: upscale_models
+  latent_upscale_models: latent_upscale_models
   embeddings: embeddings
   pulid: pulid
   insightface: insightface
