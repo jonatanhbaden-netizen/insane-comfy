@@ -143,21 +143,39 @@ fi
 # LTX-2.3 talking-head stack. Every node in aiofm_talking_ltx23.json is
 # comfy-core, so this is weights-only — no custom node pack needed.
 if [ "${SKIP_LTX:-false}" != "true" ]; then
-  echo "=== [LTX-2.3] Audio-conditioned talking-head stack (~53 GB) ==="
+  # RunPod network volumes can be badly contended — EU-NL-1 measured ~9 MB/s in
+  # both directions on 2026-07-27, which made a 29 GB checkpoint take ~50 min to
+  # reach VRAM on every single boot. LTX_LOCAL=true fetches this stack onto the
+  # pod's LOCAL container disk instead (fast NVMe), trading persistence for speed:
+  # it dies with the pod, but re-downloading from HF beats reading a slow volume.
+  # Needs container disk >= 70 GB. extra_model_paths.yaml searches it first.
+  LTX_DIR="$MODELS_DIR"
+  if [ "${LTX_LOCAL:-false}" = "true" ]; then
+    LTX_DIR="${LTX_LOCAL_DIR:-/local-models}"
+    echo "=== [LTX-2.3] using LOCAL disk: $LTX_DIR (LTX_LOCAL=true) ==="
+    mkdir -p "$LTX_DIR"
+    avail_gb=$(df -BG --output=avail "$LTX_DIR" 2>/dev/null | tail -1 | tr -dc '0-9')
+    if [ -n "$avail_gb" ] && [ "$avail_gb" -lt 60 ]; then
+      echo "  !! only ${avail_gb}GB free on $LTX_DIR — need ~55GB."
+      echo "  !! falling back to the network volume. Redeploy with a bigger container disk."
+      LTX_DIR="$MODELS_DIR"
+    fi
+  fi
+  echo "=== [LTX-2.3] Audio-conditioned talking-head stack (~53 GB) -> $LTX_DIR ==="
 
   # 22B transformer. Also carries the video VAE *and* the audio VAE — the
   # LTXVAudioVAELoader node points at this same file, there is no separate
   # audio VAE download.
-  dl "Lightricks/LTX-2.3-fp8" "ltx-2.3-22b-dev-fp8.safetensors" "$MODELS_DIR/checkpoints"
+  dl "Lightricks/LTX-2.3-fp8" "ltx-2.3-22b-dev-fp8.safetensors" "$LTX_DIR/checkpoints"
 
   # Gemma 3 12B text encoder. The official template ships fp4_mixed (9.45 GB);
   # we take fp8_scaled (13.21 GB) instead — prompt adherence is a known weak
   # point of the fp4 quant and we have the VRAM for it.
   dl "Comfy-Org/ltx-2" "split_files/text_encoders/gemma_3_12B_it_fp8_scaled.safetensors" \
-     "$MODELS_DIR/text_encoders"
+     "$LTX_DIR/text_encoders"
 
   # 8-step distillation LoRA — applied at strength 0.5, not 1.0.
-  dl "Lightricks/LTX-2.3" "ltx-2.3-22b-distilled-lora-384.safetensors" "$MODELS_DIR/loras"
+  dl "Lightricks/LTX-2.3" "ltx-2.3-22b-distilled-lora-384.safetensors" "$LTX_DIR/loras"
 
   # Reference-sheet identity LoRA. Trained 768x448 / 121f / 24fps, so it is
   # out-of-distribution at 1088x1920 — bypassed in the workflow by default.
@@ -165,7 +183,7 @@ if [ "${SKIP_LTX:-false}" != "true" ]; then
   # the same HF account, exactly like flux1-redux-dev.
   if [ -n "${HF_TOKEN:-}" ]; then
     dl "Lightricks/LTX-2.3-22b-IC-LoRA-Ingredients" \
-       "ltx-2.3-22b-ic-lora-ingredients-0.9.safetensors" "$MODELS_DIR/loras"
+       "ltx-2.3-22b-ic-lora-ingredients-0.9.safetensors" "$LTX_DIR/loras"
   else
     echo "  — skipping IC-LoRA Ingredients (gated; set HF_TOKEN + accept the"
     echo "    license at hf.co/Lightricks/LTX-2.3-22b-IC-LoRA-Ingredients)."
@@ -174,18 +192,18 @@ if [ "${SKIP_LTX:-false}" != "true" ]; then
 
   # Abliterated LoRA for the built-in Gemma prompt enhancer (TextGenerateLTX2Prompt).
   dl "Comfy-Org/ltx-2" "split_files/loras/gemma-3-12b-it-abliterated_lora_rank64_bf16.safetensors" \
-     "$MODELS_DIR/loras"
+     "$LTX_DIR/loras"
 
   # Latent upscalers. x2 spatial is wired into stage 2 of the workflow;
   # temporal x2 is for the 24 -> 48 fps test (replaces RIFE).
   dl "Lightricks/LTX-2.3" "ltx-2.3-spatial-upscaler-x2-1.1.safetensors" \
-     "$MODELS_DIR/latent_upscale_models"
+     "$LTX_DIR/latent_upscale_models"
   dl "Lightricks/LTX-2.3" "ltx-2.3-temporal-upscaler-x2-1.0.safetensors" \
-     "$MODELS_DIR/latent_upscale_models"
+     "$LTX_DIR/latent_upscale_models"
 
   # Skin/pore texture restore (1x, CC0, 181 KB) — the anti-plastic pass.
   dl "notkenski/upscalers" "1xSkinContrast-High-SuperUltraCompact.pth" \
-     "$MODELS_DIR/upscale_models"
+     "$LTX_DIR/upscale_models"
 fi
 
 # ============================================================================

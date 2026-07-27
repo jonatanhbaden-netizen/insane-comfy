@@ -1,3 +1,17 @@
+# Local container disk, searched FIRST. Only populated when LTX_LOCAL=true,
+# which downloads the LTX-2.3 stack to fast local NVMe instead of the network
+# volume. EU-NL-1's volume measured ~9 MB/s on 2026-07-27, which turned a 29 GB
+# checkpoint into a ~50 min load on every boot. Missing dirs are ignored, so
+# this block is harmless when LTX_LOCAL is unset.
+local_disk:
+  base_path: /local-models
+  checkpoints: checkpoints
+  text_encoders: text_encoders
+  loras: loras
+  latent_upscale_models: latent_upscale_models
+  upscale_models: upscale_models
+  vae: vae
+
 # Maps ComfyUI model folders onto the RunPod network volume so models
 # survive pod restarts and can be shared across pods in the same region.
 runpod_volume:
