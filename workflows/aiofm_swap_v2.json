@@ -1,0 +1,2264 @@
+{
+ "id": "aiofm-swap-v2",
+ "revision": 0,
+ "last_node_id": 90,
+ "last_link_id": 57,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "LoadImage",
+   "pos": [
+    60,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      1
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "REF 1 - SCENE (the image to replicate)",
+   "widgets_values": [
+    "example.png",
+    "image"
+   ],
+   "color": "#232",
+   "bgcolor": "#353",
+   "size": [
+    320,
+    320
+   ]
+  },
+  {
+   "id": 2,
+   "type": "LoadImage",
+   "pos": [
+    60,
+    440
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      10,
+      16,
+      29
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "REF 2 - HER FACE (clean frontal photo of your girl)",
+   "widgets_values": [
+    "example.png",
+    "image"
+   ],
+   "color": "#232",
+   "bgcolor": "#353",
+   "size": [
+    320,
+    320
+   ]
+  },
+  {
+   "id": 3,
+   "type": "LoadImage",
+   "pos": [
+    60,
+    820
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      11,
+      17
+     ]
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "LoadImage"
+   },
+   "title": "REF 3 - OPTIONAL extra ref (unbypass to use)",
+   "widgets_values": [
+    "example.png",
+    "image"
+   ],
+   "color": "#323",
+   "bgcolor": "#535",
+   "size": [
+    320,
+    320
+   ]
+  },
+  {
+   "id": 4,
+   "type": "PrimitiveStringMultiline",
+   "pos": [
+    60,
+    1200
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "links": [
+      12
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PrimitiveStringMultiline"
+   },
+   "title": "EDIT INSTRUCTION (swap + freeform edits)",
+   "widgets_values": [
+    "Replace the woman in image 1 with the woman in image 2. Keep image 1's exact pose, camera angle, framing, clothing, fabric details, accessories, lighting, shadows and background completely unchanged. Only her face, hair, skin tone and body should match the woman in image 2."
+   ],
+   "color": "#432",
+   "bgcolor": "#653",
+   "size": [
+    380,
+    240
+   ]
+  },
+  {
+   "id": 10,
+   "type": "UNETLoader",
+   "pos": [
+    480,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "qwen_image_edit_2511_fp8mixed.safetensors",
+    "default"
+   ]
+  },
+  {
+   "id": 11,
+   "type": "CLIPLoader",
+   "pos": [
+    480,
+    180
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      7,
+      13
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "qwen_2.5_vl_7b_fp8_scaled.safetensors",
+    "qwen_image",
+    "default"
+   ]
+  },
+  {
+   "id": 12,
+   "type": "VAELoader",
+   "pos": [
+    480,
+    300
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      3,
+      8,
+      14,
+      23
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "qwen_image_vae.safetensors"
+   ]
+  },
+  {
+   "id": 13,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    480,
+    400
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      5
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "title": "Qwen Lightning 4-step",
+   "widgets_values": [
+    "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
+    1.0
+   ]
+  },
+  {
+   "id": 14,
+   "type": "ModelSamplingAuraFlow",
+   "pos": [
+    480,
+    520
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      6
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "ModelSamplingAuraFlow"
+   },
+   "widgets_values": [
+    3.1
+   ]
+  },
+  {
+   "id": 15,
+   "type": "CFGNorm",
+   "pos": [
+    480,
+    620
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "patched_model",
+     "type": "MODEL",
+     "links": [
+      18
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "CFGNorm"
+   },
+   "widgets_values": [
+    1.0
+   ]
+  },
+  {
+   "id": 16,
+   "type": "FluxKontextImageScale",
+   "pos": [
+    480,
+    740
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      2,
+      9,
+      15
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "FluxKontextImageScale"
+   },
+   "title": "scale REF 1 to Qwen canvas"
+  },
+  {
+   "id": 17,
+   "type": "VAEEncode",
+   "pos": [
+    480,
+    840
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 2
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      21
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "VAEEncode"
+   },
+   "title": "encode REF 1 as canvas"
+  },
+  {
+   "id": 18,
+   "type": "TextEncodeQwenImageEditPlus",
+   "pos": [
+    840,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 7
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 8,
+     "shape": 7
+    },
+    {
+     "name": "image1",
+     "type": "IMAGE",
+     "link": 9,
+     "shape": 7
+    },
+    {
+     "name": "image2",
+     "type": "IMAGE",
+     "link": 10,
+     "shape": 7
+    },
+    {
+     "name": "image3",
+     "type": "IMAGE",
+     "link": 11,
+     "shape": 7
+    },
+    {
+     "name": "prompt",
+     "type": "STRING",
+     "widget": {
+      "name": "prompt"
+     },
+     "link": 12
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      19
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "TextEncodeQwenImageEditPlus"
+   },
+   "title": "POSITIVE (image1/2/3)",
+   "widgets_values": [
+    ""
+   ]
+  },
+  {
+   "id": 19,
+   "type": "TextEncodeQwenImageEditPlus",
+   "pos": [
+    840,
+    340
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 13
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 14,
+     "shape": 7
+    },
+    {
+     "name": "image1",
+     "type": "IMAGE",
+     "link": 15,
+     "shape": 7
+    },
+    {
+     "name": "image2",
+     "type": "IMAGE",
+     "link": 16,
+     "shape": 7
+    },
+    {
+     "name": "image3",
+     "type": "IMAGE",
+     "link": 17,
+     "shape": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      20
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "TextEncodeQwenImageEditPlus"
+   },
+   "title": "NEGATIVE (leave empty)",
+   "widgets_values": [
+    ""
+   ]
+  },
+  {
+   "id": 20,
+   "type": "KSampler",
+   "pos": [
+    1200,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 18
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 19
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 20
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 21
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      22
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "KSampler"
+   },
+   "title": "Qwen edit sampler",
+   "widgets_values": [
+    123456789,
+    "randomize",
+    4,
+    1.0,
+    "euler",
+    "simple",
+    1.0
+   ]
+  },
+  {
+   "id": 21,
+   "type": "VAEDecode",
+   "pos": [
+    1200,
+    300
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 22
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 23
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      24,
+      33
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "decode swap"
+  },
+  {
+   "id": 22,
+   "type": "PreviewImage",
+   "pos": [
+    1200,
+    400
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 24
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PreviewImage"
+   },
+   "title": "PHASE 1 - Qwen swap (judge identity HERE first)",
+   "size": [
+    300,
+    340
+   ]
+  },
+  {
+   "id": 30,
+   "type": "UNETLoader",
+   "pos": [
+    480,
+    1100
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      25,
+      45
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "flux1-dev-fp8-e4m3fn.safetensors",
+    "fp8_e4m3fn"
+   ]
+  },
+  {
+   "id": 31,
+   "type": "DualCLIPLoader",
+   "pos": [
+    480,
+    1220
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      30,
+      31,
+      35,
+      42
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "DualCLIPLoader"
+   },
+   "widgets_values": [
+    "clip_l.safetensors",
+    "t5xxl_fp8_e4m3fn_scaled.safetensors",
+    "flux",
+    "default"
+   ]
+  },
+  {
+   "id": 32,
+   "type": "VAELoader",
+   "pos": [
+    480,
+    1360
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      36,
+      48
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "ae.safetensors"
+   ]
+  },
+  {
+   "id": 33,
+   "type": "PulidFluxModelLoader",
+   "pos": [
+    840,
+    1100
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "PULIDFLUX",
+     "type": "PULIDFLUX",
+     "links": [
+      26
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PulidFluxModelLoader"
+   },
+   "widgets_values": [
+    "pulid_flux_v0.9.1.safetensors"
+   ]
+  },
+  {
+   "id": 34,
+   "type": "PulidFluxEvaClipLoader",
+   "pos": [
+    840,
+    1200
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "EVA_CLIP",
+     "type": "EVA_CLIP",
+     "links": [
+      27
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PulidFluxEvaClipLoader"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 35,
+   "type": "PulidFluxInsightFaceLoader",
+   "pos": [
+    840,
+    1290
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "FACEANALYSIS",
+     "type": "FACEANALYSIS",
+     "links": [
+      28
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PulidFluxInsightFaceLoader"
+   },
+   "widgets_values": [
+    "CUDA"
+   ]
+  },
+  {
+   "id": 36,
+   "type": "ApplyPulidFlux",
+   "pos": [
+    1200,
+    1100
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 25
+    },
+    {
+     "name": "pulid_flux",
+     "type": "PULIDFLUX",
+     "link": 26
+    },
+    {
+     "name": "eva_clip",
+     "type": "EVA_CLIP",
+     "link": 27
+    },
+    {
+     "name": "face_analysis",
+     "type": "FACEANALYSIS",
+     "link": 28
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 29
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      34
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "ApplyPulidFlux"
+   },
+   "title": "PuLID - her identity from REF 2",
+   "widgets_values": [
+    0.9,
+    0.0,
+    1.0,
+    "mean",
+    1.0,
+    0.0,
+    1000,
+    true
+   ]
+  },
+  {
+   "id": 37,
+   "type": "CLIPTextEncode",
+   "pos": [
+    840,
+    1400
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 30
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      32
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "face positive",
+   "widgets_values": [
+    "close-up photograph of a woman's face, natural realistic skin with visible pores and fine texture, faint freckles, detailed natural eyes, photorealistic, soft natural light, unretouched"
+   ]
+  },
+  {
+   "id": 38,
+   "type": "CLIPTextEncode",
+   "pos": [
+    840,
+    1540
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 31
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      38,
+      47
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "face negative",
+   "widgets_values": [
+    "cgi, 3d render, airbrushed, plastic skin, waxy, doll, oversmoothed"
+   ]
+  },
+  {
+   "id": 39,
+   "type": "FluxGuidance",
+   "pos": [
+    1200,
+    1400
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      37
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "FluxGuidance"
+   },
+   "widgets_values": [
+    3.5
+   ]
+  },
+  {
+   "id": 40,
+   "type": "UltralyticsDetectorProvider",
+   "pos": [
+    480,
+    1500
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "BBOX_DETECTOR",
+     "type": "BBOX_DETECTOR",
+     "links": [
+      39
+     ]
+    },
+    {
+     "name": "SEGM_DETECTOR",
+     "type": "SEGM_DETECTOR",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UltralyticsDetectorProvider"
+   },
+   "widgets_values": [
+    "bbox/face_yolov8m.pt"
+   ]
+  },
+  {
+   "id": 41,
+   "type": "SAMLoader",
+   "pos": [
+    480,
+    1620
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "SAM_MODEL",
+     "type": "SAM_MODEL",
+     "links": [
+      40
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "SAMLoader"
+   },
+   "widgets_values": [
+    "sam_vit_b_01ec64.pth",
+    "AUTO"
+   ]
+  },
+  {
+   "id": 42,
+   "type": "FaceDetailer",
+   "pos": [
+    1560,
+    1100
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 33
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 34
+    },
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 35
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 36
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 37
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 38
+    },
+    {
+     "name": "bbox_detector",
+     "type": "BBOX_DETECTOR",
+     "link": 39
+    },
+    {
+     "name": "sam_model_opt",
+     "type": "SAM_MODEL",
+     "link": 40,
+     "shape": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      41,
+      44
+     ]
+    },
+    {
+     "name": "cropped_refined",
+     "type": "IMAGE",
+     "links": []
+    },
+    {
+     "name": "cropped_enhanced_alpha",
+     "type": "IMAGE",
+     "links": []
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "links": []
+    },
+    {
+     "name": "detailer_pipe",
+     "type": "DETAILER_PIPE",
+     "links": []
+    },
+    {
+     "name": "cnet_images",
+     "type": "IMAGE",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "FaceDetailer"
+   },
+   "title": "PHASE 2 - identity lock (face mask only)",
+   "widgets_values": [
+    768,
+    true,
+    1024,
+    0,
+    "randomize",
+    20,
+    1.0,
+    "euler",
+    "beta",
+    0.42,
+    8,
+    true,
+    true,
+    0.5,
+    10,
+    3.0,
+    "center-1",
+    0,
+    0.93,
+    0,
+    0.7,
+    "False",
+    10,
+    "",
+    1,
+    false,
+    20,
+    false,
+    false
+   ],
+   "size": [
+    340,
+    700
+   ]
+  },
+  {
+   "id": 43,
+   "type": "PreviewImage",
+   "pos": [
+    1560,
+    1860
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 41
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PreviewImage"
+   },
+   "title": "PHASE 2 result",
+   "size": [
+    300,
+    340
+   ]
+  },
+  {
+   "id": 50,
+   "type": "UpscaleModelLoader",
+   "pos": [
+    1960,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
+     "links": [
+      49
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UpscaleModelLoader"
+   },
+   "widgets_values": [
+    "4x-UltraSharp.pth"
+   ]
+  },
+  {
+   "id": 52,
+   "type": "CLIPTextEncode",
+   "pos": [
+    1960,
+    180
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 42
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      43
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "title": "tile positive",
+   "widgets_values": [
+    "photorealistic photograph, natural unretouched skin with visible pores, fine fabric and lace texture, sharp detail, natural lighting"
+   ]
+  },
+  {
+   "id": 53,
+   "type": "FluxGuidance",
+   "pos": [
+    1960,
+    320
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "conditioning",
+     "type": "CONDITIONING",
+     "link": 43
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      46
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "FluxGuidance"
+   },
+   "widgets_values": [
+    3.0
+   ]
+  },
+  {
+   "id": 51,
+   "type": "UltimateSDUpscale",
+   "pos": [
+    2300,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 44
+    },
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 45
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 46
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 47
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 48
+    },
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 49
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      51,
+      52,
+      54
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UltimateSDUpscale"
+   },
+   "title": "PHASE 3 - 2x tiled refine (denoise LOW = safe)",
+   "widgets_values": [
+    2.0,
+    987654321,
+    "randomize",
+    12,
+    1.0,
+    "euler",
+    "beta",
+    0.16,
+    "Linear",
+    1024,
+    1024,
+    8,
+    32,
+    "Half Tile",
+    0.2,
+    64,
+    8,
+    16,
+    true,
+    false,
+    1
+   ],
+   "size": [
+    340,
+    620
+   ]
+  },
+  {
+   "id": 57,
+   "type": "UpscaleModelLoader",
+   "pos": [
+    2300,
+    740
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
+     "links": [
+      50
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "UpscaleModelLoader"
+   },
+   "title": "optional skin contrast (teeth caveat)",
+   "widgets_values": [
+    "1xSkinContrast-High-SuperUltraCompact.pth"
+   ]
+  },
+  {
+   "id": 58,
+   "type": "ImageUpscaleWithModel",
+   "pos": [
+    2300,
+    860
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 50
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 51
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "ImageUpscaleWithModel"
+   },
+   "title": "optional skin pass"
+  },
+  {
+   "id": 55,
+   "type": "FilmGrain",
+   "pos": [
+    2700,
+    60
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 52
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      53
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "ComfyUI-post-processing-nodes",
+    "Node name for S&R": "FilmGrain"
+   },
+   "title": "phone-camera grain",
+   "widgets_values": [
+    0.04,
+    12,
+    0,
+    0
+   ]
+  },
+  {
+   "id": 56,
+   "type": "SaveImage",
+   "pos": [
+    2700,
+    220
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 53
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "FINAL",
+   "widgets_values": [
+    "AIOFM_swap"
+   ],
+   "size": [
+    340,
+    420
+   ]
+  },
+  {
+   "id": 59,
+   "type": "SeedVR2LoadDiTModel",
+   "pos": [
+    2700,
+    700
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "torch_compile_args",
+     "type": "TORCH_COMPILE_ARGS",
+     "link": null,
+     "shape": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "SEEDVR2_DIT",
+     "type": "SEEDVR2_DIT",
+     "links": [
+      55
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "seedvr2_videoupscaler",
+    "Node name for S&R": "SeedVR2LoadDiTModel"
+   },
+   "title": "optional 4K - SeedVR2 DiT",
+   "widgets_values": [
+    "seedvr2_ema_7b_sharp_fp8_e4m3fn_mixed_block35_fp16.safetensors",
+    "cuda:0",
+    0,
+    false,
+    "cpu",
+    false,
+    "sdpa"
+   ]
+  },
+  {
+   "id": 60,
+   "type": "SeedVR2LoadVAEModel",
+   "pos": [
+    2700,
+    860
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "torch_compile_args",
+     "type": "TORCH_COMPILE_ARGS",
+     "link": null,
+     "shape": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "SEEDVR2_VAE",
+     "type": "SEEDVR2_VAE",
+     "links": [
+      56
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "seedvr2_videoupscaler",
+    "Node name for S&R": "SeedVR2LoadVAEModel"
+   },
+   "title": "optional 4K - SeedVR2 VAE",
+   "widgets_values": [
+    "ema_vae_fp16.safetensors",
+    "cuda:0",
+    true,
+    1280,
+    128,
+    true,
+    1280,
+    128,
+    "false",
+    "cpu",
+    false
+   ]
+  },
+  {
+   "id": 61,
+   "type": "SeedVR2VideoUpscaler",
+   "pos": [
+    3060,
+    700
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 54
+    },
+    {
+     "name": "dit",
+     "type": "SEEDVR2_DIT",
+     "link": 55
+    },
+    {
+     "name": "vae",
+     "type": "SEEDVR2_VAE",
+     "link": 56
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      57
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "seedvr2_videoupscaler",
+    "Node name for S&R": "SeedVR2VideoUpscaler"
+   },
+   "title": "optional 4K upscale (unbypass all three)",
+   "widgets_values": [
+    9527,
+    "fixed",
+    2160,
+    0,
+    1,
+    false,
+    "lab",
+    0,
+    0,
+    0,
+    0,
+    "cpu",
+    true
+   ]
+  },
+  {
+   "id": 62,
+   "type": "SaveImage",
+   "pos": [
+    3060,
+    900
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 57
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "SaveImage"
+   },
+   "title": "FINAL 4K",
+   "widgets_values": [
+    "AIOFM_swap_4k"
+   ]
+  },
+  {
+   "id": 90,
+   "type": "MarkdownNote",
+   "pos": [
+    60,
+    1500
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "size": [
+    380,
+    560
+   ],
+   "widgets_values": [
+    "# AIOFM Swap v2 \u2014 how it works\n\n**Phase 1 (Qwen)** does the swap. Identity comes from the\nPHOTO in REF 2 \u2014 no LoRA needed. Freeform edits go in the\ninstruction box, Nano-Banana style: append lines like\n\"Change the lighting to warm sunset\" or \"Make her sit up\nslightly\". Judge the PHASE 1 preview FIRST \u2014 if identity or\ncomposition is wrong there, fix REF 2 / the instruction\nbefore blaming later phases.\n\n**Phase 2 (PuLID FaceDetailer)** re-renders ONLY the face\nregion with Flux + her photo. Background cannot change \u2014\nit is outside the mask. Face not hers enough \u2192 raise PuLID\nweight 0.9\u21921.0 or FaceDetailer denoise 0.42\u21920.5. Face too\n\"pasted on\" \u2192 lower denoise to 0.35.\n\n**Phase 3 (USDU 2x)** adds texture at denoise 0.16 \u2014 too low\nto change anything. Raise to 0.2 max. Grain last.\n\n**Optional (Ctrl+B to enable):** REF 3 extra reference \u00b7\nskin-contrast pass (can yellow teeth) \u00b7 SeedVR2 4K.\n\nWire order stays: judge phase 1 \u2192 phase 2 \u2192 final."
+   ]
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   16,
+   0,
+   "IMAGE"
+  ],
+  [
+   2,
+   16,
+   0,
+   17,
+   0,
+   "IMAGE"
+  ],
+  [
+   3,
+   12,
+   0,
+   17,
+   1,
+   "VAE"
+  ],
+  [
+   4,
+   10,
+   0,
+   13,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   13,
+   0,
+   14,
+   0,
+   "MODEL"
+  ],
+  [
+   6,
+   14,
+   0,
+   15,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   11,
+   0,
+   18,
+   0,
+   "CLIP"
+  ],
+  [
+   8,
+   12,
+   0,
+   18,
+   1,
+   "VAE"
+  ],
+  [
+   9,
+   16,
+   0,
+   18,
+   2,
+   "IMAGE"
+  ],
+  [
+   10,
+   2,
+   0,
+   18,
+   3,
+   "IMAGE"
+  ],
+  [
+   11,
+   3,
+   0,
+   18,
+   4,
+   "IMAGE"
+  ],
+  [
+   12,
+   4,
+   0,
+   18,
+   5,
+   "STRING"
+  ],
+  [
+   13,
+   11,
+   0,
+   19,
+   0,
+   "CLIP"
+  ],
+  [
+   14,
+   12,
+   0,
+   19,
+   1,
+   "VAE"
+  ],
+  [
+   15,
+   16,
+   0,
+   19,
+   2,
+   "IMAGE"
+  ],
+  [
+   16,
+   2,
+   0,
+   19,
+   3,
+   "IMAGE"
+  ],
+  [
+   17,
+   3,
+   0,
+   19,
+   4,
+   "IMAGE"
+  ],
+  [
+   18,
+   15,
+   0,
+   20,
+   0,
+   "MODEL"
+  ],
+  [
+   19,
+   18,
+   0,
+   20,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   20,
+   19,
+   0,
+   20,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   21,
+   17,
+   0,
+   20,
+   3,
+   "LATENT"
+  ],
+  [
+   22,
+   20,
+   0,
+   21,
+   0,
+   "LATENT"
+  ],
+  [
+   23,
+   12,
+   0,
+   21,
+   1,
+   "VAE"
+  ],
+  [
+   24,
+   21,
+   0,
+   22,
+   0,
+   "IMAGE"
+  ],
+  [
+   25,
+   30,
+   0,
+   36,
+   0,
+   "MODEL"
+  ],
+  [
+   26,
+   33,
+   0,
+   36,
+   1,
+   "PULIDFLUX"
+  ],
+  [
+   27,
+   34,
+   0,
+   36,
+   2,
+   "EVA_CLIP"
+  ],
+  [
+   28,
+   35,
+   0,
+   36,
+   3,
+   "FACEANALYSIS"
+  ],
+  [
+   29,
+   2,
+   0,
+   36,
+   4,
+   "IMAGE"
+  ],
+  [
+   30,
+   31,
+   0,
+   37,
+   0,
+   "CLIP"
+  ],
+  [
+   31,
+   31,
+   0,
+   38,
+   0,
+   "CLIP"
+  ],
+  [
+   32,
+   37,
+   0,
+   39,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   33,
+   21,
+   0,
+   42,
+   0,
+   "IMAGE"
+  ],
+  [
+   34,
+   36,
+   0,
+   42,
+   1,
+   "MODEL"
+  ],
+  [
+   35,
+   31,
+   0,
+   42,
+   2,
+   "CLIP"
+  ],
+  [
+   36,
+   32,
+   0,
+   42,
+   3,
+   "VAE"
+  ],
+  [
+   37,
+   39,
+   0,
+   42,
+   4,
+   "CONDITIONING"
+  ],
+  [
+   38,
+   38,
+   0,
+   42,
+   5,
+   "CONDITIONING"
+  ],
+  [
+   39,
+   40,
+   0,
+   42,
+   6,
+   "BBOX_DETECTOR"
+  ],
+  [
+   40,
+   41,
+   0,
+   42,
+   7,
+   "SAM_MODEL"
+  ],
+  [
+   41,
+   42,
+   0,
+   43,
+   0,
+   "IMAGE"
+  ],
+  [
+   42,
+   31,
+   0,
+   52,
+   0,
+   "CLIP"
+  ],
+  [
+   43,
+   52,
+   0,
+   53,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   44,
+   42,
+   0,
+   51,
+   0,
+   "IMAGE"
+  ],
+  [
+   45,
+   30,
+   0,
+   51,
+   1,
+   "MODEL"
+  ],
+  [
+   46,
+   53,
+   0,
+   51,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   47,
+   38,
+   0,
+   51,
+   3,
+   "CONDITIONING"
+  ],
+  [
+   48,
+   32,
+   0,
+   51,
+   4,
+   "VAE"
+  ],
+  [
+   49,
+   50,
+   0,
+   51,
+   5,
+   "UPSCALE_MODEL"
+  ],
+  [
+   50,
+   57,
+   0,
+   58,
+   0,
+   "UPSCALE_MODEL"
+  ],
+  [
+   51,
+   51,
+   0,
+   58,
+   1,
+   "IMAGE"
+  ],
+  [
+   52,
+   51,
+   0,
+   55,
+   0,
+   "IMAGE"
+  ],
+  [
+   53,
+   55,
+   0,
+   56,
+   0,
+   "IMAGE"
+  ],
+  [
+   54,
+   51,
+   0,
+   61,
+   0,
+   "IMAGE"
+  ],
+  [
+   55,
+   59,
+   0,
+   61,
+   1,
+   "SEEDVR2_DIT"
+  ],
+  [
+   56,
+   60,
+   0,
+   61,
+   2,
+   "SEEDVR2_VAE"
+  ],
+  [
+   57,
+   61,
+   0,
+   62,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "INPUTS",
+   "bounding": [
+    40,
+    0,
+    400,
+    1480
+   ],
+   "color": "#3f5159",
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "PHASE 1 - QWEN SWAP",
+   "bounding": [
+    460,
+    0,
+    1080,
+    1000
+   ],
+   "color": "#88A",
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "PHASE 2 - IDENTITY LOCK (masked)",
+   "bounding": [
+    460,
+    1040,
+    1480,
+    1200
+   ],
+   "color": "#8A8",
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "PHASE 3 - DETAIL + UPSCALE + FINISH",
+   "bounding": [
+    1940,
+    0,
+    1500,
+    1000
+   ],
+   "color": "#A88",
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}
