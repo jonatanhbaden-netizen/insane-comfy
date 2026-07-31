@@ -108,5 +108,16 @@ else
 fi
 
 cd "$COMFY"
+# PuLID-Flux-Enhanced hardcodes /ComfyUI/models/insightface (ignores
+# extra_model_paths). Mirror antelopev2 from the volume into the container
+# path so the InsightFace loader finds it. cp not ln: container-local NVMe
+# loads ~100x faster than the volume.
+if [ -d /workspace/models/insightface/models/antelopev2 ] \
+   && [ ! -e /ComfyUI/models/insightface/models/antelopev2 ]; then
+  mkdir -p /ComfyUI/models/insightface/models
+  cp -r /workspace/models/insightface/models/antelopev2 \
+        /ComfyUI/models/insightface/models/ || true
+fi
+
 echo "=== starting ComfyUI on :8188 ==="
 exec "$PYBIN" main.py --listen 0.0.0.0 --port 8188 ${COMFY_ARGS:-$AUTO_FLAGS}
