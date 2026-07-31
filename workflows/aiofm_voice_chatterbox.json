@@ -1,0 +1,321 @@
+{
+ "id": "aiofm-voice",
+ "revision": 0,
+ "last_node_id": 20,
+ "last_link_id": 10,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "LoadAudio",
+   "pos": [
+    80,
+    80
+   ],
+   "size": [
+    360,
+    140
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "title": "GIRL VOICE REFERENCE (10-30s clean speech)",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "AUDIO",
+     "type": "AUDIO",
+     "links": [
+      1
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "LoadAudio"
+   },
+   "widgets_values": [
+    "emma_voice_ref.wav",
+    null,
+    null
+   ],
+   "color": "#232",
+   "bgcolor": "#353"
+  },
+  {
+   "id": 2,
+   "type": "ChatterBoxEngineNode",
+   "pos": [
+    80,
+    300
+   ],
+   "size": [
+    270,
+    178
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "TTS_engine",
+     "type": "TTS_ENGINE",
+     "links": [
+      2
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "tts_audio_suite",
+    "ver": "ee95cad1f155eceb1442723c7f351949b30361e3",
+    "Node name for S&R": "ChatterBoxEngineNode"
+   },
+   "widgets_values": [
+    "Norwegian",
+    "auto",
+    0.5,
+    0.5,
+    0.8,
+    ""
+   ],
+   "color": "#223",
+   "bgcolor": "#335",
+   "title": "Chatterbox engine \u2014 SET LANGUAGE HERE"
+  },
+  {
+   "id": 3,
+   "type": "PrimitiveStringMultiline",
+   "pos": [
+    80,
+    560
+   ],
+   "size": [
+    420,
+    260
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "title": "SCRIPT \u2014 what she says",
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "STRING",
+     "type": "STRING",
+     "links": [
+      3
+     ]
+    }
+   ],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PrimitiveStringMultiline"
+   },
+   "widgets_values": [
+    "Hei! Okay, jeg m\u00e5 bare fortelle deg hva som skjedde i morges, for jeg klarer fortsatt ikke \u00e5 tro det."
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 4,
+   "type": "UnifiedTTSTextNode",
+   "pos": [
+    560,
+    300
+   ],
+   "size": [
+    400,
+    324
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "TTS_engine",
+     "type": "TTS_ENGINE",
+     "link": 2
+    },
+    {
+     "name": "opt_narrator",
+     "shape": 7,
+     "type": "*",
+     "link": 1
+    },
+    {
+     "name": "text",
+     "type": "STRING",
+     "widget": {
+      "name": "text"
+     },
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "links": [
+      4,
+      5
+     ]
+    },
+    {
+     "name": "generation_info",
+     "type": "STRING",
+     "links": []
+    }
+   ],
+   "properties": {
+    "cnr_id": "tts_audio_suite",
+    "ver": "ee95cad1f155eceb1442723c7f351949b30361e3",
+    "Node name for S&R": "UnifiedTTSTextNode"
+   },
+   "widgets_values": [
+    "Hello! This is unified TTS with character switching support.\n[Alice] Hi there! I'm Alice speaking with the selected TTS engine.\n[Bob] And I'm Bob! This works with any TTS engine.\nBack to the main narrator voice for the conclusion.",
+    "none",
+    1552347952,
+    "fixed",
+    true,
+    400,
+    "auto",
+    100,
+    true,
+    0
+   ],
+   "color": "#223",
+   "bgcolor": "#335",
+   "title": "TTS \u2014 zero-shot clone of the reference"
+  },
+  {
+   "id": 5,
+   "type": "SaveAudio",
+   "pos": [
+    1020,
+    300
+   ],
+   "size": [
+    340,
+    120
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 4
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "SaveAudio"
+   },
+   "widgets_values": [
+    "audio/AIOFM_voice"
+   ],
+   "color": "#222",
+   "bgcolor": "#000"
+  },
+  {
+   "id": 6,
+   "type": "PreviewAudio",
+   "pos": [
+    1020,
+    470
+   ],
+   "size": [
+    340,
+    110
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": 5
+    }
+   ],
+   "outputs": [],
+   "properties": {
+    "cnr_id": "comfy-core",
+    "Node name for S&R": "PreviewAudio"
+   },
+   "widgets_values": []
+  },
+  {
+   "id": 7,
+   "type": "MarkdownNote",
+   "pos": [
+    560,
+    620
+   ],
+   "size": [
+    460,
+    420
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "# AIOFM Voice \u2014 per girl\n\n**One reference file per girl, forever.** Put 10\u201330s of clean speech in\nComfyUI's input folder and select it in the reference node:\n`emma_voice_ref.wav`, `sofia_voice_ref.wav`, ...\nSame reference every run = same voice every run. That IS her voice.\n\n**Language** is set on the engine node: Norwegian / English / German \u2014\nmatch the script's language, it does not auto-detect reliably.\n\n**Dials** (engine node): `exaggeration` 0.5 default \u2014 raise toward 0.7\nfor more emotion; `cfg_weight` 0.5 \u2014 lower to ~0.3 if pacing sounds\nrushed vs the reference.\n\n**Text under ~21 chars can crash Chatterbox** (known bug \u2014 the suite\npads automatically, but don't feed it one-word scripts).\n\nOutput lands in `output/audio/`. Feed it straight into the talking-head\nworkflow's LoadAudio \u2014 same pod, no round-trip.\nFirst run downloads the Chatterbox Multilingual model automatically."
+   ],
+   "color": "#432",
+   "bgcolor": "#653"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   4,
+   1,
+   "AUDIO"
+  ],
+  [
+   2,
+   2,
+   0,
+   4,
+   0,
+   "TTS_ENGINE"
+  ],
+  [
+   3,
+   3,
+   0,
+   4,
+   2,
+   "STRING"
+  ],
+  [
+   4,
+   4,
+   0,
+   5,
+   0,
+   "AUDIO"
+  ],
+  [
+   5,
+   4,
+   0,
+   6,
+   0,
+   "AUDIO"
+  ]
+ ],
+ "groups": [],
+ "config": {},
+ "extra": {},
+ "version": 0.4
+}

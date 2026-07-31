@@ -71,7 +71,8 @@ RUN cd /ComfyUI/custom_nodes \
     && git clone https://github.com/erosDiffusion/ComfyUI-EulerDiscreteScheduler.git \
     && git clone https://github.com/PGCRT/CRT-Nodes.git \
     && git clone https://github.com/MONKEYFOREVER2/ComfyUI-CameraForensicRealism.git \
-    && git clone https://github.com/MONKEYFOREVER2/comfyui-advanced-denoiser.git
+    && git clone https://github.com/MONKEYFOREVER2/comfyui-advanced-denoiser.git \
+    && git clone https://github.com/diodiogod/TTS-Audio-Suite.git
 
 RUN for d in /ComfyUI/custom_nodes/*/ ; do \
         if [ -f "${d}requirements.txt" ]; then \
