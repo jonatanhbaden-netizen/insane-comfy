@@ -3142,7 +3142,7 @@
    ],
    "flags": {},
    "order": 72,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "image",
@@ -3280,7 +3280,7 @@
    ],
    "flags": {},
    "order": 77,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "image",
@@ -3864,7 +3864,7 @@
    ],
    "flags": {},
    "order": 68,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "model",
@@ -4333,7 +4333,7 @@
    ],
    "flags": {},
    "order": 66,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "bbox_detector",
@@ -4614,7 +4614,7 @@
    },
    "color": "#332",
    "bgcolor": "#553",
-   "title": "REF 2 - CLOTHING (optional)",
+   "title": "REF 2 - HER FACE (photo of your girl)",
    "widgets_values": [
     "example.png",
     "image"
@@ -4933,7 +4933,7 @@
    "bgcolor": "#653",
    "title": "EDIT INSTRUCTION - write what to change",
    "widgets_values": [
-    "Replace the woman in image 1 with a different woman, keeping the exact same pose, camera angle, framing, clothing, lighting and background. Keep everything else in image 1 identical."
+    "Replace the woman in image 1 with the woman in image 2. Keep image 1's exact pose, camera angle, framing, clothing, lighting and background completely unchanged. Only her face, hair and body should match the woman in image 2."
    ]
   },
   {
