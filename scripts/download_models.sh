@@ -16,7 +16,15 @@
 # ============================================================================
 set -uo pipefail
 
-MODELS_DIR="${MODELS_DIR:-/workspace/models}"
+# MODELS_LOCAL=true -> everything downloads to the pod's LOCAL NVMe instead of
+# the network volume. Measured 2026-07-31: HF->local 451-829 MB/s vs HF->volume
+# 9-13 MB/s. Full stack lands in ~5-8 min per boot. Needs container disk >=150GB.
+# The volume then only carries LoRAs/outputs (extra_model_paths searches both).
+if [ "${MODELS_LOCAL:-false}" = "true" ]; then
+  MODELS_DIR="${MODELS_DIR:-/local-models}"
+else
+  MODELS_DIR="${MODELS_DIR:-/workspace/models}"
+fi
 export HF_HUB_ENABLE_HF_TRANSFER="${HF_HUB_ENABLE_HF_TRANSFER:-1}"
 
 # hf (new) vs huggingface-cli (old) — use whichever exists

@@ -1,0 +1,107 @@
+{
+  "_readme": [
+    "Library of action beats. Timings are FRACTIONS of clip length (0.0-1.0) so the",
+    "same preset works on a 5s or a 15s clip - build_prompt.py converts them to",
+    "seconds for whatever audio you give it.",
+    "",
+    "When a render comes out well, add its action line here with a name. That is how",
+    "this gets better: you stop re-inventing prompts and start reusing proven ones.",
+    "",
+    "'beats' = [fraction, text]. Keep text as a physical action, not an emotion."
+  ],
+
+  "presets": {
+    "talking_about_outfit": {
+      "use_for": "describing what she's wearing, hauls, outfit checks",
+      "beats": [
+        [0.00, "hands resting in her lap"],
+        [0.22, "she glances down at her top and pinches the fabric between two fingers"],
+        [0.40, "she looks back up at the camera and lets the fabric go"],
+        [0.62, "she runs her hand down her side once, quickly"],
+        [0.85, "her hand settles back into her lap"]
+      ]
+    },
+
+    "excited_news": {
+      "use_for": "sharing something exciting, fast energetic delivery",
+      "beats": [
+        [0.00, "both hands raised loosely near her chest"],
+        [0.18, "she gestures quickly with both hands, palms turning outward"],
+        [0.45, "she breaks into a short genuine laugh and tilts her head to one side"],
+        [0.68, "one hand comes up to cover her mouth briefly, then drops"],
+        [0.88, "she shakes her head slightly, still smiling"]
+      ]
+    },
+
+    "casual_story": {
+      "use_for": "telling a story, relaxed conversational pace",
+      "beats": [
+        [0.00, "one hand on her thigh, the other loose"],
+        [0.20, "she brushes her hair behind her ear"],
+        [0.42, "she turns her palm upward and moves her hand in small circles as she explains"],
+        [0.65, "she glances away briefly as if remembering, then back to the camera"],
+        [0.85, "her hand lowers and she leans back a little"]
+      ]
+    },
+
+    "listing_things": {
+      "use_for": "counting off points, listing items, step-by-step",
+      "beats": [
+        [0.00, "one hand raised near her chest, fingers relaxed"],
+        [0.15, "she extends one finger as she starts the first point"],
+        [0.38, "she extends a second finger, tilting her head"],
+        [0.60, "she extends a third finger and pauses"],
+        [0.82, "she lowers her hand and shrugs one shoulder slightly"]
+      ]
+    },
+
+    "intimate_close": {
+      "use_for": "quiet, direct, leaning-in delivery",
+      "beats": [
+        [0.00, "hands out of frame, shoulders relaxed"],
+        [0.25, "she leans slightly closer to the camera"],
+        [0.48, "she bites her lower lip briefly and glances down, then up"],
+        [0.70, "she tucks her hair behind one ear slowly"],
+        [0.90, "she settles back, holding eye contact with the camera"]
+      ]
+    },
+
+    "asking_question": {
+      "use_for": "asking the viewer something, inviting a reply",
+      "beats": [
+        [0.00, "hands loose in her lap"],
+        [0.25, "she tilts her head and raises her eyebrows"],
+        [0.50, "she opens one palm toward the camera as she asks"],
+        [0.72, "she shrugs both shoulders lightly"],
+        [0.88, "she holds still, waiting, with a small smile"]
+      ]
+    },
+
+    "minimal": {
+      "use_for": "safest option - almost no gesture, best identity retention",
+      "beats": [
+        [0.00, "hands out of frame, still"],
+        [0.35, "she tilts her head slightly to one side"],
+        [0.70, "she blinks and shifts her shoulders as she breathes"]
+      ]
+    }
+  },
+
+  "scenes": {
+    "car_passenger": "sitting in the passenger seat of a moving car, panoramic glass sunroof overhead with bright cloudy sky, green trees passing outside the side window, soft natural daylight from above",
+    "car_parked": "sitting in the driver's seat of a parked car, soft overcast daylight through the windscreen, blurred street visible behind her",
+    "bedroom": "sitting on the edge of a bed in a bright bedroom, soft window light from the left, white duvet and a plant behind her",
+    "kitchen": "standing in a kitchen leaning against the counter, warm afternoon light, out-of-focus cupboards behind her",
+    "bathroom_mirror": "standing in front of a bathroom mirror, bright even light from above, tiled wall behind her",
+    "gym": "standing in a gym, mirrored wall and equipment out of focus behind her, bright overhead light"
+  },
+
+  "ambience": {
+    "car_passenger": "low engine rumble and faint road noise",
+    "car_parked": "faint traffic outside, quiet cabin",
+    "bedroom": "faint room tone",
+    "kitchen": "faint room tone and distant household sounds",
+    "bathroom_mirror": "slight room echo",
+    "gym": "distant gym noise and faint music"
+  }
+}
