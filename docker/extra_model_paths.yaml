@@ -9,23 +9,13 @@ local_disk:
   diffusion_models: |
     diffusion_models
     unet
-  text_encoders: |
-    text_encoders
-    clip
-  vae: vae
+  text_encoders: text_encoders
   loras: loras
+  latent_upscale_models: latent_upscale_models
+  upscale_models: upscale_models
+  vae: vae
   controlnet: controlnet
   clip_vision: clip_vision
-  style_models: style_models
-  upscale_models: upscale_models
-  latent_upscale_models: latent_upscale_models
-  embeddings: embeddings
-  pulid: pulid
-  insightface: insightface
-  ultralytics: ultralytics
-  ultralytics_bbox: ultralytics/bbox
-  ultralytics_segm: ultralytics/segm
-  sams: sams
 
 # Maps ComfyUI model folders onto the RunPod network volume so models
 # survive pod restarts and can be shared across pods in the same region.
