@@ -156,7 +156,7 @@
    },
    "title": "EDIT INSTRUCTION (swap + freeform edits)",
    "widgets_values": [
-    "Replace the woman in image 1 with the woman in image 2. Keep image 1's exact pose, camera angle, framing, clothing, fabric details, accessories, lighting, shadows and background completely unchanged. Only her face, hair, skin tone and body should match the woman in image 2."
+    "Replace only the face of the woman in image 1 with the face of the woman in image 2. Keep her hair, body, pose, hands, clothing, jewelry, lighting and the entire background exactly identical to image 1. Only the facial identity changes."
    ],
    "color": "#432",
    "bgcolor": "#653",
@@ -906,7 +906,7 @@
    },
    "title": "PuLID - her identity from REF 2",
    "widgets_values": [
-    0.9,
+    0.8,
     0.0,
     1.0,
     "mean",
@@ -1092,7 +1092,7 @@
    ],
    "flags": {},
    "order": 0,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "image",
@@ -1186,7 +1186,7 @@
     1.0,
     "euler",
     "beta",
-    0.42,
+    0.3,
     8,
     true,
     true,
@@ -1346,7 +1346,7 @@
    ],
    "flags": {},
    "order": 0,
-   "mode": 0,
+   "mode": 4,
    "inputs": [
     {
      "name": "image",
@@ -1403,7 +1403,7 @@
     1.0,
     "euler",
     "beta",
-    0.16,
+    0.12,
     "Linear",
     1024,
     1024,
@@ -1746,7 +1746,7 @@
     560
    ],
    "widgets_values": [
-    "# AIOFM Swap v2 \u2014 how it works\n\n**Phase 1 (Qwen)** does the swap. Identity comes from the\nPHOTO in REF 2 \u2014 no LoRA needed. Freeform edits go in the\ninstruction box, Nano-Banana style: append lines like\n\"Change the lighting to warm sunset\" or \"Make her sit up\nslightly\". Judge the PHASE 1 preview FIRST \u2014 if identity or\ncomposition is wrong there, fix REF 2 / the instruction\nbefore blaming later phases.\n\n**Phase 2 (PuLID FaceDetailer)** re-renders ONLY the face\nregion with Flux + her photo. Background cannot change \u2014\nit is outside the mask. Face not hers enough \u2192 raise PuLID\nweight 0.9\u21921.0 or FaceDetailer denoise 0.42\u21920.5. Face too\n\"pasted on\" \u2192 lower denoise to 0.35.\n\n**Phase 3 (USDU 2x)** adds texture at denoise 0.16 \u2014 too low\nto change anything. Raise to 0.2 max. Grain last.\n\n**Optional (Ctrl+B to enable):** REF 3 extra reference \u00b7\nskin-contrast pass (can yellow teeth) \u00b7 SeedVR2 4K.\n\nWire order stays: judge phase 1 \u2192 phase 2 \u2192 final."
+    "# AIOFM Swap v2.1 \u2014 read this\n\n**Phase 1 IS the product.** First live run proved Qwen nails the\nswap on its own; the polish phases degraded it (painted hair =\n4x-UltraSharp on AI images, waxy face = PuLID re-rendering an\nalready-correct face). So Phases 2 and 3 now ship BYPASSED.\n\nDefault instruction = face-only swap (keeps her hair/body/pose/\nclothing from REF 1). For a full person swap, say \"Replace the\nwoman in image 1 with the woman in image 2...\" instead.\n\nEnable Phase 2 (Ctrl+B the FaceDetailer) ONLY if Phase 1's face\nisn't her enough \u2014 now gentler: PuLID 0.8, denoise 0.30.\nEnable Phase 3 only for print-size needs; prefer the SeedVR2\ngroup for upscaling photos \u2014 it doesn't paint.\n\nFreeform edits: append sentences to the instruction box."
    ]
   }
  ],
