@@ -207,6 +207,39 @@ if [ "${SKIP_LTX:-false}" != "true" ]; then
 fi
 
 # ============================================================================
+# Qwen-Image-Edit 2511 — the multi-reference front-end of
+# workflows/aiofm_i2i_qwen_zimage.json. Composes scene/clothing/background from
+# up to three reference images; the Z-Image pipeline downstream then applies the
+# character LoRA and all the realism passes.
+#
+# NOT included here: z_image_turbo, qwen_3_4b, ultraflux VAE, the character
+# LoRA, the detailer YOLO/SAM weights, SeedVR2 and the LUTs. Those came from
+# wherever that workflow was built and have to be copied across — see
+# docs/IMAGE_PIPELINE.md.
+if [ "${SKIP_QWEN_EDIT:-false}" != "true" ]; then
+  QWEN_DIR="$MODELS_DIR"
+  if [ "${LTX_LOCAL:-false}" = "true" ]; then
+    QWEN_DIR="${LTX_LOCAL_DIR:-/local-models}"   # same slow-volume workaround
+  fi
+  echo "=== [Qwen-Edit] Multi-reference image editing (~30 GB) -> $QWEN_DIR ==="
+
+  dl "Comfy-Org/Qwen-Image-Edit_ComfyUI" \
+     "split_files/diffusion_models/qwen_image_edit_2511_fp8mixed.safetensors" \
+     "$QWEN_DIR/diffusion_models"
+
+  dl "Comfy-Org/HunyuanVideo_1.5_repackaged" \
+     "split_files/text_encoders/qwen_2.5_vl_7b_fp8_scaled.safetensors" \
+     "$QWEN_DIR/text_encoders"
+
+  dl "Comfy-Org/Qwen-Image_ComfyUI" \
+     "split_files/vae/qwen_image_vae.safetensors" "$QWEN_DIR/vae"
+
+  # 4-step distill — the workflow runs the sampler at 4 steps / cfg 1 with this
+  dl "lightx2v/Qwen-Image-Edit-2511-Lightning" \
+     "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors" "$QWEN_DIR/loras"
+fi
+
+# ============================================================================
 echo "=== [6/6] Notes on auto-downloaded weights ==="
 echo "  • DWPose (yolox_l.onnx + dw-ll torchscript) and DepthAnythingV2 download"
 echo "    on first use into /workspace/model_cache/ctrl_aux (persisted)."

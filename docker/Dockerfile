@@ -44,6 +44,10 @@ RUN git clone https://github.com/comfyanonymous/ComfyUI.git /ComfyUI \
 #   UltimateSDUpscale — tiled refine upscale
 #   PuLID-Flux-Enhanced — Flux identity adapter
 #   rgthree          — QoL (progress, groups muting)
+#
+# Second block (RES4LYF onward) is what workflows/aiofm_i2i_qwen_zimage.json
+# needs — ClownsharKSampler, SeedVR2, the post-processing chain, detailer
+# helpers. Without these that workflow loads as a wall of red nodes.
 # ---------------------------------------------------------------------------
 RUN cd /ComfyUI/custom_nodes \
     && git clone https://github.com/ltdrdata/ComfyUI-Manager.git \
@@ -57,7 +61,17 @@ RUN cd /ComfyUI/custom_nodes \
     && git clone --recursive https://github.com/ssitu/ComfyUI_UltimateSDUpscale.git \
     && git clone https://github.com/sipie800/ComfyUI-PuLID-Flux-Enhanced.git \
     && git clone https://github.com/rgthree/rgthree-comfy.git \
-    && git clone https://github.com/EllangoK/ComfyUI-post-processing-nodes.git
+    && git clone https://github.com/EllangoK/ComfyUI-post-processing-nodes.git \
+    && git clone https://github.com/ClownsharkBatwing/RES4LYF.git \
+    && git clone https://github.com/cubiq/ComfyUI_essentials.git \
+    && git clone https://github.com/chrisgoringe/cg-use-everywhere.git \
+    && git clone https://github.com/lquesada/ComfyUI-Inpaint-CropAndStitch.git \
+    && git clone https://github.com/djbielejeski/a-person-mask-generator.git \
+    && git clone https://github.com/numz/ComfyUI-SeedVR2_VideoUpscaler.git \
+    && git clone https://github.com/erosDiffusion/ComfyUI-EulerDiscreteScheduler.git \
+    && git clone https://github.com/PGCRT/CRT-Nodes.git \
+    && git clone https://github.com/MONKEYFOREVER2/ComfyUI-CameraForensicRealism.git \
+    && git clone https://github.com/MONKEYFOREVER2/comfyui-advanced-denoiser.git
 
 RUN for d in /ComfyUI/custom_nodes/*/ ; do \
         if [ -f "${d}requirements.txt" ]; then \
