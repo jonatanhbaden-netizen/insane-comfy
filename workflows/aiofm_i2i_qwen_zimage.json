@@ -4220,7 +4220,7 @@
     }
    },
    "widgets_values": [
-    "M1sa with blonde hair is lying on soft, cream-colored bedding in a close, slightly tilted selfie taken from above. Her blonde hair is loosely gathered back, with wispy strands falling around her forehead and temples, giving the image a relaxed bedroom look. The bedding behind her has a plush, textured surface that fills most of the background and keeps the focus close on her face and upper body.\n\nShe is wearing a simple black spaghetti-strap top with thin straps over her shoulders.\n\nHer pose is reclined, with her head resting against the bedding and her face angled slightly toward the camera. Her expression is playful and casual, with her lips pursed as if mid-sentence or making a small pout. The lighting is bright, soft, and natural-looking, creating a warm glow across her face and shoulders while keeping the overall image cozy and intimate."
+    "f1scher, a photorealistic photograph of a woman, natural unretouched skin with visible pores and fine texture, faint freckles, subtle uneven skin tone, natural window light, shot on a phone camera, sharp focus on the face"
    ],
    "color": "#222",
    "bgcolor": "#000"
@@ -8068,7 +8068,7 @@
        1,
        "euler",
        "beta",
-       0.6,
+       0.25,
        false,
        512
       ],
@@ -8171,7 +8171,7 @@
        "widget_ue_connectable": {}
       },
       "widgets_values": [
-       3,
+       1.5,
        5,
        "",
        "simple",
@@ -8255,7 +8255,7 @@
       "widgets_values": [
        239009292808370,
        "randomize",
-       0.3
+       0.15
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -9392,7 +9392,7 @@
       "widgets_values": [
        237923216324550,
        "randomize",
-       0.4
+       0.15
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -9663,7 +9663,7 @@
        "beta57",
        9,
        9,
-       0.5,
+       0.22,
        1,
        237923216324550,
        "randomize",
@@ -10033,7 +10033,7 @@
       "widgets_values": [
        149866802828158,
        "randomize",
-       0.2
+       0.15
       ],
       "color": "#222",
       "bgcolor": "#000"
@@ -10672,7 +10672,7 @@
        "beta57",
        9,
        9,
-       0.5,
+       0.18,
        1,
        149866802828158,
        "randomize",
