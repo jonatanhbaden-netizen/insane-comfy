@@ -240,6 +240,37 @@ if [ "${SKIP_QWEN_EDIT:-false}" != "true" ]; then
 fi
 
 # ============================================================================
+# Z-Image backbone for workflows/aiofm_i2i_qwen_zimage.json — makes the image
+# pipeline fully self-hosted (no dependency on the developer's 62 GB template).
+#
+# Substitution: the workflow's "Load UltraFlux VAE" wants ultraflux.safetensors
+# (a private Flux-VAE finetune). Z-Image uses the standard Flux VAE, and
+# ae.safetensors is already fetched by the Flux section — select it in that
+# node's dropdown. Ask the developer for ultraflux if you want the exact match.
+#
+# Cannot be scripted (private / Civitai-only) — get from the developer:
+#   M1sam1sa_000003500.safetensors  <- the character LoRA, REQUIRED for identity
+#   Eyeful_v2-Paired.pt, nipple.pt, pussyV2.pt, phone_v01.pt,
+#   cyberrealisticXL_v100.safetensors, the .cube LUT
+# The breast/pussy/phone detailer groups ship BYPASSED in the workflow, so only
+# the eye-detailer group needs bypassing (Ctrl+B) until Eyeful_v2 arrives.
+# SeedVR2 weights auto-download on first use of that node.
+if [ "${SKIP_ZIMAGE:-false}" != "true" ]; then
+  echo "=== [Z-Image] i2i backbone (~19.5 GB) ==="
+  dl "Comfy-Org/z_image_turbo" \
+     "split_files/diffusion_models/z_image_turbo_bf16.safetensors" \
+     "$MODELS_DIR/diffusion_models"
+  dl "Comfy-Org/z_image_turbo" \
+     "split_files/text_encoders/qwen_3_4b.safetensors" \
+     "$MODELS_DIR/text_encoders"
+  dl "tianweiy/DMD2" "dmd2_sdxl_4step_lora_fp16.safetensors" "$MODELS_DIR/loras"
+  dl "Bingsu/adetailer" "hand_yolov8n.pt" "$MODELS_DIR/ultralytics/bbox"
+  dl "Bingsu/adetailer" "person_yolov8m-seg.pt" "$MODELS_DIR/ultralytics/segm"
+  dl_url "https://dl.fbaipublicfiles.com/segment_anything/sam_vit_l_0b3195.pth" \
+         "$MODELS_DIR/sams" "sam_vit_l_0b3195.pth"
+fi
+
+# ============================================================================
 echo "=== [6/6] Notes on auto-downloaded weights ==="
 echo "  • DWPose (yolox_l.onnx + dw-ll torchscript) and DepthAnythingV2 download"
 echo "    on first use into /workspace/model_cache/ctrl_aux (persisted)."
