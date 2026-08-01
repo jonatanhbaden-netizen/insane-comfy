@@ -1,5 +1,5 @@
 {
- "last_node_id": 93,
+ "last_node_id": 94,
  "last_link_id": 57,
  "nodes": [
   {
@@ -1638,7 +1638,7 @@
      "name": "image",
      "type": "IMAGE",
      "links": [
-      50
+      51
      ],
      "slot_index": 0
     }
@@ -1653,7 +1653,7 @@
   },
   {
    "id": 90,
-   "type": "SeedVR2LoadDiTModel",
+   "type": "UpscaleModelLoader",
    "pos": [
     2240,
     220
@@ -1668,32 +1668,25 @@
    "inputs": [],
    "outputs": [
     {
-     "name": "SEEDVR2_DIT",
-     "type": "SEEDVR2_DIT",
+     "name": "UPSCALE_MODEL",
+     "type": "UPSCALE_MODEL",
      "links": [
-      51
+      50
      ],
      "slot_index": 0
     }
    ],
    "properties": {
-    "Node name for S&R": "SeedVR2LoadDiTModel"
+    "Node name for S&R": "UpscaleModelLoader"
    },
    "widgets_values": [
-    "seedvr2_ema_3b_fp8_e4m3fn.safetensors",
-    "cuda:0",
-    0,
-    false,
-    "none",
-    false,
-    "sdpa",
-    null
+    "4x-UltraSharp.pth"
    ],
-   "title": "[finish] SeedVR2 DiT"
+   "title": "[finish] 4x-UltraSharp"
   },
   {
-   "id": 91,
-   "type": "SeedVR2LoadVAEModel",
+   "id": 92,
+   "type": "ImageUpscaleWithModel",
    "pos": [
     2240,
     320
@@ -1705,11 +1698,22 @@
    "flags": {},
    "order": 38,
    "mode": 0,
-   "inputs": [],
+   "inputs": [
+    {
+     "name": "upscale_model",
+     "type": "UPSCALE_MODEL",
+     "link": 50
+    },
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 51
+    }
+   ],
    "outputs": [
     {
-     "name": "SEEDVR2_VAE",
-     "type": "SEEDVR2_VAE",
+     "name": "IMAGE",
+     "type": "IMAGE",
      "links": [
       52
      ],
@@ -1717,34 +1721,21 @@
     }
    ],
    "properties": {
-    "Node name for S&R": "SeedVR2LoadVAEModel"
+    "Node name for S&R": "ImageUpscaleWithModel"
    },
-   "widgets_values": [
-    "ema_vae_fp16.safetensors",
-    "cuda:0",
-    false,
-    1024,
-    128,
-    false,
-    1024,
-    128,
-    "false",
-    "none",
-    false,
-    null
-   ],
-   "title": "[finish] SeedVR2 VAE"
+   "widgets_values": [],
+   "title": "\u25c6 4x model upscale"
   },
   {
-   "id": 92,
-   "type": "SeedVR2VideoUpscaler",
+   "id": 94,
+   "type": "ImageScaleToTotalPixels",
    "pos": [
     2240,
     420
    ],
    "size": [
-    340,
-    220
+    270,
+    100
    ],
    "flags": {},
    "order": 39,
@@ -1753,16 +1744,6 @@
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 50
-    },
-    {
-     "name": "dit",
-     "type": "SEEDVR2_DIT",
-     "link": 51
-    },
-    {
-     "name": "vae",
-     "type": "SEEDVR2_VAE",
      "link": 52
     }
    ],
@@ -1777,25 +1758,14 @@
     }
    ],
    "properties": {
-    "Node name for S&R": "SeedVR2VideoUpscaler"
+    "Node name for S&R": "ImageScaleToTotalPixels"
    },
    "widgets_values": [
-    42,
-    1088,
-    0,
-    1,
-    false,
-    "lab",
-    0,
-    0,
-    0.0,
-    0.0,
-    "cpu",
-    false
+    "lanczos",
+    2.1,
+    1
    ],
-   "title": "\u25c6 upscale to delivery res",
-   "color": "#232",
-   "bgcolor": "#353"
+   "title": "fit to delivery ~2.1MP"
   },
   {
    "id": 93,
@@ -2379,31 +2349,31 @@
   ],
   [
    50,
+   90,
+   0,
+   92,
+   0,
+   "UPSCALE_MODEL"
+  ],
+  [
+   51,
    50,
    0,
    92,
+   1,
+   "IMAGE"
+  ],
+  [
+   52,
+   92,
+   0,
+   94,
    0,
    "IMAGE"
   ],
   [
-   51,
-   90,
-   0,
-   92,
-   1,
-   "SEEDVR2_DIT"
-  ],
-  [
-   52,
-   91,
-   0,
-   92,
-   2,
-   "SEEDVR2_VAE"
-  ],
-  [
    53,
-   92,
+   94,
    0,
    93,
    0,

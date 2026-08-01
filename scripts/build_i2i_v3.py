@@ -39,11 +39,11 @@ LINK_TYPES = {
 # Nodes whose UI widget list does not match the object_info input list.
 # ComfyUI's frontend injects extra widgets for these.
 WIDGET_QUIRKS = {
-    # a seed INT is always followed by a control_after_generate combo
-    "KSampler": lambda vals: [vals[0], "fixed"] + vals[1:],
     # LoadImage gets an upload-button widget after the filename combo
     "LoadImage": lambda vals: vals + ["image"],
 }
+# The frontend injects a control_after_generate combo after ANY widget named
+# "seed" — applied generically in _widget_values, not per node class.
 
 GREEN = ("#232", "#353")
 BLUE = ("#223", "#335")
@@ -107,7 +107,17 @@ class Graph:
                 default = self._default(n["type"], name)
                 vals.append(default)
         quirk = WIDGET_QUIRKS.get(n["type"])
-        return quirk(vals) if quirk else vals
+        if quirk:
+            vals = quirk(vals)
+        # generic seed quirk: insert control_after_generate after each seed widget
+        out = []
+        widget_names = [name for name, t, w in self._inputs_in_order(n["type"])
+                        if w and name not in n["links"]]
+        for i, v in enumerate(vals):
+            out.append(v)
+            if i < len(widget_names) and widget_names[i] == "seed":
+                out.append("fixed")
+        return out
 
     def _default(self, ntype, name):
         spec = self.oi[ntype]["input"]
@@ -118,6 +128,9 @@ class Graph:
                 extra = s[1] if len(s) > 1 and isinstance(s[1], dict) else {}
                 if "default" in extra:
                     return extra["default"]
+                if t == "COMBO":
+                    opts = extra.get("options") or [""]
+                    return opts[0]
                 if isinstance(t, list):
                     return t[0] if t else ""
                 return {"STRING": "", "INT": 0, "FLOAT": 0.0, "BOOLEAN": False}.get(t, None)
@@ -475,17 +488,16 @@ def build(oi, lora_name, trigger):
           pos=(2240, 80), size=[340, 90], color=GREEN,
           links={"stitcher": (23, "stitcher"), "inpainted_image": (42, 0)})
 
-    g.add(90, "SeedVR2LoadDiTModel", title="[finish] SeedVR2 DiT", pos=(2240, 220),
-          widgets={"model": "seedvr2_ema_3b_fp8_e4m3fn.safetensors"})
-    g.add(91, "SeedVR2LoadVAEModel", title="[finish] SeedVR2 VAE", pos=(2240, 320))
-    g.add(92, "SeedVR2VideoUpscaler", title="◆ upscale to delivery res",
-          pos=(2240, 420), size=[340, 220], color=GREEN,
-          widgets={"seed": 42, "resolution": 1088, "max_resolution": 0,
-                   "batch_size": 1, "color_correction": "lab"},
-          links={"image": (50, 0), "dit": (90, 0), "vae": (91, 0)})
+    g.add(90, "UpscaleModelLoader", title="[finish] 4x-UltraSharp", pos=(2240, 220),
+          widgets={"model_name": "4x-UltraSharp.pth"})
+    g.add(92, "ImageUpscaleWithModel", title="◆ 4x model upscale", pos=(2240, 320),
+          links={"upscale_model": (90, 0), "image": (50, 0)})
+    g.add(94, "ImageScaleToTotalPixels", title="fit to delivery ~2.1MP", pos=(2240, 420),
+          widgets={"upscale_method": "lanczos", "megapixels": 2.1, "resolution_steps": 1},
+          links={"image": (92, 0)})
     g.add(93, "FilmGrain", title="[finish] grain", pos=(2240, 680),
           widgets={"intensity": 0.02, "scale": 10.0, "temperature": 0.0, "vignette": 0.0},
-          links={"image": (92, 0)})
+          links={"image": (94, 0)})
     g.add(51, "SaveImage", title="FINAL", pos=(2240, 780), size=[340, 300], color=GREEN,
           widgets={"filename_prefix": "AIOFM_i2i_v3"}, links={"images": (93, 0)})
 
