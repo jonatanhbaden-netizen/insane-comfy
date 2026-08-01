@@ -460,8 +460,20 @@ def build(oi, lora_name, trigger):
           links={"model": (15, 0), "positive": (16, 0), "negative": (17, 0),
                  "latent_image": (33, 0)})
 
-    g.add(32, "VAEDecode", title="latent → pixels", pos=(1350, 500),
-          links={"samples": (31, 0), "vae": (12, 0)})
+    g.add(34, "ModelSamplingAuraFlow", title="[polish] base model shift", pos=(1350, 470),
+          widgets={"shift": 3.0}, links={"model": (10, 0)})
+    g.add(35, "CFGNorm", title="[polish] cfg norm", pos=(1350, 540),
+          widgets={"strength": 1.0}, links={"model": (34, 0)})
+    g.add(36, "SetLatentNoiseMask", title="[polish] same region", pos=(1350, 610),
+          links={"samples": (31, 0), "mask": (25, 0)})
+    g.add(37, "KSampler", title="◆ POLISH — melt LoRA skin artifacts (no LoRA)",
+          pos=(1350, 680), size=[340, 240], color=BLUE,
+          widgets={"seed": 7, "steps": 8, "cfg": 1.0, "sampler_name": "euler",
+                   "scheduler": "simple", "denoise": 0.15},
+          links={"model": (35, 0), "positive": (16, 0), "negative": (17, 0),
+                 "latent_image": (36, 0)})
+    g.add(32, "VAEDecode", title="latent → pixels", pos=(1350, 960),
+          links={"samples": (37, 0), "vae": (12, 0)})
 
     # ---------------------------------------------------------- 5 HARMONISE
     # Steals the scene's white balance and skin tone off the untouched crop.

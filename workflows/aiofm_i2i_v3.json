@@ -1,6 +1,6 @@
 {
  "last_node_id": 94,
- "last_link_id": 57,
+ "last_link_id": 65,
  "nodes": [
   {
    "id": 1,
@@ -747,7 +747,8 @@
      "name": "MODEL",
      "type": "MODEL",
      "links": [
-      20
+      20,
+      40
      ],
      "slot_index": 0
     }
@@ -818,7 +819,7 @@
      "type": "VAE",
      "links": [
       33,
-      41
+      49
      ],
      "slot_index": 0
     }
@@ -983,7 +984,8 @@
      "name": "CONDITIONING",
      "type": "CONDITIONING",
      "links": [
-      37
+      37,
+      45
      ],
      "slot_index": 0
     }
@@ -1025,7 +1027,8 @@
      "name": "CONDITIONING",
      "type": "CONDITIONING",
      "links": [
-      38
+      38,
+      46
      ],
      "slot_index": 0
     }
@@ -1114,7 +1117,7 @@
      "name": "stitcher",
      "type": "STITCHER",
      "links": [
-      48
+      56
      ],
      "slot_index": 0
     },
@@ -1124,9 +1127,9 @@
      "links": [
       30,
       32,
-      42,
-      45,
-      55
+      50,
+      53,
+      63
      ],
      "slot_index": 1
     },
@@ -1244,7 +1247,8 @@
      "type": "MASK",
      "links": [
       35,
-      47
+      43,
+      55
      ],
      "slot_index": 0
     },
@@ -1397,7 +1401,7 @@
      "name": "LATENT",
      "type": "LATENT",
      "links": [
-      40
+      42
      ],
      "slot_index": 0
     }
@@ -1419,11 +1423,11 @@
    "bgcolor": "#535"
   },
   {
-   "id": 32,
-   "type": "VAEDecode",
+   "id": 34,
+   "type": "ModelSamplingAuraFlow",
    "pos": [
     1350,
-    500
+    470
    ],
    "size": [
     270,
@@ -1434,14 +1438,197 @@
    "mode": 0,
    "inputs": [
     {
+     "name": "model",
+     "type": "MODEL",
+     "link": 40
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      41
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingAuraFlow"
+   },
+   "widgets_values": [
+    3.0
+   ],
+   "title": "[polish] base model shift"
+  },
+  {
+   "id": 35,
+   "type": "CFGNorm",
+   "pos": [
+    1350,
+    540
+   ],
+   "size": [
+    270,
+    100
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 41
+    }
+   ],
+   "outputs": [
+    {
+     "name": "patched_model",
+     "type": "MODEL",
+     "links": [
+      44
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CFGNorm"
+   },
+   "widgets_values": [
+    1.0,
+    false
+   ],
+   "title": "[polish] cfg norm"
+  },
+  {
+   "id": 36,
+   "type": "SetLatentNoiseMask",
+   "pos": [
+    1350,
+    610
+   ],
+   "size": [
+    270,
+    100
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [
+    {
      "name": "samples",
      "type": "LATENT",
-     "link": 40
+     "link": 42
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 43
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      47
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "SetLatentNoiseMask"
+   },
+   "widgets_values": [],
+   "title": "[polish] same region"
+  },
+  {
+   "id": 37,
+   "type": "KSampler",
+   "pos": [
+    1350,
+    680
+   ],
+   "size": [
+    340,
+    240
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 44
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 45
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 46
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 47
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      48
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSampler"
+   },
+   "widgets_values": [
+    7,
+    "fixed",
+    8,
+    1.0,
+    "euler",
+    "simple",
+    0.15
+   ],
+   "title": "\u25c6 POLISH \u2014 melt LoRA skin artifacts (no LoRA)",
+   "color": "#223",
+   "bgcolor": "#335"
+  },
+  {
+   "id": 32,
+   "type": "VAEDecode",
+   "pos": [
+    1350,
+    960
+   ],
+   "size": [
+    270,
+    100
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 48
     },
     {
      "name": "vae",
      "type": "VAE",
-     "link": 41
+     "link": 49
     }
    ],
    "outputs": [
@@ -1449,8 +1636,8 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      43,
-      56
+      51,
+      64
      ],
      "slot_index": 0
     }
@@ -1473,18 +1660,18 @@
     140
    ],
    "flags": {},
-   "order": 33,
+   "order": 37,
    "mode": 0,
    "inputs": [
     {
      "name": "image_ref",
      "type": "IMAGE",
-     "link": 42
+     "link": 50
     },
     {
      "name": "image_target",
      "type": "IMAGE",
-     "link": 43
+     "link": 51
     }
    ],
    "outputs": [
@@ -1492,7 +1679,7 @@
      "name": "image",
      "type": "IMAGE",
      "links": [
-      44
+      52
      ],
      "slot_index": 0
     }
@@ -1521,13 +1708,13 @@
     160
    ],
    "flags": {},
-   "order": 34,
+   "order": 38,
    "mode": 0,
    "inputs": [
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 44
+     "link": 52
     }
    ],
    "outputs": [
@@ -1535,7 +1722,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      46
+      54
      ],
      "slot_index": 0
     }
@@ -1565,23 +1752,23 @@
     150
    ],
    "flags": {},
-   "order": 35,
+   "order": 39,
    "mode": 0,
    "inputs": [
     {
      "name": "destination",
      "type": "IMAGE",
-     "link": 45
+     "link": 53
     },
     {
      "name": "source",
      "type": "IMAGE",
-     "link": 46
+     "link": 54
     },
     {
      "name": "mask",
      "type": "MASK",
-     "link": 47
+     "link": 55
     }
    ],
    "outputs": [
@@ -1589,8 +1776,8 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      49,
-      57
+      57,
+      65
      ],
      "slot_index": 0
     }
@@ -1619,18 +1806,18 @@
     90
    ],
    "flags": {},
-   "order": 36,
+   "order": 40,
    "mode": 0,
    "inputs": [
     {
      "name": "stitcher",
      "type": "STITCHER",
-     "link": 48
+     "link": 56
     },
     {
      "name": "inpainted_image",
      "type": "IMAGE",
-     "link": 49
+     "link": 57
     }
    ],
    "outputs": [
@@ -1638,7 +1825,7 @@
      "name": "image",
      "type": "IMAGE",
      "links": [
-      51
+      59
      ],
      "slot_index": 0
     }
@@ -1663,7 +1850,7 @@
     100
    ],
    "flags": {},
-   "order": 37,
+   "order": 41,
    "mode": 0,
    "inputs": [],
    "outputs": [
@@ -1671,7 +1858,7 @@
      "name": "UPSCALE_MODEL",
      "type": "UPSCALE_MODEL",
      "links": [
-      50
+      58
      ],
      "slot_index": 0
     }
@@ -1696,18 +1883,18 @@
     100
    ],
    "flags": {},
-   "order": 38,
+   "order": 42,
    "mode": 0,
    "inputs": [
     {
      "name": "upscale_model",
      "type": "UPSCALE_MODEL",
-     "link": 50
+     "link": 58
     },
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 51
+     "link": 59
     }
    ],
    "outputs": [
@@ -1715,7 +1902,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      52
+      60
      ],
      "slot_index": 0
     }
@@ -1738,13 +1925,13 @@
     100
    ],
    "flags": {},
-   "order": 39,
+   "order": 43,
    "mode": 0,
    "inputs": [
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 52
+     "link": 60
     }
    ],
    "outputs": [
@@ -1752,7 +1939,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      53
+      61
      ],
      "slot_index": 0
     }
@@ -1779,13 +1966,13 @@
     100
    ],
    "flags": {},
-   "order": 40,
+   "order": 44,
    "mode": 0,
    "inputs": [
     {
      "name": "image",
      "type": "IMAGE",
-     "link": 53
+     "link": 61
     }
    ],
    "outputs": [
@@ -1793,7 +1980,7 @@
      "name": "IMAGE",
      "type": "IMAGE",
      "links": [
-      54
+      62
      ],
      "slot_index": 0
     }
@@ -1821,13 +2008,13 @@
     300
    ],
    "flags": {},
-   "order": 41,
+   "order": 45,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 54
+     "link": 62
     }
    ],
    "outputs": [
@@ -1860,13 +2047,13 @@
     250
    ],
    "flags": {},
-   "order": 42,
+   "order": 46,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 55
+     "link": 63
     }
    ],
    "outputs": [
@@ -1895,13 +2082,13 @@
     250
    ],
    "flags": {},
-   "order": 43,
+   "order": 47,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 56
+     "link": 64
     }
    ],
    "outputs": [
@@ -1930,13 +2117,13 @@
     250
    ],
    "flags": {},
-   "order": 44,
+   "order": 48,
    "mode": 0,
    "inputs": [
     {
      "name": "images",
      "type": "IMAGE",
-     "link": 57
+     "link": 65
     }
    ],
    "outputs": [
@@ -2269,14 +2456,78 @@
   ],
   [
    40,
+   10,
+   0,
+   34,
+   0,
+   "MODEL"
+  ],
+  [
+   41,
+   34,
+   0,
+   35,
+   0,
+   "MODEL"
+  ],
+  [
+   42,
    31,
+   0,
+   36,
+   0,
+   "LATENT"
+  ],
+  [
+   43,
+   25,
+   0,
+   36,
+   1,
+   "MASK"
+  ],
+  [
+   44,
+   35,
+   0,
+   37,
+   0,
+   "MODEL"
+  ],
+  [
+   45,
+   16,
+   0,
+   37,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   46,
+   17,
+   0,
+   37,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   47,
+   36,
+   0,
+   37,
+   3,
+   "LATENT"
+  ],
+  [
+   48,
+   37,
    0,
    32,
    0,
    "LATENT"
   ],
   [
-   41,
+   49,
    12,
    0,
    32,
@@ -2284,7 +2535,7 @@
    "VAE"
   ],
   [
-   42,
+   50,
    23,
    1,
    40,
@@ -2292,7 +2543,7 @@
    "IMAGE"
   ],
   [
-   43,
+   51,
    32,
    0,
    40,
@@ -2300,7 +2551,7 @@
    "IMAGE"
   ],
   [
-   44,
+   52,
    40,
    0,
    41,
@@ -2308,7 +2559,7 @@
    "IMAGE"
   ],
   [
-   45,
+   53,
    23,
    1,
    42,
@@ -2316,7 +2567,7 @@
    "IMAGE"
   ],
   [
-   46,
+   54,
    41,
    0,
    42,
@@ -2324,7 +2575,7 @@
    "IMAGE"
   ],
   [
-   47,
+   55,
    25,
    0,
    42,
@@ -2332,7 +2583,7 @@
    "MASK"
   ],
   [
-   48,
+   56,
    23,
    0,
    50,
@@ -2340,7 +2591,7 @@
    "STITCHER"
   ],
   [
-   49,
+   57,
    42,
    0,
    50,
@@ -2348,7 +2599,7 @@
    "IMAGE"
   ],
   [
-   50,
+   58,
    90,
    0,
    92,
@@ -2356,7 +2607,7 @@
    "UPSCALE_MODEL"
   ],
   [
-   51,
+   59,
    50,
    0,
    92,
@@ -2364,7 +2615,7 @@
    "IMAGE"
   ],
   [
-   52,
+   60,
    92,
    0,
    94,
@@ -2372,7 +2623,7 @@
    "IMAGE"
   ],
   [
-   53,
+   61,
    94,
    0,
    93,
@@ -2380,7 +2631,7 @@
    "IMAGE"
   ],
   [
-   54,
+   62,
    93,
    0,
    51,
@@ -2388,7 +2639,7 @@
    "IMAGE"
   ],
   [
-   55,
+   63,
    23,
    1,
    60,
@@ -2396,7 +2647,7 @@
    "IMAGE"
   ],
   [
-   56,
+   64,
    32,
    0,
    61,
@@ -2404,7 +2655,7 @@
    "IMAGE"
   ],
   [
-   57,
+   65,
    42,
    0,
    62,

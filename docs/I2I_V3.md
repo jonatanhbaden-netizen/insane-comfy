@@ -69,6 +69,20 @@ New character: swap the LoRA widget + trigger word + REF 2 photo + trait
 wording (eyes/hair) in both prompt boxes. Wan/LTX LoRAs are video-only and
 cannot load here.
 
+## Known defect + protocol: droplet/blister skin artifacts
+
+The overbaked LoRA occasionally renders glossy droplet bumps (forehead/cheeks),
+then 4x-UltraSharp amplifies them. Diagnosed live: preview A (Qwen crop) is
+clean, artifacts appear in preview B (LoRA render), and their positions are
+SEED-LOCKED — strength changes (0.55/0.60/0.65) do not move or remove them.
+Protocol when droplets appear:
+1. Change the IDENTITY RENDER seed and re-run (first resort — artifact is
+   stochastic per seed).
+2. Raise the POLISH pass denoise 0.15 → 0.30 (a no-LoRA base-model pass over
+   the same mask; 0.15 shipped default was too weak to melt them).
+3. Durable fix: retrain the character LoRA — checkpoint 2400 is fried
+   (training data intact in `lora-training/emma/`).
+
 ## Verification loop (how "can't tell" is measured, not vibed)
 
 `scripts/score_identity.py` on the pod: ArcFace embeddings of her 51 training
