@@ -104,6 +104,14 @@ def main():
     if 6499 in links:
         doomed.add(links[6499][1])
 
+    # detector providers for the deleted NSFW detailers: their .pt files are
+    # absent, and once 546/547 die they feed nothing — but the frontend still
+    # flags their missing models, so they must go, not just dangle
+    for nid, n in nodes.items():
+        if n["type"] == "UltralyticsDetectorProvider" and n.get("widgets_values"):
+            if any(x in str(n["widgets_values"][0]) for x in ("nipple", "pussy")):
+                doomed.add(nid)
+
     # previews / mask previews / comparer attached to doomed nodes
     changed = True
     while changed:
@@ -151,6 +159,14 @@ def main():
         for n in sg.get("nodes", []):
             if n["type"] == "VAELoader" and n.get("widgets_values") and "ultraflux" in str(n["widgets_values"][0]).lower():
                 n["widgets_values"] = ["ae.safetensors"]
+            if n["type"] == "CRT Post-Process Suite":
+                w = n.get("widgets_values", [])
+                # its internal-upscaler toggle ships OFF, but the widget still
+                # names the manager's absent 4kNomos model and trips the
+                # missing-model check — point it at a model that exists
+                for i, v in enumerate(w):
+                    if isinstance(v, str) and "Nomos" in v:
+                        w[i] = "4x-UltraSharp.pth"
             if n["type"] == "FaceDetailer":
                 w = n.get("widgets_values", [])
                 # denoise 0.40 -> 0.45: locate it right after res_2s/bong_tangent
