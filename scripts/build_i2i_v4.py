@@ -467,6 +467,18 @@ def main():
             print(" -", e)
         die(f"{len(errs)} validation errors")
 
+    # prune unused subgraph DEFINITIONS: deleting an instance leaves its
+    # definition behind, and the frontend still validates the models named
+    # inside it — that is how deleted NSFW/eye/phone detailers kept raising
+    # "missing model" panels that block Run before execution starts.
+    used = {n["type"] for n in d["nodes"]}
+    defs = d.get("definitions", {}).get("subgraphs", [])
+    kept = [sg for sg in defs if str(sg["id"]) in used]
+    dropped = [sg.get("name", sg["id"]) for sg in defs if str(sg["id"]) not in used]
+    d["definitions"]["subgraphs"] = kept
+    if dropped:
+        print("pruned unused subgraph defs:", ", ".join(map(str, dropped)))
+
     json.dump(d, open(a.out, "w"))
     print(f"OK: {len(d['nodes'])} nodes, {len(d['links'])} links -> {a.out}")
     print(f"deleted {len(doomed)} nodes; Stage 0 added {len(NEW)}")
