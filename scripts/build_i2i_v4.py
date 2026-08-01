@@ -50,9 +50,13 @@ QWEN_TEMPLATE_POST = (
     "visible (turned away, cropped out of frame, or hidden), do not add, "
     "reveal or rotate a face — keep the exact head pose and change only her "
     "hair and skin tone to match the description. The described hairstyle "
-    "and hair color fully replace the original hair in all cases. Keep "
-    "image 1's exact pose, body position, outfit, clothing, accessories, "
-    "background, framing, camera angle and lighting completely unchanged. "
+    "and hair color fully replace the original hair in all cases. Keep her "
+    "exact facial expression from image 1 — do not change the expression. "
+    "Do not add any clothing, coverage or fabric that is not in image 1; "
+    "keep exactly the same garments and the same amount of exposed skin. "
+    "Keep image 1's exact pose, body position, outfit, clothing, "
+    "accessories, background, framing, camera angle and lighting completely "
+    "unchanged. "
     "Photorealistic, natural skin texture. If several people are in image 1, "
     "replace only the person I specify here:"
 )
@@ -113,9 +117,18 @@ def main():
                 doomed.add(nid)
 
     # stage 1 + 2 instances and their seeds (known ids from dissection)
-    for nid in (518, 519, 28, 110):
+    # + stages 3/4 (v4.1: their whole-frame LoRA repaint drifted clothing/
+    # body off the reference and double-softened the frame — identity now
+    # lives solely in the face detailer, exactness in the Qwen frame)
+    for nid in (518, 519, 28, 110, 521, 522, 111, 436, 189, 437):
         if nid in nodes:
             doomed.add(nid)
+    for nid, n in nodes.items():
+        if n["type"] in ("SetNode", "GetNode") and n.get("widgets_values"):
+            if str(n["widgets_values"][0]) in (
+                    "Stage 1 Latent", "Stage 2 Latent", "Stage 3 Latent",
+                    "Stage 4 Latent", "Stage 3 Seed", "Stage 4 Seed"):
+                doomed.add(nid)
 
     # dead detailers
     for nid in (551, 546, 547, 549, 543, 544):
@@ -206,12 +219,14 @@ def main():
             # (stage-3 ladder step reverted 2026-08-02: it was compensating
             # for the encoder bug; with binding fixed it only added drift —
             # stage 3 runs the professional's 0.50 denoise / 0.40 inject)
-            if n["type"] == "FaceDetailer":
+            if n["type"] == "ImageScaleBy" and str(sg.get("id", "")).startswith("c6d045e4"):
+                # v4.1: SeedVR2 receives the 896x1152 Qwen frame directly —
+                # the pro's half-res round trip assumed a 1344px sampled
+                # frame; halving 896 would starve the restorer
                 w = n.get("widgets_values", [])
-                # denoise 0.40 -> 0.45: locate it right after res_2s/bong_tangent
-                for i in range(len(w) - 2):
-                    if w[i] == "res_2s" and w[i + 1] == "bong_tangent" and w[i + 2] == 0.4:
-                        w[i + 2] = 0.45
+                for i, v in enumerate(w):
+                    if v == 0.5:
+                        w[i] = 1.0
 
     # ------------------------------------------------------------ Stage 0 build
     NEW = []
@@ -307,16 +322,6 @@ def main():
     cmatch = mk(613, "ColorMatch", [X + 760, 80], ["mkl", 0.35, True],
                 "pin source grade (max 0.35)")
     cmatch["outputs"] = [{"name": "image", "type": "IMAGE", "links": [], "slot_index": 0}]
-    down = mk(614, "ImageResizeKJv2", [X + 760, 260],
-              [672, 864, "lanczos", "resize", "0, 0, 0", "center", 2],
-              "down to 672x864 graft point")
-    down["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0},
-                       {"name": "width", "type": "INT", "links": [], "slot_index": 1},
-                       {"name": "height", "type": "INT", "links": [], "slot_index": 2}]
-    vget = mk(615, "GetNode", [X + 760, 450], ["Ultra Flux VAE"], "Get_Ultra Flux VAE")
-    vget["outputs"] = [{"name": "VAE", "type": "VAE", "links": [], "slot_index": 0}]
-    genc = mk(616, "VAEEncode", [X + 760, 560], None, "graft encode (ae VAE)")
-    genc["outputs"] = [{"name": "LATENT", "type": "LATENT", "links": [], "slot_index": 0}]
     stage0_prev = mk(619, "PreviewImage", [X + 760, 700], None, "STAGE 0 — judge the swap here", [300, 300])
 
     # character/template plumbing
@@ -349,15 +354,12 @@ def main():
     wire(q_vae, 0, q_dec, "vae", "VAE")
     wire(conform, 0, cmatch, "image_ref", "IMAGE")
     wire(q_dec, 0, cmatch, "image_target", "IMAGE")
-    wire(cmatch, 0, down, "image", "IMAGE")
-    wire(down, 0, genc, "pixels", "IMAGE")
-    wire(vget, 0, genc, "vae", "VAE")
     wire(cmatch, 0, stage0_prev, "images", "IMAGE")
 
-    # graft: reuse link 1235 into SetNode 211 ("Stage 2 Latent")
-    set211 = nodes.get(211) or die("SetNode 211 'Stage 2 Latent' not found")
-    wire(genc, 0, set211, "LATENT", "LATENT", reuse=1235)
-    set211["inputs"] = [i for i in set211["inputs"] if i.get("link") == 1235]
+    # v4.1 direct chain: the color-matched Qwen frame IS the picture; the
+    # face detailer (LoRA) is the only synthesis after it (reuse link 6519,
+    # which previously carried stage 4's output into the detailer)
+    wire(cmatch, 0, nodes[553], "image", "IMAGE", reuse=6519)
 
     # FACE detailer gets the LoRA model explicitly (was AE-broadcast base model)
     mget = mk(618, "GetNode", [X + 760, 1050], ["Model with LoRA"], "Get_Model with LoRA")
