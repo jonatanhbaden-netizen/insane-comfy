@@ -219,6 +219,16 @@ def main():
             # (stage-3 ladder step reverted 2026-08-02: it was compensating
             # for the encoder bug; with binding fixed it only added drift —
             # stage 3 runs the professional's 0.50 denoise / 0.40 inject)
+            if n["type"] == "FaceDetailer":
+                w = n.get("widgets_values", [])
+                # 0.40 was the pro's touch-up strength — his upstream stages
+                # already rendered the right character. Here the detailer IS
+                # the identity stage: at 0.40 the source geometry (eye
+                # spacing) survives; 0.68 rebuilds the face from the LoRA
+                # while noise_mask + feather keep pose/lighting anchored.
+                for i in range(len(w) - 2):
+                    if w[i] == "res_2s" and w[i + 1] == "bong_tangent" and w[i + 2] == 0.4:
+                        w[i + 2] = 0.68
             if n["type"] == "ImageScaleBy" and str(sg.get("id", "")).startswith("c6d045e4"):
                 # v4.1: SeedVR2 receives the 896x1152 Qwen frame directly —
                 # the pro's half-res round trip assumed a 1344px sampled
