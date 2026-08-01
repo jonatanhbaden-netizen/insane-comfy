@@ -27,12 +27,12 @@ import json
 import sys
 
 QWEN_PROMPT = (
-    "Replace the woman (if several people are in the photo, replace ONLY the "
-    "one I specify at the end of this text) with a different woman: F1sher, golden blonde "
-    "shoulder-length bob with a middle part, heterochromia, left eye warm "
-    "brown, right eye light blue. Keep the exact same pose, outfit, clothing, "
-    "accessories, background, framing, camera angle and lighting completely "
-    "unchanged. Photorealistic, natural skin texture."
+    "Replace the woman in image 1 with a different woman: F1sher, golden "
+    "blonde shoulder-length bob with a middle part, heterochromia, left eye "
+    "warm brown, right eye light blue. Keep image 1's exact pose, outfit, "
+    "clothing, accessories, background, framing, camera angle and lighting "
+    "completely unchanged. Photorealistic, natural skin texture. If several "
+    "people are in image 1, replace only the person I specify here:"
 )
 MAIN_POSITIVE = (
     "F1sher, golden blonde shoulder-length bob with a middle part, "
@@ -236,10 +236,10 @@ def main():
     q_shift["outputs"] = [{"name": "MODEL", "type": "MODEL", "links": [], "slot_index": 0}]
     q_norm = mk(607, "CFGNorm", [X, 1200], [1.0, False])
     q_norm["outputs"] = [{"name": "patched_model", "type": "MODEL", "links": [], "slot_index": 0}]
-    q_pos = mk(608, "TextEncodeQwenImageEdit", [X + 380, 80], [QWEN_PROMPT],
+    q_pos = mk(608, "TextEncodeQwenImageEditPlus", [X + 380, 80], [QWEN_PROMPT],
                "[stage0] SWAP INSTRUCTION — 2+ people? say WHICH at the end: 'the woman on the left'", [420, 220])
     q_pos["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
-    q_neg = mk(609, "TextEncodeQwenImageEdit", [X + 380, 340], [""], "[stage0] negative")
+    q_neg = mk(609, "TextEncodeQwenImageEditPlus", [X + 380, 340], [""], "[stage0] negative")
     q_neg["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
     q_enc = mk(610, "VAEEncode", [X + 380, 470])
     q_enc["outputs"] = [{"name": "LATENT", "type": "LATENT", "links": [], "slot_index": 0}]
@@ -271,7 +271,7 @@ def main():
     wire(q_shift, 0, q_norm, "model", "MODEL")
     wire(q_clip, 0, q_pos, "clip", "CLIP")
     wire(q_vae, 0, q_pos, "vae", "VAE")
-    wire(conform, 0, q_pos, "image", "IMAGE")
+    wire(conform, 0, q_pos, "image1", "IMAGE")
     wire(q_clip, 0, q_neg, "clip", "CLIP")
     wire(conform, 0, q_enc, "pixels", "IMAGE")
     wire(q_vae, 0, q_enc, "vae", "VAE")
