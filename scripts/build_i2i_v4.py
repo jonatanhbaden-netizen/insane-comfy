@@ -26,18 +26,32 @@ import argparse
 import json
 import sys
 
-QWEN_PROMPT = (
-    "Replace the woman in image 1 with a different woman: F1sher, golden "
-    "blonde shoulder-length bob with a middle part, heterochromia, left eye "
-    "warm brown, right eye light blue. Keep image 1's exact pose, outfit, "
+# Character-agnostic prompt plumbing: ONE box holds the character (trigger
+# word + traits). Both the Qwen instruction and the main positive are built
+# from it with StringConcatenate, so switching girls = swap the LoRA in the
+# loader + edit this one box. No other node mentions the character.
+CHARACTER_DEFAULT = (
+    "F1sher, golden blonde shoulder-length bob with a middle part, "
+    "heterochromia, left eye warm brown, right eye light blue"
+)
+# "her face, hair and skin become X" vs "keep pose/outfit/background" — the
+# explicit split is what makes Qwen restructure the HAIR instead of treating
+# it as part of "keep everything unchanged" (live finding: listed as a mere
+# trait, the bob loses to the preservation clause and reference hair stays).
+QWEN_TEMPLATE_PRE = (
+    "Replace the woman in image 1: her face, her hair and her skin become "
+    "this woman: "
+)
+QWEN_TEMPLATE_POST = (
+    ". The hairstyle and hair color described above fully replace the "
+    "original hair. Keep image 1's exact pose, body position, outfit, "
     "clothing, accessories, background, framing, camera angle and lighting "
     "completely unchanged. Photorealistic, natural skin texture. If several "
     "people are in image 1, replace only the person I specify here:"
 )
-MAIN_POSITIVE = (
-    "F1sher, golden blonde shoulder-length bob with a middle part, "
-    "heterochromia, left eye warm brown, right eye light blue, natural skin "
-    "texture with visible pores and fine detail, candid phone photo"
+POSITIVE_SUFFIX = (
+    ", natural skin texture with visible pores and fine detail, candid phone "
+    "photo"
 )
 
 DELETE_TYPES_BY_TITLEHINT = {}  # populated at runtime for previews wired to dead nodes
@@ -148,8 +162,9 @@ def main():
     # LoRA 527: manager's private persona -> f1sher @ 0.6 (hard cap, overbaked)
     nodes[527]["widgets_values"] = ["f1sher_000002400.safetensors", 0.6]
 
-    # main positive prompt -> Fischer identity block
-    nodes[6]["widgets_values"] = [MAIN_POSITIVE]
+    # main positive text arrives via the CHARACTER concat (wired below);
+    # the widget value remains only as an inert fallback
+    nodes[6]["widgets_values"] = [CHARACTER_DEFAULT + POSITIVE_SUFFIX]
 
     # detailer VAE 556 (top level): fluxvae1dev -> ae
     if 556 in nodes:
@@ -198,11 +213,20 @@ def main():
         nodes[nid] = n
         return n
 
-    def wire(src, sslot, dst, iname, typ, reuse=None):
+    def wire(src, sslot, dst, iname, typ, reuse=None, widget=False):
         L[0] += 1
         lid = reuse if reuse is not None else L[0]
-        links[lid] = [lid, src["id"], sslot, dst["id"], len(dst["inputs"]), typ]
-        dst["inputs"].append({"name": iname, "type": typ, "link": lid})
+        # reuse an existing input entry (e.g. a widget the professional had
+        # converted and left disconnected) — a duplicate name would win the
+        # frontend's binding with its null link and silently blank the value
+        entry = next((i for i in dst["inputs"] if i.get("name") == iname), None)
+        if entry is None:
+            entry = {"name": iname, "type": typ}
+            dst["inputs"].append(entry)
+        entry["link"] = lid
+        if widget:
+            entry["widget"] = {"name": iname}
+        links[lid] = [lid, src["id"], sslot, dst["id"], dst["inputs"].index(entry), typ]
         while len(src["outputs"]) <= sslot:
             src["outputs"].append({"name": typ, "type": typ, "links": [], "slot_index": len(src["outputs"])})
         src["outputs"][sslot].setdefault("links", []).append(lid)
@@ -236,7 +260,24 @@ def main():
     q_shift["outputs"] = [{"name": "MODEL", "type": "MODEL", "links": [], "slot_index": 0}]
     q_norm = mk(607, "CFGNorm", [X, 1200], [1.0, False])
     q_norm["outputs"] = [{"name": "patched_model", "type": "MODEL", "links": [], "slot_index": 0}]
-    q_pos = mk(608, "TextEncodeQwenImageEditPlus", [X + 380, 80], [QWEN_PROMPT],
+    char = mk(620, "PrimitiveStringMultiline", [X, 1330], [CHARACTER_DEFAULT],
+              "◆ CHARACTER — trigger word + traits (swap girl HERE + LoRA loader)", [420, 160])
+    char["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    tpre = mk(621, "PrimitiveStringMultiline", [X + 380, 1330], [QWEN_TEMPLATE_PRE], "[template] swap pre")
+    tpre["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    tpost = mk(622, "PrimitiveStringMultiline", [X + 380, 1480], [QWEN_TEMPLATE_POST],
+               "[template] swap post — add edits / which person at the end", [420, 160])
+    tpost["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    cat1 = mk(623, "StringConcatenate", [X + 760, 1330], [""], "pre+character")
+    cat1["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    cat2 = mk(624, "StringConcatenate", [X + 760, 1440], [""], "+post = swap instruction")
+    cat2["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    psuf = mk(625, "PrimitiveStringMultiline", [X + 380, 1660], [POSITIVE_SUFFIX], "[template] positive suffix")
+    psuf["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+    cat3 = mk(626, "StringConcatenate", [X + 760, 1550], [""], "character+suffix = main positive")
+    cat3["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
+
+    q_pos = mk(608, "TextEncodeQwenImageEditPlus", [X + 380, 80], [QWEN_TEMPLATE_PRE + CHARACTER_DEFAULT + QWEN_TEMPLATE_POST],
                "[stage0] SWAP INSTRUCTION — 2+ people? say WHICH at the end: 'the woman on the left'", [420, 220])
     q_pos["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
     q_neg = mk(609, "TextEncodeQwenImageEditPlus", [X + 380, 340], [""], "[stage0] negative")
@@ -262,6 +303,16 @@ def main():
     genc = mk(616, "VAEEncode", [X + 760, 560], None, "graft encode (ae VAE)")
     genc["outputs"] = [{"name": "LATENT", "type": "LATENT", "links": [], "slot_index": 0}]
     stage0_prev = mk(619, "PreviewImage", [X + 760, 700], None, "STAGE 0 — judge the swap here", [300, 300])
+
+    # character/template plumbing
+    wire(tpre, 0, cat1, "string_a", "STRING")
+    wire(char, 0, cat1, "string_b", "STRING")
+    wire(cat1, 0, cat2, "string_a", "STRING")
+    wire(tpost, 0, cat2, "string_b", "STRING")
+    wire(cat2, 0, q_pos, "prompt", "STRING", widget=True)
+    wire(char, 0, cat3, "string_a", "STRING")
+    wire(psuf, 0, cat3, "string_b", "STRING")
+    wire(cat3, 0, nodes[6], "text", "STRING", widget=True)
 
     # explicit wires — every input connected so the Anything-Everywhere
     # broadcasters cannot inject the Z-Image model/clip into Stage 0
