@@ -356,14 +356,53 @@ def main():
     wire(q_dec, 0, cmatch, "image_target", "IMAGE")
     wire(cmatch, 0, stage0_prev, "images", "IMAGE")
 
-    # v4.1 direct chain: the color-matched Qwen frame IS the picture; the
-    # face detailer (LoRA) is the only synthesis after it (reuse link 6519,
-    # which previously carried stage 4's output into the detailer)
-    wire(cmatch, 0, nodes[553], "image", "IMAGE", reuse=6519)
-
-    # FACE detailer gets the LoRA model explicitly (was AE-broadcast base model)
+    # LoRA model tap (feeds the texture pass and the FACE detailer)
     mget = mk(618, "GetNode", [X + 760, 1050], ["Model with LoRA"], "Get_Model with LoRA")
     mget["outputs"] = [{"name": "MODEL", "type": "MODEL", "links": [], "slot_index": 0}]
+
+    # v4.2 TEXTURE PASS — the manager's texture mechanism (noise inject +
+    # Clown DetailBoost + perlin) at a structure-frozen denoise. His 0.5
+    # rewrote clothing and pose; 0.18 can only rewrite micro-texture, which
+    # is exactly the pore/film detail Qwen's synthetic-smooth skin lacks.
+    tvget = mk(630, "GetNode", [X + 1140, 80], ["Ultra Flux VAE"], "Get_Ultra Flux VAE")
+    tvget["outputs"] = [{"name": "VAE", "type": "VAE", "links": [], "slot_index": 0}]
+    tenc = mk(631, "VAEEncode", [X + 1140, 180], None, "[texture] encode")
+    tenc["outputs"] = [{"name": "LATENT", "type": "LATENT", "links": [], "slot_index": 0}]
+    tnoise = mk(632, "InjectLatentNoise+", [X + 1140, 290],
+                [4242, "fixed", 0.10, "false"], "[texture] micro noise 0.10")
+    tnoise["outputs"] = [{"name": "LATENT", "type": "LATENT", "links": [], "slot_index": 0}]
+    tshift = mk(633, "ModelSamplingAuraFlow", [X + 1140, 400], [7], "[texture] shift 7")
+    tshift["outputs"] = [{"name": "MODEL", "type": "MODEL", "links": [], "slot_index": 0}]
+    tshark = mk(634, "SharkOptions_Beta", [X + 1140, 500], ["perlin", 1, 1, False], "[texture] perlin")
+    tshark["outputs"] = [{"name": "options", "type": "OPTIONS", "links": [], "slot_index": 0}]
+    tboost = mk(635, "ClownOptions_DetailBoost_Beta", [X + 1140, 610],
+                [1.2, "model", "hard", 0.5, 1, 3], "[texture] DetailBoost 1.2")
+    tboost["outputs"] = [{"name": "options", "type": "OPTIONS", "links": [], "slot_index": 0}]
+    tclown = mk(636, "ClownsharKSampler_Beta", [X + 1140, 720],
+                [0.52, "linear/euler", "beta57", 9, 9, 0.18, 1, 4242, "fixed", "standard", True],
+                "◆ TEXTURE — denoise 0.18 (structure-frozen)", [340, 300])
+    tclown["outputs"] = [{"name": "output", "type": "LATENT", "links": [], "slot_index": 0},
+                         {"name": "denoised", "type": "LATENT", "links": [], "slot_index": 1},
+                         {"name": "options", "type": "OPTIONS", "links": [], "slot_index": 2}]
+    tdec = mk(637, "VAEDecode", [X + 1140, 1060], None, "[texture] decode")
+    tdec["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+
+    wire(cmatch, 0, tenc, "pixels", "IMAGE")
+    wire(tvget, 0, tenc, "vae", "VAE")
+    wire(tenc, 0, tnoise, "latent", "LATENT")
+    wire(mget, 0, tshift, "model", "MODEL")
+    wire(tshift, 0, tclown, "model", "MODEL")
+    wire(nodes[6], 0, tclown, "positive", "CONDITIONING")
+    wire(nodes[7], 0, tclown, "negative", "CONDITIONING")
+    wire(tnoise, 0, tclown, "latent_image", "LATENT")
+    wire(tshark, 0, tclown, "options 2", "OPTIONS")
+    wire(tboost, 0, tclown, "options 3", "OPTIONS")
+    wire(tclown, 0, tdec, "samples", "LATENT")
+    wire(tvget, 0, tdec, "vae", "VAE")
+
+    # face detailer now reads the re-textured frame (reuse link 6519)
+    wire(tdec, 0, nodes[553], "image", "IMAGE", reuse=6519)
+
     face = nodes[553]
     for i in face["inputs"]:
         if i["name"] == "model" and i.get("link") is None:
