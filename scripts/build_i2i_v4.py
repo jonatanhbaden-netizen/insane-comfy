@@ -196,12 +196,9 @@ def main():
                 # photo-latent-safe choice; DetailBoost re-sharpens after.
                 if n["type"] == "LatentUpscale" and n["widgets_values"][0] == "nearest-exact":
                     n["widgets_values"][0] = "bilinear"
-            if str(sg.get("id", "")).startswith("dfb392f5"):
-                # STAGE 3 identity-ladder step (design's planned escalation for
-                # weak likeness, triggered by the first live two-girl test):
-                # denoise 0.50 -> 0.55, noise inject 0.40 -> 0.45
-                # (stage-3 ladder step reverted 2026-08-02: it was compensating
-                # for the encoder bug; with binding fixed it only added drift)
+            # (stage-3 ladder step reverted 2026-08-02: it was compensating
+            # for the encoder bug; with binding fixed it only added drift —
+            # stage 3 runs the professional's 0.50 denoise / 0.40 inject)
             if n["type"] == "FaceDetailer":
                 w = n.get("widgets_values", [])
                 # denoise 0.40 -> 0.45: locate it right after res_2s/bong_tangent
