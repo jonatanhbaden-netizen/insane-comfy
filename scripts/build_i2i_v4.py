@@ -27,7 +27,8 @@ import json
 import sys
 
 QWEN_PROMPT = (
-    "Replace the woman with a different woman: F1sher, golden blonde "
+    "Replace the woman (if several people are in the photo, replace ONLY the "
+    "one I specify at the end of this text) with a different woman: F1sher, golden blonde "
     "shoulder-length bob with a middle part, heterochromia, left eye warm "
     "brown, right eye light blue. Keep the exact same pose, outfit, clothing, "
     "accessories, background, framing, camera angle and lighting completely "
@@ -167,6 +168,14 @@ def main():
                 for i, v in enumerate(w):
                     if isinstance(v, str) and "Nomos" in v:
                         w[i] = "4x-UltraSharp.pth"
+            if str(sg.get("id", "")).startswith("dfb392f5"):
+                # STAGE 3 identity-ladder step (design's planned escalation for
+                # weak likeness, triggered by the first live two-girl test):
+                # denoise 0.50 -> 0.55, noise inject 0.40 -> 0.45
+                if n["type"] == "ClownsharKSampler_Beta" and n["widgets_values"][5] == 0.5:
+                    n["widgets_values"][5] = 0.55
+                if n["type"] == "InjectLatentNoise+" and n["widgets_values"][2] == 0.4:
+                    n["widgets_values"][2] = 0.45
             if n["type"] == "FaceDetailer":
                 w = n.get("widgets_values", [])
                 # denoise 0.40 -> 0.45: locate it right after res_2s/bong_tangent
@@ -228,7 +237,7 @@ def main():
     q_norm = mk(607, "CFGNorm", [X, 1200], [1.0, False])
     q_norm["outputs"] = [{"name": "patched_model", "type": "MODEL", "links": [], "slot_index": 0}]
     q_pos = mk(608, "TextEncodeQwenImageEdit", [X + 380, 80], [QWEN_PROMPT],
-               "[stage0] SWAP INSTRUCTION (append edits here)", [420, 220])
+               "[stage0] SWAP INSTRUCTION — 2+ people? say WHICH at the end: 'the woman on the left'", [420, 220])
     q_pos["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
     q_neg = mk(609, "TextEncodeQwenImageEdit", [X + 380, 340], [""], "[stage0] negative")
     q_neg["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
