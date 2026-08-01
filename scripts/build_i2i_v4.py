@@ -183,6 +183,14 @@ def main():
                 for i, v in enumerate(w):
                     if isinstance(v, str) and "Nomos" in v:
                         w[i] = "4x-UltraSharp.pth"
+            if str(sg.get("id", "")).startswith(("dfb392f5", "d39950fa")):
+                # photo-fed latents: nearest-exact latent upscale turns the
+                # encoded photo's hard edges into stair-step spikes that the
+                # noise-injected samplers render as physical tears (live
+                # bisection: stage 3 clean, stage 4 shredded). bilinear is the
+                # photo-latent-safe choice; DetailBoost re-sharpens after.
+                if n["type"] == "LatentUpscale" and n["widgets_values"][0] == "nearest-exact":
+                    n["widgets_values"][0] = "bilinear"
             if str(sg.get("id", "")).startswith("dfb392f5"):
                 # STAGE 3 identity-ladder step (design's planned escalation for
                 # weak likeness, triggered by the first live two-girl test):
