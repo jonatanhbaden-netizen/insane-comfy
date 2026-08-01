@@ -1,94 +1,88 @@
-# AIOFM i2i v3 — pixel-law face swap
+# AIOFM i2i v3 — reference post in, your girl out
 
-Workflow: `workflows/aiofm_i2i_v3.json` · replaces both `aiofm_i2i_qwen_zimage`
-(character switched — no character conditioning in the graph) and the
-Phase-2/3 side of `aiofm_swap_v2` (PuLID is Flux-only and re-rendered
-already-correct faces waxy).
+Workflow: `workflows/aiofm_i2i_v3.json` · bot graph: `telegram-bot/workflows_api/i2i_v3.json`
 
-**What it does:** drop in a reference post, get the same image back with your
-girl's face. Pose, clothing, fabric, lighting, background and crop are the
-**original file's pixels, byte-identical** — only the face region is ever
-synthesised.
+Drop in a reference post + one face photo of your girl → the same shot with
+**her** in it: her face, her hair, heterochromia correct, scene/pose/outfit/
+lighting preserved, delivered at full resolution.
 
-## Why this architecture
+## Architecture: two engines, each covering the other's weakness
 
-Every earlier failure — switched character, painted hair, fabric drift, waxy
-skin — came from a model re-rendering pixels that were already correct. v3's
-rule: **the reference is law.** One region is rebuilt, everything else is never
-touched. Two consequences:
+| Stage | Engine | What it's trusted with | What it must NOT do |
+|---|---|---|---|
+| 1 · frame swap | Qwen-Edit-2511 (4-step Lightning) | whole-frame coherence: hair replacement, shadows, strand physics, outfit/scene preservation | exact identity (~90% likeness is its ceiling) |
+| 2 · identity stamp | Z-Image Turbo + her LoRA, **masked inpaint** | exact face identity + heterochromia at 1024px | frame layout (mask keeps it in the face+hair region) |
+| 3 · finish | SeedVR2 3B + grain 0.02 | delivery resolution (~1088 short side) | content changes (it's an upscaler) |
 
-- Preservation is exact by construction, not "usually good".
-- The base model never renders the body, so shot type (lingerie/explicit)
-  cannot break the pipeline — the model only ever sees a face crop.
+Stage 2 is **SetLatentNoiseMask inpainting, not img2img**: the face region is
+rebuilt from noise so geometry comes from the LoRA, while the unmasked surround
+anchors pose and lighting. ColorMatch runs at 0.35 (mkl) + FilmGrain 0.03
+against the source crop before compositing.
 
-Identity is a **rank-32 Z-Image LoRA trained on her** (`f1sher_000002400`,
-trigger `F1sher`), on the same architecture as `z_image_turbo_bf16`. There is
-no reference-photo "hint" that can lose; the character is baked into the
-weights. (LoRA architecture identified from safetensors headers:
-`ss_base_model_version: zimage` — check yours with
-`scripts/lora_id.py` before assuming.)
+## Hard-won constants (validated live 2026-08-01 — change at your peril)
 
-## The pipeline
+- **LoRA strength 0.6–0.7, shipped at 0.65.** `f1sher_000002400` is overbaked:
+  at 1.0 it produces pure noise, at 0.6 it produces her. If a render turns
+  smeary or the skin goes bumpy, the strength crept too high.
+- **Identity ref = a FACE crop** (`emma_face_ref.png`). A full-body reference
+  makes Qwen import her outfit into the scene. Face-only kills the leak.
+- **Heterochromia lives in the prompt** ("left eye warm brown, right eye light
+  blue") — the LoRA alone drops it. Same for "golden blonde shoulder-length
+  bob". Keep both if you edit the prompt.
+- **The swap instruction pins clothing to image 1 explicitly** ("Keep the exact
+  clothing, outfit, accessories and jewelry from image 1 — do not change
+  them."). Without that sentence Qwen swaps outfits.
+- ColorMatch ≤ 0.35: at 0.9 it drags recolored hair back toward the source's
+  hair color statistics.
 
-| Stage | Nodes | Job |
+## Approaches that FAILED — do not resurrect
+
+1. **Z-Image 4-stage refine over a composed frame** (`aiofm_i2i_qwen_zimage`):
+   no character conditioning in the graph → switched characters entirely.
+2. **Face-mask img2img at denoise 0.5** on someone else's photo: keeps the
+   source person's bone structure, repaints only the surface → "a blend that
+   looks like neither".
+3. **Face+hair inpaint on the raw reference**: hair identity can't be fixed in
+   a face-region mask — removed hair leaves orphan strands on the chest and
+   shadow smears under the jaw (MediaPipe only masks hair near the head).
+4. **Flux + PuLID identity phase** (swap v2): PuLID is Flux-only (can never use
+   a Z-Image LoRA) and re-rendered already-correct faces waxy.
+
+## Inputs
+
+| Node | What |
+|---|---|
+| REF 1 — SCENE | the post to replicate (any source) |
+| REF 2 — HER PHOTO | **face crop** of your girl (identity for the Qwen swap) |
+| SWAP INSTRUCTION | ships correct; append extra edit sentences at the end ("make the top red") |
+| IDENTITY PROMPT | trigger word + traits for the LoRA stamp — keep heterochromia + bob wording |
+
+## Per-character setup (all verified Z-Image arch — see `scripts/lora_id.py`)
+
+| Character | LoRA | trigger |
 |---|---|---|
-| Detect | face_yolov8m → SegsToCombinedMask | find the face, any size |
-| Crop | InpaintCropImproved, context 1.6×, out 1024² | a 90px face renders at 1024 — detail is invented big, shrunk into place |
-| Identity | Z-Image Turbo + her LoRA, KSampler denoise 0.5 | source latent keeps pose/angle/expression; LoRA supplies who it is |
-| Mask | APersonMaskGenerator (face only, hair OFF) + GrowMaskWithBlur 8/8 | her hairline/ears/neck stay reference pixels |
-| Harmonise | ColorMatch (mkl, 0.9) → FilmGrain 0.03 | steal the scene's white balance + noise floor — kills the three classic tells |
-| Composite | ImageCompositeMasked → InpaintStitchImproved | face pixels only; stitcher restores full res |
+| Emma Fischer | `f1sher_000002400` @ 0.65 | `F1sher` |
+| Sofia Lehtonen | `Sof1a-lehtonen-zti_000001100` | `Sof1a` |
+| Emma Sunde | `Emma Sund3 Lora_000003800` | `sund3` |
 
-Previews A (source crop) / B (raw render) / C (harmonised) show which stage
-broke it — never tune blind.
+New character: swap the LoRA widget + trigger word + REF 2 photo + trait
+wording (eyes/hair) in both prompt boxes. Wan/LTX LoRAs are video-only and
+cannot load here.
 
-## Dials (change one per run)
+## Verification loop (how "can't tell" is measured, not vibed)
 
-| Symptom | Dial | Direction |
-|---|---|---|
-| Not her enough | KSampler denoise 0.5 | ↑ 0.55–0.65 (expression drifts above ~0.6) |
-| LoRA style too strong (lips/jaw restyled) | LoRA strength 0.85 | ↓ 0.7 |
-| Face looks pasted | GrowMaskWithBlur blur 8 | ↑ 12–16 |
-| Colour slightly off | ColorMatch strength 0.9 | ↑ 1.0 / method `hm` |
-| Face too clean vs photo | FilmGrain 0.03 | ↑ 0.05 |
-| Eyes wrong | prompt | heterochromia is IN the default prompt — keep it |
+`scripts/score_identity.py` on the pod: ArcFace embeddings of her 51 training
+images → intra-set similarity band → a render passes only if its mean
+similarity lands inside the band (bar = intra p05 = **0.524** for Fischer).
+Run 1 (identity-preserving path) scored 0.616. Plus eyeball checklist: eyes,
+hairline, jaw shadow, orphan strands, seams, grain continuity.
 
-**Known trait that needs the prompt:** her heterochromia (left brown / right
-blue). At denoise 0.5 the LoRA alone does not reliably impose it — the default
-prompt pins it explicitly. If you rewrite the prompt, keep those words.
+Remote ops: `scripts/pod_exec.py` (Jupyter kernel — the image has no sshd,
+RunPod proxy SSH hangs forever at the banner). Model files >100 MB: split -b
+85m, upload parts via `/upload/image`, cat them together with pod_exec.
 
-## Requirements (already on pod/volume)
+## Rebuilding the graph
 
-- `z_image_turbo_bf16.safetensors` (diffusion_models — volume)
-- `qwen_3_4b.safetensors` (text_encoders; CLIPLoader type **lumina2**)
-- `ae.safetensors` (vae — the Flux VAE; Z-Image ships the identical file)
-- `f1sher_000002400.safetensors` (loras — volume)
-- packs: Impact Pack/Subpack, CropAndStitch (Improved), KJNodes, a-person-mask-generator,
-  post-processing (FilmGrain), ComfyUI-KJNodes ColorMatch — all in the image
-
-## Testing / pass bar
-
-`scripts/score_identity.py` (runs on the pod) embeds her 51-image training set
-with ArcFace, calibrates the intra-set similarity band ("same girl, different
-photo"), and passes a render only if its mean similarity lands inside that
-band. Plus eyeball checklist: seam, skin texture, lighting direction,
-catchlights, grain continuity.
-
-Remote exec for all of this: `scripts/pod_exec.py` (Jupyter kernel transport —
-the image has no sshd; RunPod proxy SSH will always hang at the banner).
-
-## Other characters
-
-Same graph, two widget changes: LoRA file + trigger word in the prompt.
-- Sofia: `Sof1a-lehtonen-zti_000001100` · trigger `Sof1a`
-- Emma Sunde: `Emma Sund3 Lora_000003800` · trigger `sund3` (or `Emm4` for the
-  `Emm4-zit` line)
-All Z-Image arch, verified from headers. Wan/LTX LoRAs (`F1scher Wan`,
-`LTXfischerLora`) are video-only — they cannot load here.
-
-## Optional prompt-edit branch
-
-The bypassed Qwen-Edit-2511 group ("make the top red") runs **before** detect,
-so edits land in the reference and the face pass still overwrites the face
-after. Enable only when an edit is wanted — when off, preservation stays
-byte-exact.
+`scripts/build_i2i_v3.py <object_info.json>` — validates every class, widget
+and socket against a live pod's `/object_info` and emits both UI and API
+formats. A typo fails the build instead of shipping a broken graph.

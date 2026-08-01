@@ -287,45 +287,56 @@ def build(oi, lora_name, trigger):
     # to 2. The edit re-renders the whole reference once (Qwen's preservation
     # objective), then the normal face pass runs on the edited image. While
     # off, the reference stays byte-exact.
-    g.add(70, "UNETLoader", title="[edit] Qwen-Edit-2511", pos=(40, 840), mode=4, color=PURPLE,
+    g.add(70, "UNETLoader", title="[edit] Qwen-Edit-2511", pos=(40, 840), mode=0, color=PURPLE,
           widgets={"unet_name": "qwen_image_edit_2511_fp8mixed.safetensors",
                    "weight_dtype": "default"})
-    g.add(71, "CLIPLoader", title="[edit] Qwen CLIP", pos=(40, 960), mode=4, color=PURPLE,
+    g.add(71, "CLIPLoader", title="[edit] Qwen CLIP", pos=(40, 960), mode=0, color=PURPLE,
           widgets={"clip_name": "qwen_2.5_vl_7b_fp8_scaled.safetensors", "type": "qwen_image"})
-    g.add(72, "VAELoader", title="[edit] Qwen VAE", pos=(40, 1060), mode=4, color=PURPLE,
+    g.add(72, "VAELoader", title="[edit] Qwen VAE", pos=(40, 1060), mode=0, color=PURPLE,
           widgets={"vae_name": "qwen_image_vae.safetensors"})
     g.add(73, "LoraLoaderModelOnly", title="[edit] Lightning 4-step", pos=(300, 840),
-          mode=4, color=PURPLE,
+          mode=0, color=PURPLE,
           widgets={"lora_name": "Qwen-Image-Edit-2511-Lightning-4steps-V1.0-bf16.safetensors",
                    "strength_model": 1.0},
           links={"model": (70, 0)})
-    g.add(74, "ModelSamplingAuraFlow", title="[edit] shift", pos=(300, 960), mode=4,
+    g.add(74, "ModelSamplingAuraFlow", title="[edit] shift", pos=(300, 960), mode=0,
           color=PURPLE, widgets={"shift": 3.1}, links={"model": (73, 0)})
-    g.add(76, "PrimitiveStringMultiline", title="[edit] EDIT PROMPT",
-          pos=(40, 1160), size=[380, 120], mode=4, color=AMBER,
-          widgets={"value": "Make the top red. Keep everything else exactly the same."})
+    g.add(6, "LoadImage", title="REF 2 — HER PHOTO (identity for the swap)",
+          pos=(40, 1300), size=[380, 320], color=GREEN,
+          widgets={"image": "emma_face_ref.png"})
+
+    g.add(76, "PrimitiveStringMultiline", title="SWAP INSTRUCTION (+ your edits)",
+          pos=(40, 1160), size=[380, 120], mode=0, color=AMBER,
+          widgets={"value": "Replace the face and hair of the woman in image 1 "
+                            "with the face of the woman in image 2. She has a "
+                            "golden blonde shoulder-length bob with a middle "
+                            "part. Keep image 1's exact pose, camera angle, "
+                            "framing, lighting, shadows and background. Keep "
+                            "the exact clothing, outfit, accessories and "
+                            "jewelry from image 1 — do not change them."})
     g.add(79, "FluxKontextImageScale", title="[edit] size for Qwen", pos=(560, 840),
-          mode=4, color=PURPLE, links={"image": (1, 0)})
+          mode=0, color=PURPLE, links={"image": (1, 0)})
     g.add(77, "TextEncodeQwenImageEditPlus", title="[edit] encode edit", pos=(560, 940),
-          mode=4, color=PURPLE,
-          links={"clip": (71, 0), "prompt": (76, 0), "vae": (72, 0), "image1": (79, 0)})
-    g.add(78, "ConditioningZeroOut", title="[edit] negative", pos=(560, 1060), mode=4,
+          mode=0, color=PURPLE,
+          links={"clip": (71, 0), "prompt": (76, 0), "vae": (72, 0), "image1": (79, 0),
+                 "image2": (6, 0)})
+    g.add(78, "ConditioningZeroOut", title="[edit] negative", pos=(560, 1060), mode=0,
           color=PURPLE, links={"conditioning": (77, 0)})
-    g.add(80, "VAEEncode", title="[edit] to latent", pos=(560, 1160), mode=4, color=PURPLE,
+    g.add(80, "VAEEncode", title="[edit] to latent", pos=(560, 1160), mode=0, color=PURPLE,
           links={"pixels": (79, 0), "vae": (72, 0)})
     g.add(81, "KSampler", title="[edit] 4-step edit", pos=(800, 840), size=[300, 240],
-          mode=4, color=PURPLE,
+          mode=0, color=PURPLE,
           widgets={"seed": 0, "steps": 4, "cfg": 1.0, "sampler_name": "euler",
                    "scheduler": "simple", "denoise": 1.0},
           links={"model": (74, 0), "positive": (77, 0), "negative": (78, 0),
                  "latent_image": (80, 0)})
-    g.add(82, "VAEDecode", title="[edit] decode", pos=(800, 1120), mode=4, color=PURPLE,
+    g.add(82, "VAEDecode", title="[edit] decode", pos=(800, 1120), mode=0, color=PURPLE,
           links={"samples": (81, 0), "vae": (72, 0)})
 
     # switch: 1 = untouched reference (default) · 2 = Qwen-edited reference
     g.add(5, "ImageMaskSwitch", title="SOURCE SWITCH  (1 = original, 2 = edited)",
           pos=(40, 700), size=[380, 100], color=GREEN,
-          widgets={"select": 1},
+          widgets={"select": 2},
           links={"images1": (1, 0), "images2_opt": (82, 0)})
 
     g.add(2, "PrimitiveStringMultiline",
@@ -333,8 +344,9 @@ def build(oi, lora_name, trigger):
           pos=(40, 500), size=[380, 180], color=AMBER,
           widgets={"value": f"{trigger}, photo of a woman, heterochromia, "
                             "left eye warm brown, right eye light blue, "
-                            "natural skin texture, visible pores and fine skin "
-                            "detail, sharp eyes, photographic lighting"})
+                            "shoulder-length golden blonde bob with a middle part, "
+                            "looking at the camera, soft natural expression, "
+                            "natural skin, sharp eyes, photographic lighting"})
 
     g.add(3, "PrimitiveStringMultiline", title="NEGATIVE  (inert at cfg 1.0 — leave empty)",
           pos=(40, 700), size=[380, 90], color=BLUE, widgets={"value": ""})
@@ -356,7 +368,7 @@ def build(oi, lora_name, trigger):
 
     g.add(13, "LoraLoaderModelOnly", title="◆ HER IDENTITY — character LoRA",
           pos=(490, 390), size=[350, 90], color=PURPLE,
-          widgets={"lora_name": lora_name, "strength_model": 0.85},
+          widgets={"lora_name": lora_name, "strength_model": 0.65},
           links={"model": (10, 0)})
 
     g.add(14, "ModelSamplingAuraFlow", title="shift", pos=(490, 520),
@@ -372,16 +384,16 @@ def build(oi, lora_name, trigger):
           links={"clip": (11, 0), "text": (3, 0)})
 
     # --------------------------------------------- 3 FIND THE FACE, CROP BIG
-    g.add(20, "UltralyticsDetectorProvider", title="face detector",
-          pos=(920, 80), widgets={"model_name": "bbox/face_yolov8m.pt"})
-
-    g.add(21, "BboxDetectorSEGS", title="detect face", pos=(920, 180), size=[330, 180],
-          widgets={"threshold": 0.5, "dilation": 10, "crop_factor": 3.0,
-                   "drop_size": 10, "labels": "all"},
-          links={"bbox_detector": (20, 0), "image": (5, 0)})
-
-    g.add(22, "SegsToCombinedMask", title="→ coarse face mask", pos=(920, 400),
-          links={"segs": (21, 0)})
+    # Full-image parse: face AND hair define the swap region. Hair is identity —
+    # excluding it (the July face-only rule) leaves the reference person's hair
+    # on her head. Full-image (not crop-level) so long hair can't spill outside
+    # the crop and go two-tone.
+    g.add(22, "APersonMaskGenerator", title="swap region: face + ALL hair",
+          pos=(920, 180), size=[350, 200], color=BLUE,
+          widgets={"face_mask": True, "background_mask": False, "hair_mask": True,
+                   "body_mask": False, "clothes_mask": False, "confidence": 0.4,
+                   "refine_mask": True},
+          links={"images": (5, 0)})
 
     # context_from_mask_extend_factor gives the model hair + neck + surrounding
     # light to match against; output_target_* is why a 90px face still renders
@@ -400,16 +412,16 @@ def build(oi, lora_name, trigger):
 
     # MediaPipe face parse at 1024 — hair_mask stays False so her hair is never
     # painted; the reference's hair, ears and jawline survive the swap.
-    g.add(24, "APersonMaskGenerator", title="◆ precise face mask (hair excluded)",
+    g.add(24, "APersonMaskGenerator", title="◆ precise face+hair mask",
           pos=(920, 660), size=[350, 180], color=BLUE,
-          widgets={"face_mask": True, "background_mask": False, "hair_mask": False,
+          widgets={"face_mask": True, "background_mask": False, "hair_mask": True,
                    "body_mask": False, "clothes_mask": False, "confidence": 0.4,
                    "refine_mask": True},
           links={"images": (23, "cropped_image")})
 
     g.add(25, "GrowMaskWithBlur", title="feather the mask", pos=(920, 880), size=[330, 200],
-          widgets={"expand": 8, "incremental_expandrate": 0.0, "tapered_corners": True,
-                   "flip_input": False, "blur_radius": 8.0, "lerp_alpha": 1.0,
+          widgets={"expand": 10, "incremental_expandrate": 0.0, "tapered_corners": True,
+                   "flip_input": False, "blur_radius": 10.0, "lerp_alpha": 1.0,
                    "decay_factor": 1.0, "fill_holes": False},
           links={"mask": (24, 0)})
 
@@ -417,14 +429,23 @@ def build(oi, lora_name, trigger):
     g.add(30, "VAEEncode", title="crop → latent", pos=(1350, 80),
           links={"pixels": (23, "cropped_image"), "vae": (12, 0)})
 
+    # THE identity mechanism. img2img at 0.5 kept the source person's bone
+    # structure and only repainted the surface — "a blend that looks like
+    # neither". With the noise mask, the masked region regenerates from pure
+    # noise: geometry comes from the LoRA, pose/lighting anchor on the
+    # untouched surround.
+    g.add(33, "SetLatentNoiseMask", title="◆ erase her — rebuild from the LoRA",
+          pos=(1350, 170), color=PURPLE,
+          links={"samples": (30, 0), "mask": (25, 0)})
+
     # denoise 0.5: enough for the LoRA to impose her features, low enough that
     # the source latent keeps pose, head angle and expression.
     g.add(31, "KSampler", title="◆ IDENTITY RENDER", pos=(1350, 200), size=[350, 260],
           color=PURPLE,
           widgets={"seed": 0, "steps": 16, "cfg": 1.0, "sampler_name": "euler",
-                   "scheduler": "simple", "denoise": 0.5},
+                   "scheduler": "simple", "denoise": 1.0},
           links={"model": (15, 0), "positive": (16, 0), "negative": (17, 0),
-                 "latent_image": (30, 0)})
+                 "latent_image": (33, 0)})
 
     g.add(32, "VAEDecode", title="latent → pixels", pos=(1350, 500),
           links={"samples": (31, 0), "vae": (12, 0)})
@@ -433,7 +454,7 @@ def build(oi, lora_name, trigger):
     # Steals the scene's white balance and skin tone off the untouched crop.
     g.add(40, "ColorMatch", title="◆ match colour to the scene", pos=(1780, 80),
           size=[350, 140], color=("#353", "#232"),
-          widgets={"method": "mkl", "strength": 0.9},
+          widgets={"method": "mkl", "strength": 0.35},
           links={"image_ref": (23, "cropped_image"), "image_target": (32, 0)})
 
     # A face with no grain in a grainy photo is the classic tell.
@@ -454,8 +475,19 @@ def build(oi, lora_name, trigger):
           pos=(2240, 80), size=[340, 90], color=GREEN,
           links={"stitcher": (23, "stitcher"), "inpainted_image": (42, 0)})
 
-    g.add(51, "SaveImage", title="FINAL", pos=(2240, 220), size=[340, 300], color=GREEN,
-          widgets={"filename_prefix": "AIOFM_i2i_v3"}, links={"images": (50, 0)})
+    g.add(90, "SeedVR2LoadDiTModel", title="[finish] SeedVR2 DiT", pos=(2240, 220),
+          widgets={"model": "seedvr2_ema_3b_fp8_e4m3fn.safetensors"})
+    g.add(91, "SeedVR2LoadVAEModel", title="[finish] SeedVR2 VAE", pos=(2240, 320))
+    g.add(92, "SeedVR2VideoUpscaler", title="◆ upscale to delivery res",
+          pos=(2240, 420), size=[340, 220], color=GREEN,
+          widgets={"seed": 42, "resolution": 1088, "max_resolution": 0,
+                   "batch_size": 1, "color_correction": "lab"},
+          links={"image": (50, 0), "dit": (90, 0), "vae": (91, 0)})
+    g.add(93, "FilmGrain", title="[finish] grain", pos=(2240, 680),
+          widgets={"intensity": 0.02, "scale": 10.0, "temperature": 0.0, "vignette": 0.0},
+          links={"image": (92, 0)})
+    g.add(51, "SaveImage", title="FINAL", pos=(2240, 780), size=[340, 300], color=GREEN,
+          widgets={"filename_prefix": "AIOFM_i2i_v3"}, links={"images": (93, 0)})
 
     # diagnosis previews — which stage broke it, without guessing
     g.add(60, "PreviewImage", title="A · source crop", pos=(2240, 560), size=[300, 250],
