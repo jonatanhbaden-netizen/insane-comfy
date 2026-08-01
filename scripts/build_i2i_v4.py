@@ -175,6 +175,11 @@ def main():
         for n in sg.get("nodes", []):
             if n["type"] == "VAELoader" and n.get("widgets_values") and "ultraflux" in str(n["widgets_values"][0]).lower():
                 n["widgets_values"] = ["ae.safetensors"]
+            if n["type"] == "AdvancedImageDenoiser":
+                w = n.get("widgets_values", [])
+                for i, v in enumerate(w):
+                    if v == 0.41:
+                        w[i] = 0.15
             if n["type"] == "CRT Post-Process Suite":
                 w = n.get("widgets_values", [])
                 # its internal-upscaler toggle ships OFF, but the widget still
@@ -195,10 +200,8 @@ def main():
                 # STAGE 3 identity-ladder step (design's planned escalation for
                 # weak likeness, triggered by the first live two-girl test):
                 # denoise 0.50 -> 0.55, noise inject 0.40 -> 0.45
-                if n["type"] == "ClownsharKSampler_Beta" and n["widgets_values"][5] == 0.5:
-                    n["widgets_values"][5] = 0.55
-                if n["type"] == "InjectLatentNoise+" and n["widgets_values"][2] == 0.4:
-                    n["widgets_values"][2] = 0.45
+                # (stage-3 ladder step reverted 2026-08-02: it was compensating
+                # for the encoder bug; with binding fixed it only added drift)
             if n["type"] == "FaceDetailer":
                 w = n.get("widgets_values", [])
                 # denoise 0.40 -> 0.45: locate it right after res_2s/bong_tangent
