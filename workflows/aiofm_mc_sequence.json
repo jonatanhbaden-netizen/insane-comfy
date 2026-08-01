@@ -1,0 +1,2775 @@
+{
+ "last_node_id": 47,
+ "last_link_id": 72,
+ "nodes": [
+  {
+   "id": 1,
+   "type": "UNETLoader",
+   "pos": [
+    -1960,
+    120
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 0,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      1
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "I2V HIGH-noise expert (Wan 2.2 A14B)"
+  },
+  {
+   "id": 2,
+   "type": "UNETLoader",
+   "pos": [
+    -1960,
+    260
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 1,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      5
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "UNETLoader"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors",
+    "default"
+   ],
+   "title": "I2V LOW-noise expert (Wan 2.2 A14B)"
+  },
+  {
+   "id": 3,
+   "type": "CLIPLoader",
+   "pos": [
+    -1960,
+    400
+   ],
+   "size": [
+    340,
+    82
+   ],
+   "flags": {},
+   "order": 2,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "CLIP",
+     "type": "CLIP",
+     "links": [
+      15,
+      16,
+      17,
+      18
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPLoader"
+   },
+   "widgets_values": [
+    "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+    "wan",
+    "default"
+   ],
+   "title": "UMT5-XXL text encoder"
+  },
+  {
+   "id": 4,
+   "type": "VAELoader",
+   "pos": [
+    -1960,
+    530
+   ],
+   "size": [
+    340,
+    58
+   ],
+   "flags": {},
+   "order": 3,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "VAE",
+     "type": "VAE",
+     "links": [
+      21,
+      32,
+      38,
+      50,
+      56,
+      68
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAELoader"
+   },
+   "widgets_values": [
+    "wan_2.1_vae.safetensors"
+   ],
+   "title": "Wan VAE"
+  },
+  {
+   "id": 5,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1580,
+    120
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 4,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 1
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      2
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "f1sher_000002400.safetensors",
+    0.8
+   ],
+   "title": "Character LoRA (HIGH expert)"
+  },
+  {
+   "id": 6,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1580,
+    260
+   ],
+   "size": [
+    380,
+    82
+   ],
+   "flags": {},
+   "order": 5,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 5
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      6
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "f1sher_000002400.safetensors",
+    0.8
+   ],
+   "title": "Character LoRA (LOW expert)"
+  },
+  {
+   "id": 7,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1160,
+    120
+   ],
+   "size": [
+    400,
+    82
+   ],
+   "flags": {},
+   "order": 6,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 2
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      3
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors",
+    1.0
+   ],
+   "title": "SVI 2.0 Pro LoRA HIGH (required \u00b7 NEW DOWNLOAD)"
+  },
+  {
+   "id": 8,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -1160,
+    260
+   ],
+   "size": [
+    400,
+    82
+   ],
+   "flags": {},
+   "order": 7,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 6
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      7
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors",
+    1.0
+   ],
+   "title": "SVI 2.0 Pro LoRA LOW (required \u00b7 NEW DOWNLOAD)"
+  },
+  {
+   "id": 9,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -740,
+    120
+   ],
+   "size": [
+    360,
+    82
+   ],
+   "flags": {},
+   "order": 8,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 3
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      4
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_high_noise.safetensors",
+    0.6
+   ],
+   "title": "\u26a1 Lightning LoRA HIGH (OFF for chains \u00b7 \u22640.6)"
+  },
+  {
+   "id": 10,
+   "type": "LoraLoaderModelOnly",
+   "pos": [
+    -740,
+    260
+   ],
+   "size": [
+    360,
+    82
+   ],
+   "flags": {},
+   "order": 9,
+   "mode": 4,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 7
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      8
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoraLoaderModelOnly"
+   },
+   "widgets_values": [
+    "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
+    0.6
+   ],
+   "title": "\u26a1 Lightning LoRA LOW (OFF for chains \u00b7 \u22640.6)"
+  },
+  {
+   "id": 11,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -360,
+    120
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 10,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 4
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      9,
+      10,
+      11
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift HIGH (8.0 \u00b7 lightning: 5.0)"
+  },
+  {
+   "id": 12,
+   "type": "ModelSamplingSD3",
+   "pos": [
+    -360,
+    260
+   ],
+   "size": [
+    270,
+    58
+   ],
+   "flags": {},
+   "order": 11,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 8
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MODEL",
+     "type": "MODEL",
+     "links": [
+      12,
+      13,
+      14
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ModelSamplingSD3"
+   },
+   "widgets_values": [
+    8.0
+   ],
+   "title": "Shift LOW (8.0 \u00b7 lightning: 5.0)"
+  },
+  {
+   "id": 13,
+   "type": "LoadImage",
+   "pos": [
+    -1960,
+    760
+   ],
+   "size": [
+    320,
+    314
+   ],
+   "flags": {},
+   "order": 12,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      19
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "LoadImage"
+   },
+   "widgets_values": [
+    "start_image.png",
+    "image"
+   ],
+   "title": "START IMAGE \u2014 identity anchor (9:16)"
+  },
+  {
+   "id": 14,
+   "type": "ImageScale",
+   "pos": [
+    -1580,
+    760
+   ],
+   "size": [
+    315,
+    130
+   ],
+   "flags": {},
+   "order": 13,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 19
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      20,
+      36,
+      54
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ImageScale"
+   },
+   "widgets_values": [
+    "lanczos",
+    480,
+    832,
+    "center"
+   ],
+   "title": "Anchor \u2192 480\u00d7832 (9:16 gen size)"
+  },
+  {
+   "id": 15,
+   "type": "VAEEncode",
+   "pos": [
+    -1580,
+    960
+   ],
+   "size": [
+    280,
+    46
+   ],
+   "flags": {},
+   "order": 14,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 20
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 21
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      24,
+      41,
+      59
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   },
+   "title": "ANCHOR LATENT \u2014 feeds every segment"
+  },
+  {
+   "id": 16,
+   "type": "CLIPTextEncode",
+   "pos": [
+    -1220,
+    760
+   ],
+   "size": [
+    400,
+    180
+   ],
+   "flags": {},
+   "order": 15,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 15
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      23,
+      40,
+      58
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "\u8272\u8c03\u8273\u4e3d\uff0c\u8fc7\u66dd\uff0c\u9759\u6001\uff0c\u7ec6\u8282\u6a21\u7cca\u4e0d\u6e05\uff0c\u5b57\u5e55\uff0c\u98ce\u683c\uff0c\u4f5c\u54c1\uff0c\u753b\u4f5c\uff0c\u753b\u9762\uff0c\u9759\u6b62\uff0c\u6574\u4f53\u53d1\u7070\uff0c\u6700\u5dee\u8d28\u91cf\uff0c\u4f4e\u8d28\u91cf\uff0cJPEG\u538b\u7f29\u6b8b\u7559\uff0c\u4e11\u964b\u7684\uff0c\u6b8b\u7f3a\u7684\uff0c\u591a\u4f59\u7684\u624b\u6307\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u624b\u90e8\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u8138\u90e8\uff0c\u7578\u5f62\u7684\uff0c\u6bc1\u5bb9\u7684\uff0c\u5f62\u6001\u7578\u5f62\u7684\u80a2\u4f53\uff0c\u624b\u6307\u878d\u5408\uff0c\u9759\u6b62\u4e0d\u52a8\u7684\u753b\u9762\uff0c\u6742\u4e71\u7684\u80cc\u666f\uff0c\u4e09\u6761\u817f\uff0c\u80cc\u666f\u4eba\u5f88\u591a\uff0c\u5012\u7740\u8d70"
+   ],
+   "title": "NEGATIVE (canonical Wan \u2014 keep)"
+  },
+  {
+   "id": 17,
+   "type": "CLIPTextEncode",
+   "pos": [
+    80,
+    120
+   ],
+   "size": [
+    400,
+    200
+   ],
+   "flags": {},
+   "order": 16,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 16
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      22
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "A photorealistic young woman in a cozy sunlit apartment kitchen, sitting on a barstool by the counter, vertical 9:16 framing. STATE: hands empty, hair loose over her shoulders. MOTION: she talks casually toward the camera, gestures softly with one hand, natural blinks, subtle weight shifts, gentle handheld camera sway, natural skin texture, film grain"
+   ],
+   "title": "SEGMENT 1 PROMPT \u2014 state + motion"
+  },
+  {
+   "id": 18,
+   "type": "CLIPTextEncode",
+   "pos": [
+    1400,
+    120
+   ],
+   "size": [
+    400,
+    200
+   ],
+   "flags": {},
+   "order": 24,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 17
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      39
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "Same young woman, same sunlit apartment kitchen, same outfit and lighting, vertical 9:16 framing. STATE: she sits mid-conversation on the barstool. MOTION: a hand enters from the right and gives her a drink; she accepts the glass, smiles and nods in thanks, takes a small sip, the same gentle handheld camera sway continues"
+   ],
+   "title": "SEGMENT 2 PROMPT \u2014 state + motion"
+  },
+  {
+   "id": 19,
+   "type": "CLIPTextEncode",
+   "pos": [
+    2760,
+    120
+   ],
+   "size": [
+    400,
+    200
+   ],
+   "flags": {},
+   "order": 33,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "clip",
+     "type": "CLIP",
+     "link": 18
+    }
+   ],
+   "outputs": [
+    {
+     "name": "CONDITIONING",
+     "type": "CONDITIONING",
+     "links": [
+      57
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "CLIPTextEncode"
+   },
+   "widgets_values": [
+    "Same young woman, same sunlit apartment kitchen, same outfit and lighting, vertical 9:16 framing. STATE: she holds the glass in her left hand. MOTION: she sets the glass down on the counter, leans slightly toward the camera laughing, tucks a strand of hair behind her ear, gentle handheld camera sway continues"
+   ],
+   "title": "SEGMENT 3 PROMPT \u2014 state + motion"
+  },
+  {
+   "id": 20,
+   "type": "WanImageToVideoSVIPro",
+   "pos": [
+    80,
+    400
+   ],
+   "size": [
+    330,
+    190
+   ],
+   "flags": {},
+   "order": 17,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 22
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 23
+    },
+    {
+     "name": "anchor_samples",
+     "type": "LATENT",
+     "link": 24
+    },
+    {
+     "name": "prev_samples",
+     "type": "LATENT",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      25,
+      28
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      26,
+      29
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "links": [
+      27
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WanImageToVideoSVIPro"
+   },
+   "widgets_values": [
+    81,
+    1
+   ],
+   "title": "SVI SEGMENT 1 \u2014 anchor start (81f)"
+  },
+  {
+   "id": 21,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    520,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 18,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 9
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 25
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 26
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 27
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      30
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "enable",
+    77710001,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    0,
+    10,
+    "enable"
+   ],
+   "title": "S1 SAMPLER 1/2 \u2014 HIGH (0\u219210) \u00b7 seed 77710001"
+  },
+  {
+   "id": 22,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    880,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 19,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 12
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 28
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 29
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 30
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      31
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "disable",
+    0,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    10,
+    10000,
+    "disable"
+   ],
+   "title": "S1 SAMPLER 2/2 \u2014 LOW (10\u2192end)"
+  },
+  {
+   "id": 23,
+   "type": "VAEDecode",
+   "pos": [
+    880,
+    520
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 20,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 31
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 32
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      33,
+      34
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "S1 decode"
+  },
+  {
+   "id": 24,
+   "type": "GetImageRangeFromBatch",
+   "pos": [
+    520,
+    620
+   ],
+   "size": [
+    315,
+    106
+   ],
+   "flags": {},
+   "order": 21,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 33
+    },
+    {
+     "name": "masks",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      35
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GetImageRangeFromBatch"
+   },
+   "widgets_values": [
+    -1,
+    1
+   ],
+   "title": "S1 LAST FRAME (start_index -1)"
+  },
+  {
+   "id": 25,
+   "type": "ColorMatchV2",
+   "pos": [
+    520,
+    800
+   ],
+   "size": [
+    315,
+    150
+   ],
+   "flags": {},
+   "order": 22,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image_target",
+     "type": "IMAGE",
+     "link": 35
+    },
+    {
+     "name": "image_ref",
+     "type": "IMAGE",
+     "link": 36
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      37
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ColorMatchV2"
+   },
+   "widgets_values": [
+    "mkl",
+    1.0,
+    true
+   ],
+   "title": "S1 tail \u2192 ColorMatch vs anchor"
+  },
+  {
+   "id": 26,
+   "type": "VAEEncode",
+   "pos": [
+    520,
+    1020
+   ],
+   "size": [
+    300,
+    46
+   ],
+   "flags": {},
+   "order": 23,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 37
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 38
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      42
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   },
+   "title": "S1 tail latent \u2192 S2 motion context"
+  },
+  {
+   "id": 27,
+   "type": "WanImageToVideoSVIPro",
+   "pos": [
+    1400,
+    400
+   ],
+   "size": [
+    330,
+    190
+   ],
+   "flags": {},
+   "order": 25,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 39
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 40
+    },
+    {
+     "name": "anchor_samples",
+     "type": "LATENT",
+     "link": 41
+    },
+    {
+     "name": "prev_samples",
+     "type": "LATENT",
+     "link": 42
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      43,
+      46
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      44,
+      47
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "links": [
+      45
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WanImageToVideoSVIPro"
+   },
+   "widgets_values": [
+    81,
+    1
+   ],
+   "title": "SVI SEGMENT 2 \u2014 anchor + S1 context (81f)"
+  },
+  {
+   "id": 28,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    1840,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 26,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 10
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 43
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 44
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 45
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      48
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "enable",
+    77720002,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    0,
+    10,
+    "enable"
+   ],
+   "title": "S2 SAMPLER 1/2 \u2014 HIGH (0\u219210) \u00b7 seed 77720002"
+  },
+  {
+   "id": 29,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    2200,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 27,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 13
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 46
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 47
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 48
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      49
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "disable",
+    0,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    10,
+    10000,
+    "disable"
+   ],
+   "title": "S2 SAMPLER 2/2 \u2014 LOW (10\u2192end)"
+  },
+  {
+   "id": 30,
+   "type": "VAEDecode",
+   "pos": [
+    2200,
+    520
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 28,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 49
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 50
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      51,
+      52
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "S2 decode"
+  },
+  {
+   "id": 31,
+   "type": "GetImageRangeFromBatch",
+   "pos": [
+    1840,
+    620
+   ],
+   "size": [
+    315,
+    106
+   ],
+   "flags": {},
+   "order": 29,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 51
+    },
+    {
+     "name": "masks",
+     "type": "MASK",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      53
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GetImageRangeFromBatch"
+   },
+   "widgets_values": [
+    -1,
+    1
+   ],
+   "title": "S2 LAST FRAME (start_index -1)"
+  },
+  {
+   "id": 32,
+   "type": "ColorMatchV2",
+   "pos": [
+    1840,
+    800
+   ],
+   "size": [
+    315,
+    150
+   ],
+   "flags": {},
+   "order": 30,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "image_target",
+     "type": "IMAGE",
+     "link": 53
+    },
+    {
+     "name": "image_ref",
+     "type": "IMAGE",
+     "link": 54
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      55
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "ColorMatchV2"
+   },
+   "widgets_values": [
+    "mkl",
+    1.0,
+    true
+   ],
+   "title": "S2 tail \u2192 ColorMatch vs anchor"
+  },
+  {
+   "id": 33,
+   "type": "VAEEncode",
+   "pos": [
+    1840,
+    1020
+   ],
+   "size": [
+    300,
+    46
+   ],
+   "flags": {},
+   "order": 31,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "pixels",
+     "type": "IMAGE",
+     "link": 55
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 56
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      60
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEEncode"
+   },
+   "title": "S2 tail latent \u2192 S3 motion context"
+  },
+  {
+   "id": 34,
+   "type": "VHS_MergeImages",
+   "pos": [
+    2200,
+    660
+   ],
+   "size": [
+    315,
+    130
+   ],
+   "flags": {},
+   "order": 32,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images_A",
+     "type": "IMAGE",
+     "link": 34
+    },
+    {
+     "name": "images_B",
+     "type": "IMAGE",
+     "link": 52
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      69
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "count",
+     "type": "INT",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_MergeImages"
+   },
+   "widgets_values": [
+    "match A",
+    "nearest-exact",
+    "disabled"
+   ],
+   "title": "CONCAT S1 + S2"
+  },
+  {
+   "id": 35,
+   "type": "WanImageToVideoSVIPro",
+   "pos": [
+    2760,
+    400
+   ],
+   "size": [
+    330,
+    190
+   ],
+   "flags": {},
+   "order": 34,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 57
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 58
+    },
+    {
+     "name": "anchor_samples",
+     "type": "LATENT",
+     "link": 59
+    },
+    {
+     "name": "prev_samples",
+     "type": "LATENT",
+     "link": 60
+    }
+   ],
+   "outputs": [
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "links": [
+      61,
+      64
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "links": [
+      62,
+      65
+     ],
+     "slot_index": 1
+    },
+    {
+     "name": "latent",
+     "type": "LATENT",
+     "links": [
+      63
+     ],
+     "slot_index": 2
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "WanImageToVideoSVIPro"
+   },
+   "widgets_values": [
+    81,
+    1
+   ],
+   "title": "SVI SEGMENT 3 \u2014 anchor + S2 context (81f)"
+  },
+  {
+   "id": 36,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    3200,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 35,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 11
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 61
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 62
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 63
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      66
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "enable",
+    77730003,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    0,
+    10,
+    "enable"
+   ],
+   "title": "S3 SAMPLER 1/2 \u2014 HIGH (0\u219210) \u00b7 seed 77730003"
+  },
+  {
+   "id": 37,
+   "type": "KSamplerAdvanced",
+   "pos": [
+    3560,
+    120
+   ],
+   "size": [
+    315,
+    334
+   ],
+   "flags": {},
+   "order": 36,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "model",
+     "type": "MODEL",
+     "link": 14
+    },
+    {
+     "name": "positive",
+     "type": "CONDITIONING",
+     "link": 64
+    },
+    {
+     "name": "negative",
+     "type": "CONDITIONING",
+     "link": 65
+    },
+    {
+     "name": "latent_image",
+     "type": "LATENT",
+     "link": 66
+    }
+   ],
+   "outputs": [
+    {
+     "name": "LATENT",
+     "type": "LATENT",
+     "links": [
+      67
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "KSamplerAdvanced"
+   },
+   "widgets_values": [
+    "disable",
+    0,
+    "fixed",
+    20,
+    3.5,
+    "euler",
+    "simple",
+    10,
+    10000,
+    "disable"
+   ],
+   "title": "S3 SAMPLER 2/2 \u2014 LOW (10\u2192end)"
+  },
+  {
+   "id": 38,
+   "type": "VAEDecode",
+   "pos": [
+    3560,
+    520
+   ],
+   "size": [
+    210,
+    46
+   ],
+   "flags": {},
+   "order": 37,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "samples",
+     "type": "LATENT",
+     "link": 67
+    },
+    {
+     "name": "vae",
+     "type": "VAE",
+     "link": 68
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      70
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VAEDecode"
+   },
+   "title": "S3 decode"
+  },
+  {
+   "id": 39,
+   "type": "VHS_MergeImages",
+   "pos": [
+    3560,
+    660
+   ],
+   "size": [
+    315,
+    130
+   ],
+   "flags": {},
+   "order": 38,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images_A",
+     "type": "IMAGE",
+     "link": 69
+    },
+    {
+     "name": "images_B",
+     "type": "IMAGE",
+     "link": 70
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      71
+     ],
+     "slot_index": 0
+    },
+    {
+     "name": "count",
+     "type": "INT",
+     "links": [],
+     "slot_index": 1
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_MergeImages"
+   },
+   "widgets_values": [
+    "match A",
+    "nearest-exact",
+    "disabled"
+   ],
+   "title": "CONCAT + SEGMENT 3 (bypass with Seg 3)"
+  },
+  {
+   "id": 40,
+   "type": "RIFE VFI",
+   "pos": [
+    4080,
+    120
+   ],
+   "size": [
+    315,
+    322
+   ],
+   "flags": {},
+   "order": 39,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "frames",
+     "type": "IMAGE",
+     "link": 71
+    }
+   ],
+   "outputs": [
+    {
+     "name": "IMAGE",
+     "type": "IMAGE",
+     "links": [
+      72
+     ],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "RIFE VFI"
+   },
+   "widgets_values": [
+    "rife49.pth",
+    10,
+    2,
+    true,
+    true,
+    1.0,
+    "float32",
+    false,
+    1
+   ],
+   "title": "RIFE \u00d72 \u2192 32 fps"
+  },
+  {
+   "id": 41,
+   "type": "VHS_VideoCombine",
+   "pos": [
+    4460,
+    120
+   ],
+   "size": [
+    360,
+    340
+   ],
+   "flags": {},
+   "order": 40,
+   "mode": 0,
+   "inputs": [
+    {
+     "name": "images",
+     "type": "IMAGE",
+     "link": 72
+    },
+    {
+     "name": "audio",
+     "type": "AUDIO",
+     "link": null
+    }
+   ],
+   "outputs": [
+    {
+     "name": "Filenames",
+     "type": "VHS_FILENAMES",
+     "links": [],
+     "slot_index": 0
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "VHS_VideoCombine"
+   },
+   "widgets_values": {
+    "frame_rate": 32,
+    "loop_count": 0,
+    "filename_prefix": "mc_sequence/svi_chain",
+    "format": "video/h264-mp4",
+    "pix_fmt": "yuv420p",
+    "crf": 17,
+    "save_metadata": true,
+    "trim_to_audio": false,
+    "pingpong": false,
+    "save_output": true,
+    "videopreview": {
+     "hidden": false,
+     "paused": false,
+     "params": {}
+    }
+   },
+   "title": "EXPORT \u2014 h264 mp4, crf 17"
+  },
+  {
+   "id": 42,
+   "type": "Note",
+   "pos": [
+    -2000,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 41,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "MC SEQUENCE \u2014 30\u201390 s anti-drift chaining (SVI 2.0 Pro)\n\nWHAT THIS DOES\nChains Wan 2.2 I2V A14B segments with the Stable-Video-Infinity\n2.0 Pro LoRAs. Every segment is conditioned on the SAME anchor\nlatent (your start image) \u2014 identity cannot walk away over the\nchain. Motion continuity comes from each segment's last frame,\nColorMatched back to the anchor before hand-off, so color cannot\nwalk either.\n\nTHIS FILE = 3 segments \u00d7 81 frames @ 16 fps \u2248 15 s per queue.\nFor 30\u201390 s: duplicate the SEGMENT 2 group (it contains the full\nhand-off chain) \u2014 see note \u2465. Each extra segment adds ~5 s:\n30 s \u2248 6 segments \u00b7 90 s \u2248 18 segments. The fixed anchor keeps\nidentity locked no matter how many you add.\n\nQUICK START\n1) Download the 2 SVI Pro LoRAs \u2014 note \u2461. REQUIRED.\n2) INPUT group: upload your 9:16 start image.\n3) Write SEGMENT 1/2/3 prompts (rules in note \u2462).\n4) Queue. Output \u2192 output/mc_sequence/.\n\n~4\u20136 min per segment on A100 80GB @ 480\u00d7832, 20 steps."
+   ],
+   "title": "\u2460 READ ME \u2014 MC SEQUENCE",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 43,
+   "type": "Note",
+   "pos": [
+    -1500,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 42,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "ALREADY ON VOLUME\ndiffusion_models/wan2.2_i2v_high_noise_14B_fp8_scaled.safetensors\ndiffusion_models/wan2.2_i2v_low_noise_14B_fp8_scaled.safetensors\ntext_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors\nvae/wan_2.1_vae.safetensors\nloras/wan2.2_i2v_lightx2v_4steps_lora_v1_{high,low}_noise.safetensors\n\nNEW DOWNLOAD \u2014 REQUIRED (~2.4 GB total; the chain does not work\nwithout them):\nloras/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors\nloras/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors\nSource: huggingface.co/Kijai/WanVideo_comfy\n        \u2192 LoRAs/Stable-Video-Infinity/v2.0/  (1.23 GB each, fp16)\ncd models/loras && wget https://huggingface.co/Kijai/WanVideo_comfy/resolve/main/LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors\nwget .../SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors\n\nWHY fp16: fp16 accumulates less error over long chains (SVI only\nships fp16 \u2014 good). Volume UNETs are fp8_scaled: fine for 3\nsegments; fp16 UNETs are cleaner for very long chains but ~2\u00d7\nsize/VRAM.\n\nSTACK ORDER (both experts): UNET \u2192 Character LoRA \u2192 SVI Pro \u2192\nLightning \u2192 shift. Keep HIGH files on the HIGH expert, LOW on\nLOW \u2014 crossing them breaks sampling."
+   ],
+   "title": "\u2461 MODELS + NEW DOWNLOAD",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 44,
+   "type": "Note",
+   "pos": [
+    -1000,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 43,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "HOW THE CHAIN WORKS\nanchor latent = VAEEncode(start image) \u2192 EVERY segment's\n  anchor_samples (identity anchor \u2014 the anti-drift core).\nprev context  = segment N last frame \u2192 ColorMatch (vs anchor)\n  \u2192 VAEEncode \u2192 segment N+1 prev_samples\n  (motion_latent_count 1).\n\nPROMPT RULES (titles are the patch contract)\nEach segment prompt = STATE + MOTION:\n  STATE  \u2014 what is already true when the segment starts\n  MOTION \u2014 what happens during these 81 frames\n\nOFF-FRAME ENTRIES go in the NEXT segment's prompt, never the\ncurrent one. Example (already wired into SEGMENT 2's prompt):\n\"a hand enters from the right and gives her a drink\" \u2014 anything\nentering frame must be introduced at a segment boundary, in the\nsegment where it appears.\n\nKeep character, outfit, scene and lighting descriptions\nIDENTICAL across all segments \u2014 contradicting the anchor is\ndrift you asked for. Only STATE and MOTION should change."
+   ],
+   "title": "\u2462 CHAINING + PROMPT RULES",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 45,
+   "type": "Note",
+   "pos": [
+    -500,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 44,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "81 FRAMES PER SEGMENT IS A HARD LIMIT\n121-frame segments = progressive color degradation (latent\nsaturation walk). Never raise length \u2014 add segments instead.\n\nSLOW MOTION + COLOR SHIFT ACROSS THE CHAIN\n#1 cause: lightning/distill LoRAs. They are BYPASSED here on\npurpose and pre-set to 0.6 strength. Draft mode: enable both,\nsteps 6, cfg 1.0, shift 5.0 \u2014 expect softer joins. Never render\nfinal chains with them enabled.\n\nIDENTITY STILL DRIFTS \u2192 enable Character LoRA on BOTH experts\n(strength 0.6\u20130.9) and/or use a cleaner, sharper anchor still.\n\nVISIBLE JUMP AT A JOIN \u2192 set motion_latent_count 2 on the next\nsegment AND num_frames 5 on the tail LAST FRAME node, or drop\nColorMatch strength to 0.7.\n\nSATURATION CREEP AFTER MANY SEGMENTS \u2192 switch ColorMatch method\nmkl \u2192 hm-mkl-hm.\n\nOOM at 480\u00d7832\u00d781f \u2192 replace VAEDecode with VAEDecodeTiled, or\nset UNET weight_dtype fp8_e4m3fn_fast."
+   ],
+   "title": "\u2463 FAILURE MODES + FIXES",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 46,
+   "type": "Note",
+   "pos": [
+    0,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 45,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "GENERATE AT 480\u00d7832 (9:16) \u2014 ALWAYS.\nChains run ~3\u00d7 faster than at 720\u00d71280, drift-per-step is\nlower, and 81 frames fits VRAM comfortably. Generation size\ncomes from the anchor ImageScale node \u2014 do not raise it.\n\nUPSCALE AFTER APPROVAL, on the finished mp4:\n480\u00d7832 \u2192 1080\u00d71920 with your upscaler of choice (SeedVR2 /\nTopaz / a Wan low-noise refine pass). Upscaling drafts burns\n10\u00d7 GPU time on takes you will throw away.\n\nFPS: segments render 16 fps native (81f = 5.06 s each).\nRIFE \u00d72 \u2192 32 fps export. For a 24 fps deliverable: RIFE\nmultiplier 3 (\u2192 48 fps) + frame_rate 48, or remove RIFE and\nexport at 16."
+   ],
+   "title": "\u2464 VERTICAL 480\u00d7832 + UPSCALE-AFTER POLICY",
+   "color": "#432",
+   "bgcolor": "#653"
+  },
+  {
+   "id": 47,
+   "type": "Note",
+   "pos": [
+    500,
+    -720
+   ],
+   "size": [
+    460,
+    560
+   ],
+   "flags": {},
+   "order": 46,
+   "mode": 0,
+   "inputs": [],
+   "outputs": [],
+   "properties": {},
+   "widgets_values": [
+    "SEGMENT 2 and SEGMENT 3 are boxed for exactly this:\n\n10 s RUN \u2014 select the SEGMENT 3 group frame \u2192 Ctrl+B.\nIts CONCAT node is bypassed too and passes S1+S2 straight\nthrough to RIFE.\n 5 s RUN \u2014 bypass BOTH the SEGMENT 2 and SEGMENT 3 groups.\nNever bypass Seg 2 while keeping Seg 3: segment 3's prev\ncontext comes from segment 2's tail \u2014 the chain breaks.\n\nSEEDS are fixed and different per segment (77710001 /\n77720002 / 77730003) so a prompt set reproduces exactly.\nChange all three for a new take. Same seed on every segment\nmakes repetitive motion \u2014 keep them different.\n\nEXTENDING PAST 15 s \u2014 duplicate the SEGMENT 2 group (it has\nthe full tail hand-off), then rewire on the copy:\n  SVI prev_samples \u2190 previous segment's tail VAEEncode\n  SVI anchor_samples \u2190 ANCHOR LATENT (never changes)\n  CONCAT images_A \u2190 previous CONCAT IMAGE output\n  new fixed seed on the HIGH sampler\n+5 s per copy. 30 s \u2248 6 segments \u00b7 90 s \u2248 18 segments."
+   ],
+   "title": "\u2465 SHORT RUNS \u00b7 SEEDS \u00b7 EXTENDING",
+   "color": "#432",
+   "bgcolor": "#653"
+  }
+ ],
+ "links": [
+  [
+   1,
+   1,
+   0,
+   5,
+   0,
+   "MODEL"
+  ],
+  [
+   2,
+   5,
+   0,
+   7,
+   0,
+   "MODEL"
+  ],
+  [
+   3,
+   7,
+   0,
+   9,
+   0,
+   "MODEL"
+  ],
+  [
+   4,
+   9,
+   0,
+   11,
+   0,
+   "MODEL"
+  ],
+  [
+   5,
+   2,
+   0,
+   6,
+   0,
+   "MODEL"
+  ],
+  [
+   6,
+   6,
+   0,
+   8,
+   0,
+   "MODEL"
+  ],
+  [
+   7,
+   8,
+   0,
+   10,
+   0,
+   "MODEL"
+  ],
+  [
+   8,
+   10,
+   0,
+   12,
+   0,
+   "MODEL"
+  ],
+  [
+   9,
+   11,
+   0,
+   21,
+   0,
+   "MODEL"
+  ],
+  [
+   10,
+   11,
+   0,
+   28,
+   0,
+   "MODEL"
+  ],
+  [
+   11,
+   11,
+   0,
+   36,
+   0,
+   "MODEL"
+  ],
+  [
+   12,
+   12,
+   0,
+   22,
+   0,
+   "MODEL"
+  ],
+  [
+   13,
+   12,
+   0,
+   29,
+   0,
+   "MODEL"
+  ],
+  [
+   14,
+   12,
+   0,
+   37,
+   0,
+   "MODEL"
+  ],
+  [
+   15,
+   3,
+   0,
+   16,
+   0,
+   "CLIP"
+  ],
+  [
+   16,
+   3,
+   0,
+   17,
+   0,
+   "CLIP"
+  ],
+  [
+   17,
+   3,
+   0,
+   18,
+   0,
+   "CLIP"
+  ],
+  [
+   18,
+   3,
+   0,
+   19,
+   0,
+   "CLIP"
+  ],
+  [
+   19,
+   13,
+   0,
+   14,
+   0,
+   "IMAGE"
+  ],
+  [
+   20,
+   14,
+   0,
+   15,
+   0,
+   "IMAGE"
+  ],
+  [
+   21,
+   4,
+   0,
+   15,
+   1,
+   "VAE"
+  ],
+  [
+   22,
+   17,
+   0,
+   20,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   23,
+   16,
+   0,
+   20,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   24,
+   15,
+   0,
+   20,
+   2,
+   "LATENT"
+  ],
+  [
+   25,
+   20,
+   0,
+   21,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   26,
+   20,
+   1,
+   21,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   27,
+   20,
+   2,
+   21,
+   3,
+   "LATENT"
+  ],
+  [
+   28,
+   20,
+   0,
+   22,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   29,
+   20,
+   1,
+   22,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   30,
+   21,
+   0,
+   22,
+   3,
+   "LATENT"
+  ],
+  [
+   31,
+   22,
+   0,
+   23,
+   0,
+   "LATENT"
+  ],
+  [
+   32,
+   4,
+   0,
+   23,
+   1,
+   "VAE"
+  ],
+  [
+   33,
+   23,
+   0,
+   24,
+   0,
+   "IMAGE"
+  ],
+  [
+   34,
+   23,
+   0,
+   34,
+   0,
+   "IMAGE"
+  ],
+  [
+   35,
+   24,
+   0,
+   25,
+   0,
+   "IMAGE"
+  ],
+  [
+   36,
+   14,
+   0,
+   25,
+   1,
+   "IMAGE"
+  ],
+  [
+   37,
+   25,
+   0,
+   26,
+   0,
+   "IMAGE"
+  ],
+  [
+   38,
+   4,
+   0,
+   26,
+   1,
+   "VAE"
+  ],
+  [
+   39,
+   18,
+   0,
+   27,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   40,
+   16,
+   0,
+   27,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   41,
+   15,
+   0,
+   27,
+   2,
+   "LATENT"
+  ],
+  [
+   42,
+   26,
+   0,
+   27,
+   3,
+   "LATENT"
+  ],
+  [
+   43,
+   27,
+   0,
+   28,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   44,
+   27,
+   1,
+   28,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   45,
+   27,
+   2,
+   28,
+   3,
+   "LATENT"
+  ],
+  [
+   46,
+   27,
+   0,
+   29,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   47,
+   27,
+   1,
+   29,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   48,
+   28,
+   0,
+   29,
+   3,
+   "LATENT"
+  ],
+  [
+   49,
+   29,
+   0,
+   30,
+   0,
+   "LATENT"
+  ],
+  [
+   50,
+   4,
+   0,
+   30,
+   1,
+   "VAE"
+  ],
+  [
+   51,
+   30,
+   0,
+   31,
+   0,
+   "IMAGE"
+  ],
+  [
+   52,
+   30,
+   0,
+   34,
+   1,
+   "IMAGE"
+  ],
+  [
+   53,
+   31,
+   0,
+   32,
+   0,
+   "IMAGE"
+  ],
+  [
+   54,
+   14,
+   0,
+   32,
+   1,
+   "IMAGE"
+  ],
+  [
+   55,
+   32,
+   0,
+   33,
+   0,
+   "IMAGE"
+  ],
+  [
+   56,
+   4,
+   0,
+   33,
+   1,
+   "VAE"
+  ],
+  [
+   57,
+   19,
+   0,
+   35,
+   0,
+   "CONDITIONING"
+  ],
+  [
+   58,
+   16,
+   0,
+   35,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   59,
+   15,
+   0,
+   35,
+   2,
+   "LATENT"
+  ],
+  [
+   60,
+   33,
+   0,
+   35,
+   3,
+   "LATENT"
+  ],
+  [
+   61,
+   35,
+   0,
+   36,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   62,
+   35,
+   1,
+   36,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   63,
+   35,
+   2,
+   36,
+   3,
+   "LATENT"
+  ],
+  [
+   64,
+   35,
+   0,
+   37,
+   1,
+   "CONDITIONING"
+  ],
+  [
+   65,
+   35,
+   1,
+   37,
+   2,
+   "CONDITIONING"
+  ],
+  [
+   66,
+   36,
+   0,
+   37,
+   3,
+   "LATENT"
+  ],
+  [
+   67,
+   37,
+   0,
+   38,
+   0,
+   "LATENT"
+  ],
+  [
+   68,
+   4,
+   0,
+   38,
+   1,
+   "VAE"
+  ],
+  [
+   69,
+   34,
+   0,
+   39,
+   0,
+   "IMAGE"
+  ],
+  [
+   70,
+   38,
+   0,
+   39,
+   1,
+   "IMAGE"
+  ],
+  [
+   71,
+   39,
+   0,
+   40,
+   0,
+   "IMAGE"
+  ],
+  [
+   72,
+   40,
+   0,
+   41,
+   0,
+   "IMAGE"
+  ]
+ ],
+ "groups": [
+  {
+   "id": 1,
+   "title": "1 \u00b7 MODELS \u2014 Wan 2.2 I2V A14B + SVI 2.0 Pro stack",
+   "bounding": [
+    -2000,
+    40,
+    1960,
+    580
+   ],
+   "color": "#3f789e",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 2,
+   "title": "2 \u00b7 INPUT \u2014 anchor image \u00b7 anchor latent \u00b7 negative",
+   "bounding": [
+    -2000,
+    680,
+    1220,
+    560
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 3,
+   "title": "3 \u00b7 SEGMENT 1 (0\u20135 s)",
+   "bounding": [
+    40,
+    40,
+    1200,
+    1100
+   ],
+   "color": "#b58b2a",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 4,
+   "title": "4 \u00b7 SEGMENT 2 (5\u201310 s) \u2014 bypass with Seg 3 for 5 s runs",
+   "bounding": [
+    1360,
+    40,
+    1240,
+    1100
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 5,
+   "title": "5 \u00b7 SEGMENT 3 (10\u201315 s) \u2014 Ctrl+B this group for 10 s runs",
+   "bounding": [
+    2720,
+    40,
+    1240,
+    1100
+   ],
+   "color": "#a1309b",
+   "font_size": 24,
+   "flags": {}
+  },
+  {
+   "id": 6,
+   "title": "6 \u00b7 CONCAT \u00b7 RIFE \u00b7 EXPORT",
+   "bounding": [
+    4040,
+    40,
+    860,
+    600
+   ],
+   "color": "#8A8",
+   "font_size": 24,
+   "flags": {}
+  }
+ ],
+ "config": {},
+ "extra": {
+  "ds": {
+   "scale": 0.35,
+   "offset": [
+    2100,
+    900
+   ]
+  }
+ },
+ "version": 0.4
+}

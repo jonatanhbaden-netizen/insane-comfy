@@ -107,6 +107,27 @@ if [ "${SKIP_WAN:-false}" != "true" ]; then
 fi
 
 # ============================================================================
+# Motion Control v2 suite (aiofm_mc_shot / _wardrobe / _sequence) — ~4.3 GB
+# ArcShot + Handheld camera LoRAs are Civitai-only (auth wall): download in a
+# browser and drop into loras/ manually. Slots ship bypassed, so not blocking.
+if [ "${SKIP_MOTION_CONTROL:-false}" != "true" ]; then
+  echo "=== [2b] Motion Control v2: Uni3C camera + SVI 2.0 Pro (~4.3 GB) ==="
+  dl "Kijai/WanVideo_comfy" "Wan21_Uni3C_controlnet_fp16.safetensors" "$MODELS_DIR/model_patches"
+  dl "Kijai/WanVideo_comfy" "LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_HIGH_lora_rank_128_fp16.safetensors" "$MODELS_DIR/loras"
+  dl "Kijai/WanVideo_comfy" "LoRAs/Stable-Video-Infinity/v2.0/SVI_v2_PRO_Wan2.2-I2V-A14B_LOW_lora_rank_128_fp16.safetensors"  "$MODELS_DIR/loras"
+fi
+
+# ============================================================================
+# Wan-Animate performance transfer (aiofm_mc_animate) — ~20 GB
+# VitPose/YOLO onnx models auto-download via the WanAnimatePreprocess pack.
+if [ "${SKIP_ANIMATE:-false}" != "true" ]; then
+  echo "=== [2c] Wan 2.2 Animate: model + relight + clip_vision_h (~20 GB) ==="
+  dl "Kijai/WanVideo_comfy_fp8_scaled" "Wan22Animate/Wan2_2-Animate-14B_fp8_scaled_e4m3fn_KJ_v2.safetensors" "$MODELS_DIR/diffusion_models/Wan22Animate"
+  dl "Kijai/WanVideo_comfy" "LoRAs/Wan22_relight/WanAnimate_relight_lora_fp16.safetensors" "$MODELS_DIR/loras"
+  dl "$WAN_21_REPO" "split_files/clip_vision/clip_vision_h.safetensors" "$MODELS_DIR/clip_vision"
+fi
+
+# ============================================================================
 if [ "${SKIP_FLUX:-false}" != "true" ]; then
   echo "=== [3/6] Flux.1-dev backbone (~18 GB) ==="
   dl "Kijai/flux-fp8" "flux1-dev-fp8-e4m3fn.safetensors" "$MODELS_DIR/diffusion_models"

@@ -1,0 +1,1935 @@
+{
+  "last_node_id": 37,
+  "last_link_id": 37,
+  "nodes": [
+    {
+      "id": 1,
+      "type": "UNETLoader",
+      "pos": [
+        -1860,
+        40
+      ],
+      "size": [
+        340,
+        82
+      ],
+      "flags": {},
+      "order": 0,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            1
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "wan2.2_fun_control_high_noise_14B_fp8_scaled.safetensors",
+        "default"
+      ],
+      "title": "Fun-Control HIGH-noise expert"
+    },
+    {
+      "id": 2,
+      "type": "UNETLoader",
+      "pos": [
+        -1860,
+        200
+      ],
+      "size": [
+        340,
+        82
+      ],
+      "flags": {},
+      "order": 1,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            8
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "UNETLoader"
+      },
+      "widgets_values": [
+        "wan2.2_fun_control_low_noise_14B_fp8_scaled.safetensors",
+        "default"
+      ],
+      "title": "Fun-Control LOW-noise expert"
+    },
+    {
+      "id": 3,
+      "type": "CLIPLoader",
+      "pos": [
+        -1860,
+        360
+      ],
+      "size": [
+        340,
+        106
+      ],
+      "flags": {},
+      "order": 2,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "CLIP",
+          "type": "CLIP",
+          "links": [
+            12,
+            13
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPLoader"
+      },
+      "widgets_values": [
+        "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+        "wan",
+        "default"
+      ],
+      "title": "UMT5-XXL text encoder"
+    },
+    {
+      "id": 4,
+      "type": "VAELoader",
+      "pos": [
+        -1860,
+        540
+      ],
+      "size": [
+        340,
+        58
+      ],
+      "flags": {},
+      "order": 3,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "VAE",
+          "type": "VAE",
+          "links": [
+            14,
+            15,
+            16
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAELoader"
+      },
+      "widgets_values": [
+        "wan_2.1_vae.safetensors"
+      ],
+      "title": "Wan VAE"
+    },
+    {
+      "id": 5,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -1480,
+        40
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 4,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 1
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            2
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "f1sher_000002400.safetensors",
+        0.8
+      ],
+      "title": "Character LoRA (F1scher HIGH)"
+    },
+    {
+      "id": 6,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -1480,
+        200
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 5,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 8
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            9
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "f1sher_000002400.safetensors",
+        0.8
+      ],
+      "title": "Character LoRA (F1scher LOW)"
+    },
+    {
+      "id": 7,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -1080,
+        40
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 6,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 2
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            3
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan22_ArcShot_high_noise.safetensors",
+        0.8
+      ],
+      "title": "Camera LoRA: ArcShot (0.8)"
+    },
+    {
+      "id": 8,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -1080,
+        200
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 7,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 3
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            4
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan22_Handheld_high_noise.safetensors",
+        1.7
+      ],
+      "title": "Camera LoRA: Handheld (1.7)"
+    },
+    {
+      "id": 9,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -680,
+        40
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 8,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 4
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            5
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan2.2_t2v_A14b_high_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+        1.0
+      ],
+      "title": "\u26a1 Lightning LoRA HIGH (kills camera motion \u2014 keep bypassed)"
+    },
+    {
+      "id": 10,
+      "type": "LoraLoaderModelOnly",
+      "pos": [
+        -680,
+        200
+      ],
+      "size": [
+        360,
+        82
+      ],
+      "flags": {},
+      "order": 9,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 9
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            10
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoraLoaderModelOnly"
+      },
+      "widgets_values": [
+        "wan2.2_t2v_A14b_low_noise_lora_rank64_lightx2v_4step_1217.safetensors",
+        1.0
+      ],
+      "title": "\u26a1 Lightning LoRA LOW (bypassed = max quality)"
+    },
+    {
+      "id": 11,
+      "type": "ModelPatchLoader",
+      "pos": [
+        -1480,
+        720
+      ],
+      "size": [
+        360,
+        58
+      ],
+      "flags": {},
+      "order": 10,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "MODEL_PATCH",
+          "type": "MODEL_PATCH",
+          "links": [
+            17
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelPatchLoader"
+      },
+      "widgets_values": [
+        "Wan21_Uni3C_controlnet_fp16.safetensors"
+      ],
+      "title": "Uni3C controlnet patch (NEW DOWNLOAD \u2248 2.0 GB)"
+    },
+    {
+      "id": 12,
+      "type": "VHS_LoadVideo",
+      "pos": [
+        -1860,
+        720
+      ],
+      "size": [
+        320,
+        340
+      ],
+      "flags": {},
+      "order": 11,
+      "mode": 4,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            18
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [],
+          "slot_index": 2
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": [],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_LoadVideo"
+      },
+      "widgets_values": {
+        "video": "camera_trajectory_480x832.mp4",
+        "force_rate": 16,
+        "custom_width": 0,
+        "custom_height": 0,
+        "frame_load_cap": 81,
+        "skip_first_frames": 0,
+        "select_every_nth": 1,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      },
+      "title": "CAMERA trajectory render video (Uni3C)"
+    },
+    {
+      "id": 13,
+      "type": "WanUni3CControlnetApply",
+      "pos": [
+        -1080,
+        720
+      ],
+      "size": [
+        340,
+        150
+      ],
+      "flags": {},
+      "order": 12,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 5
+        },
+        {
+          "name": "model_patch",
+          "type": "MODEL_PATCH",
+          "link": 17
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 16
+        },
+        {
+          "name": "render_video",
+          "type": "IMAGE",
+          "link": 18
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            6
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "WanUni3CControlnetApply"
+      },
+      "widgets_values": [
+        1.0,
+        0.0,
+        0.3
+      ],
+      "title": "Uni3C camera control \u2014 HIGH expert (end 0.3)"
+    },
+    {
+      "id": 14,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        -260,
+        40
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 13,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 6
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            7
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "widgets_values": [
+        8.0
+      ],
+      "title": "Shift HIGH (8.0 \u00b7 lightning: 5.0)"
+    },
+    {
+      "id": 15,
+      "type": "ModelSamplingSD3",
+      "pos": [
+        -260,
+        200
+      ],
+      "size": [
+        270,
+        58
+      ],
+      "flags": {},
+      "order": 14,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 10
+        }
+      ],
+      "outputs": [
+        {
+          "name": "MODEL",
+          "type": "MODEL",
+          "links": [
+            11
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ModelSamplingSD3"
+      },
+      "widgets_values": [
+        8.0
+      ],
+      "title": "Shift LOW (8.0 \u00b7 lightning: 5.0)"
+    },
+    {
+      "id": 16,
+      "type": "LoadImage",
+      "pos": [
+        -1860,
+        1220
+      ],
+      "size": [
+        320,
+        314
+      ],
+      "flags": {},
+      "order": 15,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            19
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "MASK",
+          "type": "MASK",
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "LoadImage"
+      },
+      "widgets_values": [
+        "character_reference.png",
+        "image"
+      ],
+      "title": "CHARACTER reference image"
+    },
+    {
+      "id": 17,
+      "type": "ImageScale",
+      "pos": [
+        -1480,
+        1220
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 16,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 19
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            20,
+            21
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "lanczos",
+        480,
+        832,
+        "center"
+      ],
+      "title": "Ref \u2192 480\u00d7832"
+    },
+    {
+      "id": 18,
+      "type": "VHS_LoadVideo",
+      "pos": [
+        -1860,
+        1640
+      ],
+      "size": [
+        320,
+        340
+      ],
+      "flags": {},
+      "order": 17,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            22
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "frame_count",
+          "type": "INT",
+          "links": [],
+          "slot_index": 1
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "links": [],
+          "slot_index": 2
+        },
+        {
+          "name": "video_info",
+          "type": "VHS_VIDEOINFO",
+          "links": [],
+          "slot_index": 3
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_LoadVideo"
+      },
+      "widgets_values": {
+        "video": "motion_reference.mp4",
+        "force_rate": 16,
+        "custom_width": 0,
+        "custom_height": 0,
+        "frame_load_cap": 81,
+        "skip_first_frames": 0,
+        "select_every_nth": 1,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      },
+      "title": "DRIVING video (16fps \u00b7 81 frames)"
+    },
+    {
+      "id": 19,
+      "type": "DWPreprocessor",
+      "pos": [
+        -1480,
+        1640
+      ],
+      "size": [
+        330,
+        220
+      ],
+      "flags": {},
+      "order": 18,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 22
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            23
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "POSE_KEYPOINT",
+          "type": "POSE_KEYPOINT",
+          "links": [],
+          "slot_index": 1
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DWPreprocessor"
+      },
+      "widgets_values": [
+        "enable",
+        "enable",
+        "enable",
+        1024,
+        "yolox_l.onnx",
+        "dw-ll_ucoco_384_bs5.torchscript.pt",
+        "disable"
+      ],
+      "title": "DWPose skeleton (DEFAULT control)"
+    },
+    {
+      "id": 20,
+      "type": "DepthAnythingV2Preprocessor",
+      "pos": [
+        -1080,
+        1640
+      ],
+      "size": [
+        340,
+        106
+      ],
+      "flags": {},
+      "order": 19,
+      "mode": 4,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 23
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            24
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "DepthAnythingV2Preprocessor"
+      },
+      "widgets_values": [
+        "depth_anything_v2_vitl.pth",
+        1024
+      ],
+      "title": "Depth ALT control (bypassed \u2014 carries camera move)"
+    },
+    {
+      "id": 21,
+      "type": "ImageScale",
+      "pos": [
+        -680,
+        1640
+      ],
+      "size": [
+        315,
+        130
+      ],
+      "flags": {},
+      "order": 20,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "link": 24
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            25
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ImageScale"
+      },
+      "widgets_values": [
+        "lanczos",
+        480,
+        832,
+        "center"
+      ],
+      "title": "Control frames \u2192 480\u00d7832"
+    },
+    {
+      "id": 22,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -260,
+        420
+      ],
+      "size": [
+        400,
+        200
+      ],
+      "flags": {},
+      "order": 21,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 12
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            26
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "A photorealistic cinematic vertical shot of a young woman in casual streetwear dancing in a sunlit loft apartment, fluid confident choreography, natural skin texture, soft window light, film grain, sharp focus. The camera slowly pushes in toward her."
+      ],
+      "title": "POSITIVE \u2014 character, scene, motion + ONE camera move"
+    },
+    {
+      "id": 23,
+      "type": "CLIPTextEncode",
+      "pos": [
+        -260,
+        680
+      ],
+      "size": [
+        400,
+        160
+      ],
+      "flags": {},
+      "order": 22,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "clip",
+          "type": "CLIP",
+          "link": 13
+        }
+      ],
+      "outputs": [
+        {
+          "name": "CONDITIONING",
+          "type": "CONDITIONING",
+          "links": [
+            27
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "CLIPTextEncode"
+      },
+      "widgets_values": [
+        "\u8272\u8c03\u8273\u4e3d\uff0c\u8fc7\u66dd\uff0c\u9759\u6001\uff0c\u7ec6\u8282\u6a21\u7cca\u4e0d\u6e05\uff0c\u5b57\u5e55\uff0c\u98ce\u683c\uff0c\u4f5c\u54c1\uff0c\u753b\u4f5c\uff0c\u753b\u9762\uff0c\u9759\u6b62\uff0c\u6574\u4f53\u53d1\u7070\uff0c\u6700\u5dee\u8d28\u91cf\uff0c\u4f4e\u8d28\u91cf\uff0cJPEG\u538b\u7f29\u6b8b\u7559\uff0c\u4e11\u964b\u7684\uff0c\u6b8b\u7f3a\u7684\uff0c\u591a\u4f59\u7684\u624b\u6307\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u624b\u90e8\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u8138\u90e8\uff0c\u7578\u5f62\u7684\uff0c\u6bc1\u5bb9\u7684\uff0c\u5f62\u6001\u7578\u5f62\u7684\u80a2\u4f53\uff0c\u624b\u6307\u878d\u5408\uff0c\u9759\u6b62\u4e0d\u52a8\u7684\u753b\u9762\uff0c\u6742\u4e71\u7684\u80cc\u666f\uff0c\u4e09\u6761\u817f\uff0c\u80cc\u666f\u4eba\u5f88\u591a\uff0c\u5012\u7740\u8d70"
+      ],
+      "title": "NEGATIVE (canonical Wan \u2014 keep)"
+    },
+    {
+      "id": 24,
+      "type": "Wan22FunControlToVideo",
+      "pos": [
+        200,
+        680
+      ],
+      "size": [
+        280,
+        230
+      ],
+      "flags": {},
+      "order": 23,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 26
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 27
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 14
+        },
+        {
+          "name": "ref_image",
+          "type": "IMAGE",
+          "link": 20
+        },
+        {
+          "name": "control_video",
+          "type": "IMAGE",
+          "link": 25
+        }
+      ],
+      "outputs": [
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "links": [
+            28,
+            31
+          ],
+          "slot_index": 0
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "links": [
+            29,
+            32
+          ],
+          "slot_index": 1
+        },
+        {
+          "name": "latent",
+          "type": "LATENT",
+          "links": [
+            30
+          ],
+          "slot_index": 2
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "Wan22FunControlToVideo"
+      },
+      "widgets_values": [
+        480,
+        832,
+        81,
+        1
+      ],
+      "title": "Wan 2.2 Fun-Control (identity + motion)"
+    },
+    {
+      "id": 25,
+      "type": "KSamplerAdvanced",
+      "pos": [
+        560,
+        300
+      ],
+      "size": [
+        315,
+        334
+      ],
+      "flags": {},
+      "order": 24,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 7
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 28
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 29
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 30
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            33
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerAdvanced"
+      },
+      "widgets_values": [
+        "enable",
+        77770001,
+        "fixed",
+        20,
+        3.5,
+        "euler",
+        "simple",
+        0,
+        10,
+        "enable"
+      ],
+      "title": "SAMPLER 1/2 \u2014 HIGH expert (steps 0\u219210)"
+    },
+    {
+      "id": 26,
+      "type": "KSamplerAdvanced",
+      "pos": [
+        930,
+        300
+      ],
+      "size": [
+        315,
+        334
+      ],
+      "flags": {},
+      "order": 25,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "model",
+          "type": "MODEL",
+          "link": 11
+        },
+        {
+          "name": "positive",
+          "type": "CONDITIONING",
+          "link": 31
+        },
+        {
+          "name": "negative",
+          "type": "CONDITIONING",
+          "link": 32
+        },
+        {
+          "name": "latent_image",
+          "type": "LATENT",
+          "link": 33
+        }
+      ],
+      "outputs": [
+        {
+          "name": "LATENT",
+          "type": "LATENT",
+          "links": [
+            34
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "KSamplerAdvanced"
+      },
+      "widgets_values": [
+        "disable",
+        0,
+        "fixed",
+        20,
+        3.5,
+        "euler",
+        "simple",
+        10,
+        10000,
+        "disable"
+      ],
+      "title": "SAMPLER 2/2 \u2014 LOW expert (steps 10\u219220)"
+    },
+    {
+      "id": 27,
+      "type": "VAEDecode",
+      "pos": [
+        1300,
+        300
+      ],
+      "size": [
+        210,
+        46
+      ],
+      "flags": {},
+      "order": 26,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "samples",
+          "type": "LATENT",
+          "link": 34
+        },
+        {
+          "name": "vae",
+          "type": "VAE",
+          "link": 15
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            35
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VAEDecode"
+      }
+    },
+    {
+      "id": 28,
+      "type": "ColorMatch",
+      "pos": [
+        1300,
+        400
+      ],
+      "size": [
+        315,
+        122
+      ],
+      "flags": {},
+      "order": 27,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "image_ref",
+          "type": "IMAGE",
+          "link": 21
+        },
+        {
+          "name": "image_target",
+          "type": "IMAGE",
+          "link": 35
+        }
+      ],
+      "outputs": [
+        {
+          "name": "image",
+          "type": "IMAGE",
+          "links": [
+            36
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "ColorMatch"
+      },
+      "widgets_values": [
+        "mkl",
+        1.0,
+        true
+      ],
+      "title": "ColorMatch \u2192 ref image (fixes Wan color drift)"
+    },
+    {
+      "id": 29,
+      "type": "RIFE VFI",
+      "pos": [
+        1300,
+        580
+      ],
+      "size": [
+        315,
+        270
+      ],
+      "flags": {},
+      "order": 28,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "frames",
+          "type": "IMAGE",
+          "link": 36
+        }
+      ],
+      "outputs": [
+        {
+          "name": "IMAGE",
+          "type": "IMAGE",
+          "links": [
+            37
+          ],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "RIFE VFI"
+      },
+      "widgets_values": [
+        "rife49.pth",
+        10,
+        2,
+        true,
+        true,
+        1.0,
+        "float32",
+        false,
+        1
+      ],
+      "title": "RIFE \u00d72 \u2192 32 fps"
+    },
+    {
+      "id": 30,
+      "type": "VHS_VideoCombine",
+      "pos": [
+        1680,
+        300
+      ],
+      "size": [
+        360,
+        340
+      ],
+      "flags": {},
+      "order": 29,
+      "mode": 0,
+      "inputs": [
+        {
+          "name": "images",
+          "type": "IMAGE",
+          "link": 37
+        },
+        {
+          "name": "audio",
+          "type": "AUDIO",
+          "link": null
+        }
+      ],
+      "outputs": [
+        {
+          "name": "Filenames",
+          "type": "VHS_FILENAMES",
+          "links": [],
+          "slot_index": 0
+        }
+      ],
+      "properties": {
+        "Node name for S&R": "VHS_VideoCombine"
+      },
+      "widgets_values": {
+        "frame_rate": 32,
+        "loop_count": 0,
+        "filename_prefix": "aiofm_mc/mc_shot",
+        "format": "video/h264-mp4",
+        "pix_fmt": "yuv420p",
+        "crf": 17,
+        "save_metadata": true,
+        "trim_to_audio": false,
+        "pingpong": false,
+        "save_output": true,
+        "videopreview": {
+          "hidden": false,
+          "paused": false,
+          "params": {}
+        }
+      },
+      "title": "EXPORT \u2014 h264 mp4, crf 17"
+    },
+    {
+      "id": 31,
+      "type": "Note",
+      "pos": [
+        -1860,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 30,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "MC SHOT \u2014 motion + camera control (Wan 2.2 Fun-Control A14B)\n\nWHAT THIS DOES\nAnimates YOUR character with body motion taken from a driving\nclip AND a controllable camera move. Motion comes from DWPose\nskeletons; camera comes from one of three stacked options:\n  a) prompt vocabulary alone (always on \u2014 see \u2465)\n  b) camera LoRAs on the HIGH expert (bypassed slots \u2014 see \u2465)\n  c) Uni3C controlnet with a rendered trajectory (\u2464, strongest)\n\nQUICK START\n1) INPUTS: upload character_reference.png + motion_reference.mp4\n   (one person, framing similar to your reference image).\n2) POSITIVE prompt: describe character, outfit, scene, motion,\n   and exactly ONE camera move (\u2465 vocabulary).\n3) Queue. Output \u2192 output/aiofm_mc/.\n\nCharacter identity lock: enable the two Character LoRA\n(F1scher) slots \u2014 Ctrl+B \u2014 once the pair is on the volume (\u2461).\nDefaults = max quality: 20 steps, cfg 3.5, ~4\u20136 min per 5 s\nclip at 480\u00d7832 on an A100 80GB."
+      ],
+      "title": "\u2460 READ ME \u2014 MC SHOT",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 32,
+      "type": "Note",
+      "pos": [
+        -1320,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 31,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "ALREADY ON THE VOLUME (verified via /object_info)\n  diffusion_models/wan2.2_fun_control_{high,low}_noise_14B_fp8_scaled.safetensors\n  text_encoders/umt5_xxl_fp8_e4m3fn_scaled.safetensors\n  vae/wan_2.1_vae.safetensors\n  loras/wan2.2_t2v_A14b_{high,low}_noise_lora_rank64_lightx2v_4step_1217.safetensors\n  DWPose + DepthAnythingV2 + RIFE checkpoints auto-download on\n  first queue (first run is slower).\n\nNEW DOWNLOAD \u2014 Uni3C (camera controlnet, \u2248 2.0 GB)\n  models/model_patches/Wan21_Uni3C_controlnet_fp16.safetensors\n  (Comfy-Org repackaged Uni3C on HuggingFace; create the\n  model_patches/ folder if missing)\n\nNEW DOWNLOAD \u2014 camera LoRAs (Civitai, Wan 2.2 HIGH-noise)\n  loras/wan22_ArcShot_high_noise.safetensors      (\u2018Arc Shot\u2019)\n  loras/wan22_Handheld_high_noise.safetensors     (\u2018Handheld\u2019)\n  Rename to these exact names OR repoint the two widgets.\n\nNEEDS UPLOAD \u2014 F1scher character pair (local \u2192 volume loras/)\n  from Desktop/Claude/AIOFM/LoRA-Library/F1scher-Wan/:\n  \u2018f1scher lora_high_noise.safetensors\u2019 + \u2018\u2026low_noise\u2026\u2019\n  (volume currently only has single-file f1sher_000002400 \u2014\n  expert split unknown, do not use it for both slots)"
+      ],
+      "title": "\u2461 MODELS \u2014 on volume vs NEW DOWNLOADS",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 33,
+      "type": "Note",
+      "pos": [
+        -780,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 32,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "This rig generates at 480\u00d7832 \u00b7 81 frames \u00b7 16 fps (native Wan\nlow-res bucket, \u2248 3\u00d7 faster than 720\u00d71280 and camera control is\nMORE reliable at low res).\n\nPOLICY: never crank width/height here for finals. Instead:\n  1) iterate + pick winners at 480\u00d7832\n  2) upscale the winning mp4 AFTER (SeedVR2 / Topaz / a Wan\n     low-noise v2v refine pass) to 1080\u00d71920\n  3) RIFE here already lifts 16\u219232 fps for smooth playback\n\nIf you must change aspect: change BOTH ImageScale nodes AND the\nFun-Control width/height together, keep multiples of 16, keep\nlength 81 (4n+1). Camera trajectory renders (\u2464) are tied to\naspect ratio \u2014 480\u00d7832 renders only fit 480\u00d7832 shots."
+      ],
+      "title": "\u2462 VERTICAL 9:16 \u2014 UPSCALE AFTER, NOT DURING",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 34,
+      "type": "Note",
+      "pos": [
+        -240,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 33,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "DEFAULT: DWPose skeleton \u2014 transfers BODY MOTION ONLY.\nThe driving clip's own camera movement is discarded, which is\nwhat you want when adding your own camera moves (\u2464/\u2465):\nthe two control signals never fight.\n\nALT: DepthAnythingV2 (bypassed) \u2014 depth maps carry the driving\nvideo's camera movement TOO (parallax lives in depth). Use it\nto clone the full shot incl. its camera, e.g. a reference reel\nwhose camerawork you want 1:1. Do NOT combine depth control\nwith Uni3C or camera LoRAs \u2014 conflicting camera signals cause\njuddering half-moves.\n\nSWITCH: select DWPose + Depth nodes \u2192 Ctrl+B (exactly ONE\nactive; the chain passes through the bypassed one).\n\nFAILURE MODES\n\u2022 Warped anatomy \u2192 framing mismatch ref image vs driving clip.\n\u2022 Skeleton flicker \u2192 drop DWPose resolution 1024 \u2192 512.\n\u2022 Two people detected \u2192 crop the driving clip to one person."
+      ],
+      "title": "\u2463 POSE vs DEPTH control",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 35,
+      "type": "Note",
+      "pos": [
+        300,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 34,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "STRONGEST camera control: a rendered camera trajectory video\ndrives the shot via the Uni3C controlnet patching the HIGH\nexpert only (camera/layout is decided in steps 0\u219210).\n\nENABLE: select ModelPatchLoader + trajectory VHS_LoadVideo +\nWanUni3CControlnetApply \u2192 Ctrl+B. Needs the NEW DOWNLOAD (\u2461).\n\nTRAJECTORY VIDEO: warped point-cloud render of your reference\nimage along a camera path (Uni3C repo render script, or any\nprior clip with the camera move you want). 81 frames, 480\u00d7832.\nRenders are REUSABLE: build a library per aspect ratio\n(orbit_L, push_in, crane_up\u2026) and reuse them for every\ncharacter/scene at that ratio.\n\nend_percent = 0.3 (default here) \u2014 the controlnet releases\nafter 30% of steps. RAISING IT \u2192 the #1 failure mode: FROZEN\nPERFORMANCE (character stops acting, scene slides around).\nIf camera is too weak: raise strength 1.0 \u2192 1.2 first, then\nend_percent in +0.05 steps. If motion freezes: lower back."
+      ],
+      "title": "\u2464 CAMERA \u2014 Uni3C trajectory controlnet (bypassed)",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 36,
+      "type": "Note",
+      "pos": [
+        840,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 35,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "CAMERA LoRA SLOTS (bypassed, HIGH expert only \u2014 camera lives\nin the high-noise steps; low expert never needs them):\n  Camera LoRA: ArcShot (0.8)  \u2014 slow orbit / arc moves\n  Camera LoRA: Handheld (1.7) \u2014 organic handheld sway\nEnable ONE at a time (Ctrl+B). Both = fighting camera styles.\n\nPROMPT TEMPLATE (Alibaba camera vocabulary \u2014 the model was\ntrained on these exact phrases):\n  \u2018The camera pushes in\u2026\u2019 / \u2018The camera pulls out\u2026\u2019\n  \u2018tracking shot, the camera follows her\u2026\u2019\n  \u2018the camera arcs around her\u2019 (keep arcs UNDER ~45\u00b0 per 5 s\n  clip \u2014 bigger orbits need Uni3C \u2464)\nONE camera move per clip. Put it in its own sentence.\n\n\u26a0 LIGHTNING / DISTILL LoRAs SUPPRESS CAMERA MOTION.\nFor camera shots keep the \u26a1 slots bypassed on HIGH (defaults).\nSpeed compromise: run the first 2 high-noise steps WITHOUT\nlightning (HIGH: steps 8, cfg 3.5, end_at_step 2 \u2192 second\nhigh sampler with lightning steps 8 cfg 1.0 start 2) \u2014 or\njust eat the full-quality render time for camera work."
+      ],
+      "title": "\u2465 CAMERA \u2014 LoRAs + prompt vocabulary",
+      "color": "#432",
+      "bgcolor": "#653"
+    },
+    {
+      "id": 37,
+      "type": "Note",
+      "pos": [
+        1380,
+        -640
+      ],
+      "size": [
+        500,
+        540
+      ],
+      "flags": {},
+      "order": 36,
+      "mode": 0,
+      "inputs": [],
+      "outputs": [],
+      "properties": {},
+      "widgets_values": [
+        "PRESET A \u2014 MAX QUALITY (current defaults; camera-safe)\n  \u26a1 slots bypassed \u00b7 HIGH 20 st cfg 3.5 end 10 \u00b7 LOW start 10\n  \u00b7 shift 8.0 both \u00b7 \u2248 4\u20136 min per 5 s @ 480\u00d7832 (A100 80GB)\n\nPRESET B \u2014 LIGHTNING drafts (NO camera moves \u2014 see \u2465)\n  enable both \u26a1 slots \u00b7 4 steps \u00b7 cfg 1.0 \u00b7 HIGH end 2, LOW\n  start 2 \u00b7 shift 5.0 both \u00b7 \u2248 30\u201360 s. Iterate motion/framing\n  in B, then final render in A with the same seed.\n\nCOLOR: ColorMatch grades the output against the reference\nimage \u2014 fixes the Wan 2.2 warm/green drift on 81f clips. If\nthe grade looks off, try method \u2018hm-mkl-hm\u2019 or strength 0.7.\n\nSYNERGY: build the perfect character still first in\ninsane_image_to_image.json, feed it here as the reference.\nLonger shots: chain 5 s segments \u2014 last frame of N = reference\nfor N+1, re-anchor with your best still every 2\u20133 segments.\nLoRA stack order: UNET \u2192 character \u2192 camera \u2192 \u26a1 \u2192 Uni3C \u2192\nshift. Character LoRA strength 0.6\u20130.9 (0.8 default)."
+      ],
+      "title": "\u2466 QUALITY vs SPEED + SYNERGY",
+      "color": "#432",
+      "bgcolor": "#653"
+    }
+  ],
+  "links": [
+    [
+      1,
+      1,
+      0,
+      5,
+      0,
+      "MODEL"
+    ],
+    [
+      2,
+      5,
+      0,
+      7,
+      0,
+      "MODEL"
+    ],
+    [
+      3,
+      7,
+      0,
+      8,
+      0,
+      "MODEL"
+    ],
+    [
+      4,
+      8,
+      0,
+      9,
+      0,
+      "MODEL"
+    ],
+    [
+      5,
+      9,
+      0,
+      13,
+      0,
+      "MODEL"
+    ],
+    [
+      6,
+      13,
+      0,
+      14,
+      0,
+      "MODEL"
+    ],
+    [
+      7,
+      14,
+      0,
+      25,
+      0,
+      "MODEL"
+    ],
+    [
+      8,
+      2,
+      0,
+      6,
+      0,
+      "MODEL"
+    ],
+    [
+      9,
+      6,
+      0,
+      10,
+      0,
+      "MODEL"
+    ],
+    [
+      10,
+      10,
+      0,
+      15,
+      0,
+      "MODEL"
+    ],
+    [
+      11,
+      15,
+      0,
+      26,
+      0,
+      "MODEL"
+    ],
+    [
+      12,
+      3,
+      0,
+      22,
+      0,
+      "CLIP"
+    ],
+    [
+      13,
+      3,
+      0,
+      23,
+      0,
+      "CLIP"
+    ],
+    [
+      14,
+      4,
+      0,
+      24,
+      2,
+      "VAE"
+    ],
+    [
+      15,
+      4,
+      0,
+      27,
+      1,
+      "VAE"
+    ],
+    [
+      16,
+      4,
+      0,
+      13,
+      2,
+      "VAE"
+    ],
+    [
+      17,
+      11,
+      0,
+      13,
+      1,
+      "MODEL_PATCH"
+    ],
+    [
+      18,
+      12,
+      0,
+      13,
+      3,
+      "IMAGE"
+    ],
+    [
+      19,
+      16,
+      0,
+      17,
+      0,
+      "IMAGE"
+    ],
+    [
+      20,
+      17,
+      0,
+      24,
+      3,
+      "IMAGE"
+    ],
+    [
+      21,
+      17,
+      0,
+      28,
+      0,
+      "IMAGE"
+    ],
+    [
+      22,
+      18,
+      0,
+      19,
+      0,
+      "IMAGE"
+    ],
+    [
+      23,
+      19,
+      0,
+      20,
+      0,
+      "IMAGE"
+    ],
+    [
+      24,
+      20,
+      0,
+      21,
+      0,
+      "IMAGE"
+    ],
+    [
+      25,
+      21,
+      0,
+      24,
+      4,
+      "IMAGE"
+    ],
+    [
+      26,
+      22,
+      0,
+      24,
+      0,
+      "CONDITIONING"
+    ],
+    [
+      27,
+      23,
+      0,
+      24,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      28,
+      24,
+      0,
+      25,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      29,
+      24,
+      1,
+      25,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      30,
+      24,
+      2,
+      25,
+      3,
+      "LATENT"
+    ],
+    [
+      31,
+      24,
+      0,
+      26,
+      1,
+      "CONDITIONING"
+    ],
+    [
+      32,
+      24,
+      1,
+      26,
+      2,
+      "CONDITIONING"
+    ],
+    [
+      33,
+      25,
+      0,
+      26,
+      3,
+      "LATENT"
+    ],
+    [
+      34,
+      26,
+      0,
+      27,
+      0,
+      "LATENT"
+    ],
+    [
+      35,
+      27,
+      0,
+      28,
+      1,
+      "IMAGE"
+    ],
+    [
+      36,
+      28,
+      0,
+      29,
+      0,
+      "IMAGE"
+    ],
+    [
+      37,
+      29,
+      0,
+      30,
+      0,
+      "IMAGE"
+    ]
+  ],
+  "groups": [
+    {
+      "id": 1,
+      "title": "1 \u00b7 MODELS \u2014 experts \u00b7 character \u00b7 camera \u00b7 \u26a1 LoRAs",
+      "bounding": [
+        -1900,
+        -40,
+        2000,
+        660
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 2,
+      "title": "2 \u00b7 CAMERA STACK \u2014 Uni3C (bypassed \u00b7 Ctrl+B to enable)",
+      "bounding": [
+        -1900,
+        640,
+        1200,
+        480
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 3,
+      "title": "3 \u00b7 INPUTS \u2014 character + driving video",
+      "bounding": [
+        -1900,
+        1140,
+        1580,
+        900
+      ],
+      "color": "#8A8",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 4,
+      "title": "4 \u00b7 PROMPTS",
+      "bounding": [
+        -300,
+        340,
+        480,
+        540
+      ],
+      "color": "#b58b2a",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 5,
+      "title": "5 \u00b7 MOTION-CONTROL LATENT",
+      "bounding": [
+        180,
+        600,
+        340,
+        340
+      ],
+      "color": "#a1309b",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 6,
+      "title": "6 \u00b7 SAMPLING \u2014 HIGH \u2192 LOW expert",
+      "bounding": [
+        540,
+        230,
+        730,
+        430
+      ],
+      "color": "#3f789e",
+      "font_size": 24,
+      "flags": {}
+    },
+    {
+      "id": 7,
+      "title": "7 \u00b7 DECODE \u00b7 COLOR \u00b7 RIFE \u00b7 EXPORT",
+      "bounding": [
+        1280,
+        230,
+        790,
+        640
+      ],
+      "color": "#8A8",
+      "font_size": 24,
+      "flags": {}
+    }
+  ],
+  "config": {},
+  "extra": {
+    "ds": {
+      "scale": 0.35,
+      "offset": [
+        2100,
+        900
+      ]
+    }
+  },
+  "version": 0.4
+}
