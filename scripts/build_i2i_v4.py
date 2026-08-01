@@ -39,15 +39,22 @@ CHARACTER_DEFAULT = (
 # it as part of "keep everything unchanged" (live finding: listed as a mere
 # trait, the bob loses to the preservation clause and reference hair stays).
 QWEN_TEMPLATE_PRE = (
-    "Replace the woman in image 1: her face, her hair and her skin become "
-    "this woman: "
+    "Replace the woman in image 1 with this woman: "
 )
+# Face-conditional: on faceless references (back shots, cropped, turned away)
+# Qwen must NOT invent or reveal a face to satisfy a face-swap instruction —
+# it applies only the attributes the shot can show (hair, skin, body).
 QWEN_TEMPLATE_POST = (
-    ". The hairstyle and hair color described above fully replace the "
-    "original hair. Keep image 1's exact pose, body position, outfit, "
-    "clothing, accessories, background, framing, camera angle and lighting "
-    "completely unchanged. Photorealistic, natural skin texture. If several "
-    "people are in image 1, replace only the person I specify here:"
+    ". Apply only what is visible in image 1: if her face is visible, "
+    "replace the face with the described woman's face. If her face is NOT "
+    "visible (turned away, cropped out of frame, or hidden), do not add, "
+    "reveal or rotate a face — keep the exact head pose and change only her "
+    "hair and skin tone to match the description. The described hairstyle "
+    "and hair color fully replace the original hair in all cases. Keep "
+    "image 1's exact pose, body position, outfit, clothing, accessories, "
+    "background, framing, camera angle and lighting completely unchanged. "
+    "Photorealistic, natural skin texture. If several people are in image 1, "
+    "replace only the person I specify here:"
 )
 POSITIVE_SUFFIX = (
     ", natural skin texture with visible pores and fine detail, candid phone "
