@@ -233,10 +233,14 @@ def main():
                     # change. Body skin only.
                     n["widgets_values"][2] = False        # hair_mask
                 if n["type"] == "MaskDetailerPipe":
-                    # un-bypass: body skin texture. Indices verified against
-                    # the saved array (seed carries a control_after_generate
-                    # companion, so denoise is [10], NOT [6]).
-                    n["mode"] = 0
+                    # SHIPS BYPASSED (mode 4). Enabled during v5 testing it
+                    # sprayed white speckle across forearm skin on a reference
+                    # whose arms are clean — the artifact survived
+                    # inpaint_model=False, and SeedVR2 + the face/eye passes
+                    # already deliver the skin texture this pass was meant to
+                    # add. Settings below are left correct so it can be
+                    # un-bypassed (Ctrl+B) for experiments.
+                    n["mode"] = 4
                     w = n["widgets_values"]
                     w[0] = 2048.0    # guide_size — must scale with the 2160 frame
                     w[2] = 2816.0    # max_size >= crop height, else the whole
