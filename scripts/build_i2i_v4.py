@@ -167,16 +167,7 @@ def main():
     # keep the final preview 535 (POST output) — it survives because 552 lives
 
     # ------------------------------------------------------------ rewires
-    # FACE(553).image -> HAND(542).image   (bridging over deleted EYE/PUSSY/BREAST)
-    links[6509] = [6509, 553, 2, 542, 0, "IMAGE"]
-    for i in nodes[542]["inputs"]:
-        if i["name"] == "image":
-            i["link"] = 6509
-    # HAND(542).image -> BODY(539).image   (bridging over deleted PHONE)
-    links[6505] = [6505, 542, 0, 539, 0, "IMAGE"]
-    for i in nodes[539]["inputs"]:
-        if i["name"] == "image":
-            i["link"] = 6505
+    # (image-chain order is built explicitly in the v5 section below)
 
     # ------------------------------------------------------------ widget edits
     # LoRA 527: manager's private persona -> f1sher @ 0.6 (hard cap, overbaked)
@@ -229,6 +220,46 @@ def main():
                 for i in range(len(w) - 2):
                     if w[i] == "res_2s" and w[i + 1] == "bong_tangent" and w[i + 2] == 0.4:
                         w[i + 2] = 0.68
+                if str(sg.get("id", "")).startswith("111b0941"):
+                    # at 2160 the face crop reaches ~1450px; max_size 1920 was
+                    # forcing a downsample-then-upsample paste-back that strips
+                    # the pores the pass just rendered
+                    w[0] = 1280.0
+                    w[2] = 2304.0
+            if str(sg.get("id", "")).startswith("f7d61cbf"):
+                if n["type"] == "APersonMaskGenerator":
+                    # hair ships ON in the manager's file; a denoise pass over
+                    # hair frizzes/re-tiles the bob and reads as an identity
+                    # change. Body skin only.
+                    n["widgets_values"][2] = False        # hair_mask
+                if n["type"] == "MaskDetailerPipe":
+                    # un-bypass: body skin texture. Indices verified against
+                    # the saved array (seed carries a control_after_generate
+                    # companion, so denoise is [10], NOT [6]).
+                    n["mode"] = 0
+                    w = n["widgets_values"]
+                    w[0] = 2048.0    # guide_size — must scale with the 2160 frame
+                    w[2] = 2816.0    # max_size >= crop height, else the whole
+                                     # torso is downsampled and re-blurred
+                    w[8] = "euler"   # ddim/beta is not Z-Image Turbo's solver
+                    w[9] = "simple"  #   (cfg 1 distilled) — it renders waxy
+                    w[10] = 0.22     # denoise: texture only, under the
+                                     # structure-change threshold
+                    w[11] = 24       # feather — 10px was tuned at 896
+                    w[17] = False    # inpaint_model: the manager's file ships
+                                     # True, which expects an inpainting
+                                     # checkpoint — with Z-Image Turbo it
+                                     # sprays white speckle over skin
+                    w[18] = 24       # noise_mask_feather (jaw/neck seam)
+            if str(sg.get("id", "")).startswith("f7868d1c") and n["type"] == "FaceDetailer":
+                # v5: un-bypass the hand pass — hands are the classic tell and
+                # hand_yolov8n is on the pod.
+                n["mode"] = 0
+                w = n["widgets_values"]
+                w[0] = 1280.0   # guide_size
+                w[2] = 2304.0   # max_size
+                w[9] = 0.35     # denoise
+                w[10] = 24      # feather
             if n["type"] == "ImageScaleBy" and str(sg.get("id", "")).startswith("c6d045e4"):
                 # v4.1: SeedVR2 receives the 896x1152 Qwen frame directly —
                 # the pro's half-res round trip assumed a 1344px sampled
@@ -242,7 +273,42 @@ def main():
     NEW = []
     L = [7000]
 
+    def ordered_widgets(ntype, wd):
+        """dict -> the positional widgets_values list ComfyUI expects.
+
+        Passing a dict straight through silently ships widget NAMES as values
+        (the graph loads, then every int/float input fails at queue time).
+        """
+        spec = oi.get(ntype, {}).get("input", {})
+        vals = []
+        for sec in ("required", "optional"):
+            for k, v in spec.get(sec, {}).items():
+                t = v[0]
+                is_widget = (t == "COMBO" or isinstance(t, list)
+                             or (isinstance(t, str) and t in ("INT", "FLOAT", "BOOLEAN", "STRING")))
+                if not is_widget:
+                    continue
+                if k in wd:
+                    vals.append(wd[k])
+                else:
+                    extra = v[1] if len(v) > 1 and isinstance(v[1], dict) else {}
+                    if "default" in extra:
+                        vals.append(extra["default"])
+                    elif t == "COMBO":
+                        opts = extra.get("options") or [""]
+                        vals.append(opts[0])
+                    elif isinstance(t, list):
+                        vals.append(t[0] if t else "")
+                    else:
+                        vals.append({"STRING": "", "INT": 0, "FLOAT": 0.0,
+                                     "BOOLEAN": False}.get(t))
+                if k == "seed":
+                    vals.append("fixed")
+        return vals
+
     def mk(nid, ntype, pos, widgets=None, title=None, size=None):
+        if isinstance(widgets, dict):
+            widgets = ordered_widgets(ntype, widgets)
         n = {"id": nid, "type": ntype, "pos": pos, "size": size or [300, 110],
              "flags": {}, "order": 0, "mode": 0, "inputs": [], "outputs": [],
              "properties": {"Node name for S&R": ntype},
@@ -410,8 +476,59 @@ def main():
     wire(tclown, 0, tdec, "samples", "LATENT")
     wire(tvget, 0, tdec, "vae", "VAE")
 
-    # face detailer now reads the re-textured frame (reuse link 6519)
-    wire(tdec, 0, nodes[553], "image", "IMAGE", reuse=6519)
+    # ---- v5 ORDER: restore first, then detail -------------------------
+    # Detailing at 896 was the "animated/pixelated" cause: the detailers had
+    # no pixels to work with and SeedVR2 only sharpened afterwards. SeedVR2 is
+    # a restoration model — run it first so every detailer works on a sharp
+    # 2160-class frame, then finish with the grade.
+    seed_vr = nodes[523]
+    post = nodes[552]
+    wire(tdec, 0, seed_vr, "image", "IMAGE", reuse=6522)      # texture -> SeedVR2
+    wire(seed_vr, 0, nodes[553], "image", "IMAGE", reuse=6519)  # SeedVR2 -> FACE
+
+    # ---- EYE pass (rebuilt without the manager's private weights) --------
+    # MediaPipe mesh isolates eyes+pupils; the positive is the MAIN character
+    # prompt, so heterochromia is reinforced instead of symmetrised (the
+    # manager's own eye detailer hardcoded "symmetrical eyes, blue iris",
+    # which is why it was deleted rather than reused).
+    eseg = mk(640, "MediaPipeFaceMeshToSEGS", [1700, 300], size=[320, 300],
+              widgets={"crop_factor": 3.0, "bbox_fill": False, "crop_min_size": 20,
+                       "drop_size": 1, "dilation": 10, "face": False, "mouth": False,
+                       "left_eyebrow": False, "left_eye": True, "left_pupil": False,
+                       "right_eyebrow": False, "right_eye": True, "right_pupil": False},
+              title="[eye] isolate both eyes (pupils are inside the eye SEG)")
+    eseg["outputs"] = [{"name": "SEGS", "type": "SEGS", "links": [], "slot_index": 0}]
+
+    eyetxt = mk(643, "CLIPTextEncode", [1700, 660], size=[380, 120],
+                widgets={"text": "detailed iris with fine radial fibers, sharp "
+                                 "individual eyelashes, natural sclera, single "
+                                 "soft catchlight"},
+                title="[eye] geometry-only prompt (NO colour words — colour comes from the face pass)")
+    eyetxt["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
+
+    edet = mk(642, "DetailerForEach", [2060, 300], size=[340, 420],
+              widgets={"guide_size": 640.0, "guide_size_for": True, "max_size": 1280.0,
+                       "seed": 5150, "steps": 12, "cfg": 1.0, "sampler_name": "euler",
+                       "scheduler": "simple", "denoise": 0.28, "feather": 14,
+                       "noise_mask": True, "force_inpaint": True, "wildcard": "",
+                       "cycle": 1, "inpaint_model": False, "noise_mask_feather": 20},
+              title="◆ EYE detailer — lash/iris crispness only")
+    edet["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+
+    wire(nodes[553], 2, eseg, "image", "IMAGE")          # FACE image -> mesh
+    wire(nodes[553], 2, edet, "image", "IMAGE")          # FACE image -> detailer
+    wire(eseg, 0, edet, "segs", "SEGS")
+    wire(mget, 0, edet, "model", "MODEL")
+    wire(nodes[529], 0, edet, "clip", "CLIP")   # MODELS subgraph slot 0 = CLIP
+    wire(nodes[556], 0, edet, "vae", "VAE")
+    wire(nodes[529], 0, eyetxt, "clip", "CLIP")
+    wire(eyetxt, 0, edet, "positive", "CONDITIONING")
+    wire(nodes[7], 0, edet, "negative", "CONDITIONING")
+
+    # EYE -> BODY -> HAND -> POST  (BODY/HAND un-bypassed above)
+    wire(edet, 0, nodes[539], "image", "IMAGE", reuse=6509)
+    wire(nodes[539], 0, nodes[542], "image", "IMAGE", reuse=6505)
+    wire(nodes[542], 0, post, "image", "IMAGE", reuse=6523)
 
     face = nodes[553]
     for i in face["inputs"]:
