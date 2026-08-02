@@ -39,7 +39,8 @@ CHARACTER_DEFAULT = (
 # it as part of "keep everything unchanged" (live finding: listed as a mere
 # trait, the bob loses to the preservation clause and reference hair stays).
 QWEN_TEMPLATE_PRE = (
-    "Replace the woman in image 1 with this woman: "
+    "Replace the woman in image 1 with the woman shown in image 2. "
+    "Her face must match image 2 exactly. She is: "
 )
 # Face-conditional: on faceless references (back shots, cropped, turned away)
 # Qwen must NOT invent or reveal a face to satisfy a face-swap instruction —
@@ -256,9 +257,9 @@ def main():
                                      # sprays white speckle over skin
                     w[18] = 24       # noise_mask_feather (jaw/neck seam)
             if str(sg.get("id", "")).startswith("f7868d1c") and n["type"] == "FaceDetailer":
-                # v5: un-bypass the hand pass — hands are the classic tell and
-                # hand_yolov8n is on the pod.
-                n["mode"] = 0
+                # v6: bypassed — hands are original reference pixels in the
+                # composite output, nothing to fix
+                n["mode"] = 4
                 w = n["widgets_values"]
                 w[0] = 1280.0   # guide_size
                 w[2] = 2304.0   # max_size
@@ -387,6 +388,11 @@ def main():
     cat3 = mk(626, "StringConcatenate", [X + 760, 1550], [""], "character+suffix = main positive")
     cat3["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
 
+    idphoto = mk(650, "LoadImage", [X, 470], ["emma_face_ref.png", "image"],
+                 "◆ IDENTITY PHOTO — her face (swap with LoRA when changing girls)", [340, 340])
+    idphoto["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0},
+                          {"name": "MASK", "type": "MASK", "links": [], "slot_index": 1}]
+
     q_pos = mk(608, "TextEncodeQwenImageEditPlus", [X + 380, 80], [QWEN_TEMPLATE_PRE + CHARACTER_DEFAULT + QWEN_TEMPLATE_POST],
                "[stage0] SWAP INSTRUCTION — 2+ people? say WHICH at the end: 'the woman on the left'", [420, 220])
     q_pos["outputs"] = [{"name": "CONDITIONING", "type": "CONDITIONING", "links": [], "slot_index": 0}]
@@ -423,6 +429,7 @@ def main():
     wire(q_clip, 0, q_pos, "clip", "CLIP")
     wire(q_vae, 0, q_pos, "vae", "VAE")
     wire(conform, 0, q_pos, "image1", "IMAGE")
+    wire(idphoto, 0, q_pos, "image2", "IMAGE")
     wire(q_clip, 0, q_neg, "clip", "CLIP")
     wire(conform, 0, q_enc, "pixels", "IMAGE")
     wire(q_vae, 0, q_enc, "vae", "VAE")
@@ -487,7 +494,11 @@ def main():
     # 2160-class frame, then finish with the grade.
     seed_vr = nodes[523]
     post = nodes[552]
-    wire(tdec, 0, seed_vr, "image", "IMAGE", reuse=6522)      # texture -> SeedVR2
+    for tn in (tenc, tnoise, tshift, tshark, tboost, tclown, tdec):
+        tn["mode"] = 4   # v6: whole-frame texture grit is pointless when the
+                         # body ships as original pixels; face texture comes
+                         # from the detailer at 2160
+    wire(cmatch, 0, seed_vr, "image", "IMAGE", reuse=6522)     # ColorMatch -> SeedVR2
     wire(seed_vr, 0, nodes[553], "image", "IMAGE", reuse=6519)  # SeedVR2 -> FACE
 
     # ---- EYE pass (rebuilt without the manager's private weights) --------
@@ -529,10 +540,61 @@ def main():
     wire(eyetxt, 0, edet, "positive", "CONDITIONING")
     wire(nodes[7], 0, edet, "negative", "CONDITIONING")
 
-    # EYE -> BODY -> HAND -> POST  (BODY/HAND un-bypassed above)
-    wire(edet, 0, nodes[539], "image", "IMAGE", reuse=6509)
-    wire(nodes[539], 0, nodes[542], "image", "IMAGE", reuse=6505)
-    wire(nodes[542], 0, post, "image", "IMAGE", reuse=6523)
+    # ---- v6 FACE-ONLY COMPOSITE ---------------------------------------
+    # The rendered frame is only a DONOR for face+hair pixels. The output is
+    # the user's original (crop-conformed at render resolution, plain lanczos
+    # resample — no model touches it) with the rendered face+hair composited
+    # in. Union of both frames' face+hair masks so the original hairstyle's
+    # silhouette is fully covered by the render (which carries Qwen's
+    # inpainted background where the old hair was).
+    gis = mk(660, "GetImageSize", [2400, 60], None, "[comp] render dims")
+    gis["outputs"] = [{"name": "width", "type": "INT", "links": [], "slot_index": 0},
+                      {"name": "height", "type": "INT", "links": [], "slot_index": 1},
+                      {"name": "batch_size", "type": "INT", "links": [], "slot_index": 2}]
+    dest = mk(661, "ImageResizeKJv2", [2400, 200],
+              {"width": 2160, "height": 2776, "upscale_method": "lanczos",
+               "keep_proportion": "crop", "pad_color": "0, 0, 0",
+               "crop_position": "center", "divisible_by": 2},
+              "[comp] ORIGINAL at render dims (pure resample)")
+    dest["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0},
+                       {"name": "width", "type": "INT", "links": [], "slot_index": 1},
+                       {"name": "height", "type": "INT", "links": [], "slot_index": 2}]
+    m_dest = mk(662, "APersonMaskGenerator", [2400, 420],
+                {"face_mask": True, "background_mask": False, "hair_mask": True,
+                 "body_mask": False, "clothes_mask": False, "confidence": 0.3,
+                 "refine_mask": True}, "[comp] face+hair mask of ORIGINAL")
+    m_dest["outputs"] = [{"name": "MASK", "type": "MASK", "links": [], "slot_index": 0}]
+    m_rend = mk(663, "APersonMaskGenerator", [2400, 620],
+                {"face_mask": True, "background_mask": False, "hair_mask": True,
+                 "body_mask": False, "clothes_mask": False, "confidence": 0.3,
+                 "refine_mask": True}, "[comp] face+hair mask of RENDER")
+    m_rend["outputs"] = [{"name": "MASK", "type": "MASK", "links": [], "slot_index": 0}]
+    munion = mk(664, "MaskComposite", [2740, 420],
+                {"x": 0, "y": 0, "operation": "add"}, "[comp] union")
+    munion["outputs"] = [{"name": "MASK", "type": "MASK", "links": [], "slot_index": 0}]
+    mfeather = mk(665, "GrowMaskWithBlur", [2740, 560],
+                  {"expand": 8, "incremental_expandrate": 0.0, "tapered_corners": True,
+                   "flip_input": False, "blur_radius": 16.0, "lerp_alpha": 1.0,
+                   "decay_factor": 1.0}, "[comp] feather")
+    mfeather["outputs"] = [{"name": "mask", "type": "MASK", "links": [], "slot_index": 0},
+                           {"name": "mask_inverted", "type": "MASK", "links": [], "slot_index": 1}]
+    comp = mk(666, "ImageCompositeMasked", [3080, 420],
+              {"x": 0, "y": 0, "resize_source": False},
+              "◆ COMPOSITE — face+hair from render, EVERYTHING else original")
+    comp["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+
+    wire(edet, 0, gis, "image", "IMAGE")
+    wire(ref, 0, dest, "image", "IMAGE")
+    wire(gis, 0, dest, "width", "INT", widget=True)
+    wire(gis, 1, dest, "height", "INT", widget=True)
+    wire(dest, 0, m_dest, "images", "IMAGE")
+    wire(edet, 0, m_rend, "images", "IMAGE")
+    wire(m_dest, 0, munion, "destination", "MASK")
+    wire(m_rend, 0, munion, "source", "MASK")
+    wire(munion, 0, mfeather, "mask", "MASK")
+    wire(dest, 0, comp, "destination", "IMAGE")
+    wire(edet, 0, comp, "source", "IMAGE")
+    wire(mfeather, 0, comp, "mask", "MASK")
 
     face = nodes[553]
     for i in face["inputs"]:
@@ -544,8 +606,8 @@ def main():
             mget["outputs"][0]["links"].append(L[0])
 
     # SaveImage on the POST output (original chain ended at a preview)
-    save = mk(617, "SaveImage", [1600, 80], ["AIOFM_i2i_v4"], "FINAL", [340, 320])
-    wire(nodes[552], 0, save, "images", "IMAGE")
+    save = mk(617, "SaveImage", [3080, 620], ["AIOFM_i2i_v6"], "FINAL — composite", [340, 320])
+    wire(comp, 0, save, "images", "IMAGE")
 
     # ------------------------------------------------------------ apply deletions
     for nid in doomed:
