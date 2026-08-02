@@ -34,6 +34,9 @@ def load_app():
     sys.exit("antelopev2 not found on this pod")
 
 
+_last_bbox = {}
+
+
 def embed(app, path, largest_only=True):
     import cv2
     img = cv2.imread(path)
@@ -41,10 +44,12 @@ def embed(app, path, largest_only=True):
         return None
     faces = app.get(img)
     if not faces:
+        _last_bbox["bbox"] = None
         return None
     if largest_only:
         faces.sort(key=lambda f: (f.bbox[2] - f.bbox[0]) * (f.bbox[3] - f.bbox[1]),
                    reverse=True)
+    _last_bbox["bbox"] = faces[0].bbox
     e = faces[0].normed_embedding
     return np.asarray(e, dtype=np.float32)
 
@@ -97,13 +102,19 @@ def main():
                 queries.append({"file": os.path.basename(p), "error": "no face detected"})
                 continue
             s = bank @ e
-            queries.append({
+            entry = {
                 "file": os.path.basename(p),
+                "path": os.path.abspath(p),
                 "mean_sim": float(s.mean()),
                 "max_sim": float(s.max()),
                 "pct_of_refs_beaten": float((intra < s.mean()).mean() * 100),
                 "verdict": "PASS" if s.mean() >= pass_bar else "FAIL",
-            })
+            }
+            # face bbox for downstream zoom-sheet cropping (largest face)
+            bb = _last_bbox.get("bbox")
+            if bb is not None:
+                entry["bbox"] = [int(v) for v in bb]
+            queries.append(entry)
 
     out = {"calibration": band, "pass_bar_mean_sim": pass_bar, "results": queries}
     print(json.dumps(out, indent=1))
