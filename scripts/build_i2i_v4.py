@@ -588,6 +588,99 @@ def main():
             print(" -", e)
         die(f"{len(errs)} validation errors")
 
+    # ---- repair version-drifted widget arrays --------------------------
+    # The manager saved this file against older builds of the CRT /
+    # CameraForensic / denoiser nodes, whose input lists have since changed.
+    # A saved array that is longer or shorter than the installed node expects
+    # shifts EVERY widget: that is how POST PROCESSING's `seed` ended up
+    # holding the string "fixed", which fails validation and kills the run at
+    # the final stage — so no output is ever written and the last thing the UI
+    # shows is SeedVR2's preview.
+    def widget_spec(cls):
+        out = []
+        for section in ("required", "optional"):
+            for k, v in oi.get(cls, {}).get("input", {}).get(section, {}).items():
+                t = v[0]
+                extra = v[1] if len(v) > 1 and isinstance(v[1], dict) else {}
+                if t == "COMBO":
+                    out.append((k, "COMBO", extra.get("options") or [], extra.get("default")))
+                elif isinstance(t, list):
+                    out.append((k, "COMBO", t, extra.get("default")))
+                elif isinstance(t, str) and t in ("INT", "FLOAT", "BOOLEAN", "STRING"):
+                    out.append((k, t, None, extra.get("default")))
+                else:
+                    continue
+                if k == "seed":
+                    out.append(("<control>", "COMBO",
+                                ["fixed", "increment", "decrement", "randomize"], "fixed"))
+        return out
+
+    def typechecks(val, kind, opts):
+        if kind == "BOOLEAN":
+            return isinstance(val, bool)
+        if kind in ("INT", "FLOAT"):
+            return isinstance(val, (int, float)) and not isinstance(val, bool)
+        if kind == "COMBO":
+            return val in opts if opts else isinstance(val, str)
+        if kind == "STRING":
+            return isinstance(val, str)
+        return True
+
+    REPAIR_KEEP = {
+        # what the manager's tuning actually meant, re-applied by NAME
+        "AdvancedImageDenoiser": {"method": "non_local_means", "strength": 0.15},
+        "CameraForensicRealismEngine": {"master_strength": 0.54, "seed": 4022444571},
+    }
+
+    def repair(n):
+        spec = widget_spec(n["type"])
+        w = n.get("widgets_values")
+        if not spec or not isinstance(w, list) or len(w) == len(spec):
+            return None
+        # extra trailing values only: the prefix still lines up -> truncate
+        if len(w) > len(spec) and all(
+                typechecks(w[i], spec[i][1], spec[i][2]) for i in range(len(spec))):
+            n["widgets_values"] = w[:len(spec)]
+            return f"{n['type']}: truncated {len(w)}->{len(spec)}"
+        # otherwise the array is shifted: rebuild from defaults + named intent
+        keep = REPAIR_KEEP.get(n["type"], {})
+        rebuilt = []
+        for k, kind, opts, dflt in spec:
+            if k in keep:
+                rebuilt.append(keep[k])
+            elif dflt is not None:
+                rebuilt.append(dflt)
+            elif kind == "COMBO":
+                rebuilt.append(opts[0] if opts else "")
+            else:
+                rebuilt.append({"INT": 0, "FLOAT": 0.0, "BOOLEAN": False, "STRING": ""}[kind])
+        n["widgets_values"] = rebuilt
+        return f"{n['type']}: rebuilt {len(w)}->{len(rebuilt)} (was shifted)"
+
+    fixed = []
+    for sg in d.get("definitions", {}).get("subgraphs", []):
+        for n in sg.get("nodes", []):
+            r = repair(n)
+            if r:
+                fixed.append(f"{sg.get('name','?')}/{r}")
+                # A rebuilt array means the manager's tuning for that node was
+                # unrecoverable (its inputs changed shape), so it now runs on
+                # library defaults. Verified live: default CameraForensic +
+                # denoiser over-process — pushed contrast, over-sharpened hair
+                # edges, waxy HDR sheen — visibly worse than no grade at all.
+                # Ship them bypassed rather than invent a look he never chose.
+                # The CRT suite and LUT keep his real values (truncate-only
+                # repair), so the surviving half of the grade still applies.
+                if "rebuilt" in r and n["type"] in (
+                        "CameraForensicRealismEngine", "AdvancedImageDenoiser"):
+                    n["mode"] = 4
+                    fixed.append(f"{sg.get('name','?')}/{n['type']}: bypassed "
+                                 f"(tuning unrecoverable, defaults degrade)")
+    if fixed:
+        print("repaired version-drifted widgets:")
+        for f in fixed:
+            print("   ", f)
+
     # prune unused subgraph DEFINITIONS: deleting an instance leaves its
     # definition behind, and the frontend still validates the models named
     # inside it — that is how deleted NSFW/eye/phone detailers kept raising
