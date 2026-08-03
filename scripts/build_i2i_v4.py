@@ -609,8 +609,35 @@ def main():
             mget["outputs"][0]["links"].append(L[0])
 
     # SaveImage on the POST output (original chain ended at a preview)
+    # ---- EXPERIMENT 1: face-region grain matching -----------------------
+    # Measured defect (runs/v5-preloop-observed): grain_ratio ~1.5 — the
+    # generated face carries ~50% more high-frequency energy than the host
+    # photo's own skin, which is what makes an otherwise-correct insert read
+    # as synthetic. One dial: hf_attenuation. 0.0 = identity (baseline), and
+    # the blend pulls the face toward its own low-pass, shedding excess AI
+    # micro-detail without touching pose, colour or geometry.
+    # Applied INSIDE the face mask only — host pixels stay untouched.
+    blur_comp = mk(670, "ImageBlur", [3420, 300],
+                   {"blur_radius": 2, "sigma": 1.0}, "[grain] face low-pass")
+    blur_comp["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+    atten = mk(671, "ImageBlend", [3420, 430],
+               {"blend_factor": 0.0, "blend_mode": "normal"},
+               "◆ DIAL hf_attenuation (0 = baseline; try 0.20/0.35/0.50)")
+    atten["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+    regrain = mk(672, "ImageCompositeMasked", [3420, 560],
+                 {"x": 0, "y": 0, "resize_source": False},
+                 "[grain] apply inside face mask only")
+    regrain["outputs"] = [{"name": "IMAGE", "type": "IMAGE", "links": [], "slot_index": 0}]
+
+    wire(comp, 0, blur_comp, "image", "IMAGE")
+    wire(comp, 0, atten, "image1", "IMAGE")
+    wire(blur_comp, 0, atten, "image2", "IMAGE")
+    wire(comp, 0, regrain, "destination", "IMAGE")
+    wire(atten, 0, regrain, "source", "IMAGE")
+    wire(mfeather, 0, regrain, "mask", "MASK")
+
     save = mk(617, "SaveImage", [3080, 620], ["AIOFM_i2i_v6"], "FINAL — composite", [340, 320])
-    wire(comp, 0, save, "images", "IMAGE")
+    wire(regrain, 0, save, "images", "IMAGE")
 
     # ------------------------------------------------------------ apply deletions
     for nid in doomed:
