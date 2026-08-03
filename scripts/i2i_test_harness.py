@@ -210,6 +210,25 @@ def run_cycle(a):
     else:
         report["identity_note"] = "pod scorer unreachable — identity NOT measured this cycle"
 
+    # 200%-zoom evidence sheets — the mandate's acceptance test is visual, so
+    # every cycle produces the artifact automatically rather than on request.
+    pairs = [f"{report['refs'][r]['ref_local']}={report['refs'][r]['output']}"
+             for r in REFS
+             if report["refs"].get(r, {}).get("output")
+             and report["refs"].get(r, {}).get("ref_local")]
+    if pairs:
+        sj = os.path.join(rundir, "score.json")
+        json.dump({"results": [{"file": os.path.basename(p.split("=")[1])} for p in pairs]},
+                  open(sj, "w"))
+        try:
+            subprocess.run([sys.executable, os.path.join(HERE, "zoom_sheet.py"),
+                            "--score-json", sj, "--pairs", *pairs,
+                            "--outdir", os.path.join(rundir, "zoom")],
+                           check=False, capture_output=True, timeout=600)
+            report["zoom_sheets"] = os.path.join(rundir, "zoom")
+        except Exception as e:
+            report["zoom_error"] = str(e)[:150]
+
     json.dump(report, open(os.path.join(rundir, "report.json"), "w"), indent=1)
     with open(os.path.join(rundir, "report.md"), "w") as f:
         f.write(f"# cycle `{a.tag}`\n\nvariant: `{a.set or 'none (baseline)'}`\n\n")

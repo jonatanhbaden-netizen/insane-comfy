@@ -55,10 +55,24 @@ def sheet_for_pair(ref_path, out_path, bbox_by_file, dest):
     out = Image.open(out_path).convert("RGB")
     bb_out = bbox_by_file.get(os.path.basename(out_path))
     if bb_out is None:
+        # no ArcFace bbox (pod scorer unavailable) — detect locally so the
+        # zoom evidence still gets produced
+        try:
+            from i2i_metrics import detect_face
+            bb_out = detect_face(out_path)
+        except Exception:
+            bb_out = None
+    if bb_out is None:
         return None
     # each side uses its OWN detected bbox; scaling the output bbox onto the
     # reference misframes whenever the output is an aspect-crop of the ref.
     bb_ref = bbox_by_file.get(os.path.basename(ref_path))
+    if bb_ref is None:
+        try:
+            from i2i_metrics import detect_face
+            bb_ref = detect_face(ref_path)
+        except Exception:
+            bb_ref = None
     if bb_ref is None:
         sx, sy = ref.width / out.width, ref.height / out.height
         bb_ref = [bb_out[0] * sx, bb_out[1] * sy, bb_out[2] * sx, bb_out[3] * sy]
