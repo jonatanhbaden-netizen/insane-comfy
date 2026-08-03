@@ -12,8 +12,22 @@ LINKY = {"MODEL","CLIP","VAE","IMAGE","MASK","LATENT","CONDITIONING","STRING","S
          "SAMPLER","GUIDER","NOISE","OPTIONS","GUIDES","BBOX_DETECTOR","SEGM_DETECTOR",
          "SAM_MODEL","UPSCALE_MODEL","BASIC_PIPE","DETAILER_PIPE","SEEDVR2_DIT","SEEDVR2_VAE",
          "SEEDVR2_MODEL","LUT","COMFY_AUTOGROW_V3","DETAILER_HOOK","SEGS","MASK_MAPPING"}
-SCALARS = {"INT","FLOAT","BOOLEAN","STRING","COMBO"}
+SCALARS = {"INT","FLOAT","BOOLEAN","STRING","COMBO",
+           # dynamic combo serializes its selection as one widget slot; nodes whose
+           # dynamic sub-widgets also serialize are listed in SPECIAL_WIDGETS
+           "COMFY_DYNAMICCOMBO_V3"}
 CTRL = {"fixed","increment","decrement","randomize"}
+
+# V3 dynamic-combo nodes: the class spec doesn't enumerate their widget stream,
+# so map widgets_values slots to API input names explicitly (widget order as
+# serialized by the frontend). Linked slots still resolve to links.
+SPECIAL_WIDGETS = {
+    "ResizeImageMaskNode": ["resize_type", "resize_type.width",
+                            "resize_type.height", "resize_type.crop",
+                            "scale_method"],
+    # valid while sampling_mode == "off" (no sampling_mode.* sub-widgets serialize)
+    "TextGenerateLTX2Prompt": ["prompt", "max_length", "sampling_mode"],
+}
 
 
 def norm_links(links):
@@ -125,24 +139,84 @@ def flatten(ui, oi):
         entry = {"inputs": {}, "class_type": n["type"],
                  "_meta": {"title": n.get("title", n["type"])}}
         linked = {i["name"]: i["link"] for i in n.get("inputs", []) if i.get("link") is not None}
-        # widget stream
-        wv = list(n.get("widgets_values", []) or [])
+        # widget stream. Widget-backed inputs ALWAYS occupy a widgets_values slot,
+        # even when converted to a link (the frontend keeps a placeholder), so the
+        # slot must be consumed either way or everything after it misaligns.
+        wvraw = n.get("widgets_values") or []
+        if isinstance(wvraw, dict):
+            # VHS nodes (VHS_VideoCombine / VHS_LoadVideo) serialize widgets
+            # as a name->value dict, not a positional stream. Assign by name;
+            # links win over widget values; UI-only keys are dropped.
+            UI_ONLY = {"videopreview", "choose video to upload"}
+            for k, v in wvraw.items():
+                if k in UI_ONLY or k in linked:
+                    continue
+                entry["inputs"][k] = v
+            for k, lk in linked.items():
+                l = S["lby"].get(lk)
+                r = resolve(scope, l["o"], l["os"]) if l else None
+                if r:
+                    entry["inputs"][k] = [r[0], r[1]]
+            api[g] = entry
+            return g
+        wv = list(wvraw)
         wi = 0
-        for k, tp in order:
-            is_link = isinstance(tp, str) and tp != "STRING" and (tp in LINKY or (tp.isupper() and tp not in SCALARS))
-            if k in linked:
-                l = S["lby"].get(linked[k])
-                if l:
-                    r = resolve(scope, l["o"], l["os"])
+        seen = set()
+        smap = SPECIAL_WIDGETS.get(n["type"])
+        if smap is not None:
+            for k in smap:
+                seen.add(k)
+                if k in linked:
+                    l = S["lby"].get(linked[k])
+                    r = resolve(scope, l["o"], l["os"]) if l else None
                     if r:
                         entry["inputs"][k] = [r[0], r[1]]
+                    elif wi < len(wv):
+                        entry["inputs"][k] = wv[wi]
+                elif wi < len(wv):
+                    entry["inputs"][k] = wv[wi]
+                wi += 1
+            for k, lk in linked.items():
+                if k in seen:
+                    continue
+                l = S["lby"].get(lk)
+                r = resolve(scope, l["o"], l["os"]) if l else None
+                if r:
+                    entry["inputs"][k] = [r[0], r[1]]
+            api[g] = entry
+            return g
+        for k, tp in order:
+            seen.add(k)
+            widgetish = isinstance(tp, list) or (isinstance(tp, str) and tp in SCALARS)
+            if k in linked:
+                l = S["lby"].get(linked[k])
+                r = resolve(scope, l["o"], l["os"]) if l else None
+                if r:
+                    entry["inputs"][k] = [r[0], r[1]]
+                elif widgetish and wi < len(wv):
+                    # dangling boundary link (unconnected promoted widget):
+                    # fall back to the placeholder value
+                    entry["inputs"][k] = wv[wi]
+                if widgetish:
+                    wi += 1
+                    if k.endswith("seed") and wi < len(wv) and wv[wi] in CTRL:
+                        wi += 1
                 continue
-            if is_link:
+            if not widgetish:
                 continue
             if wi < len(wv):
                 entry["inputs"][k] = wv[wi]; wi += 1
                 if k.endswith("seed") and wi < len(wv) and wv[wi] in CTRL:
                     wi += 1
+        # autogrow sub-inputs ("values.a" on ComfyMathExpression etc.) are not in
+        # the class spec by name — pass linked ones through under their dotted name
+        for k, lk in linked.items():
+            if k in seen or "." not in k:
+                continue
+            l = S["lby"].get(lk)
+            r = resolve(scope, l["o"], l["os"]) if l else None
+            if r:
+                entry["inputs"][k] = [r[0], r[1]]
         api[g] = entry
         return g
 
@@ -177,8 +251,13 @@ def flatten(ui, oi):
 
     # top scope
     scopes[""] = get_scope("", ui["nodes"], norm_links(ui["links"]), {})
-    # emit everything reachable from SaveImage nodes
-    save_ids = [n["id"] for n in ui["nodes"] if n["type"] == "SaveImage"]
+    # emit everything reachable from active sink nodes
+    SINKS = {"SaveImage", "SaveVideo", "SaveAudio", "SaveAudioMP3", "SaveAudioOpus",
+             "PreviewImage", "PreviewAudio", "PreviewAny", "SaveAnimatedWEBP",
+             # VHS terminal writer — the sink of every aiofm_mc_* master
+             "VHS_VideoCombine"}
+    save_ids = [n["id"] for n in ui["nodes"]
+                if n["type"] in SINKS and n.get("mode") not in (2, 4)]
     for sid in save_ids:
         emit("", sid)
 
