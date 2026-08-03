@@ -15,26 +15,41 @@ design: see `superpowers/specs/2026-08-01-motion-control-v2-design.md` for why.
 Wan 2.2 Animate + VitPose: the user-preferred motion copier, cleaned to run on
 our pod. Two modes:
 
-- **MOVE (default):** the girl performs the driving clip's motion in *her*
-  scene. No off-frame events possible — the model only knows pose + face.
-- **🔁 MIX (the off-frame answer):** un-bypass the two MIX MODE nodes and wire
-  them into `WanVideoAnimateEmbeds` (`bg_images` + `mask`). The original reel is
-  kept 1:1 — camera moves, hands/objects entering from off-screen, everything —
-  and only the person is swapped. **Pick source reels that contain the events
-  you want.** Relight LoRA matches her lighting to the scene.
+- **🔁 MIX (DEFAULT, and the off-frame answer):** the original reel is kept
+  1:1 — background, camera moves, hands/objects entering from off-screen,
+  everything — and only the person is replaced with your girl. **Pick source
+  reels that already contain the events you want.** Relight LoRA matches her
+  lighting to the scene. Verified working end-to-end (see below).
+- **MOVE:** bypass the MIX MODE node group (mask-gen, grow, blockify, blackout)
+  and she performs the driving motion in *her own* scene from the reference
+  image. No off-frame events are possible in this mode — the model only ever
+  sees pose + face crops, so anything entering frame is hallucinated.
 
-Changed vs b-1 (all reversible, documented in the in-graph Note): 5-LoRA stack
-trimmed to relight + lightning-LOW (the 5×@1.0 stack is the documented
-plastic-skin/identity-drift cause), NLF pose branch removed (VitPose was
-active), empty prompts filled, RunningHub-only nodes replaced with installed
-equivalents. Needs: `ComfyUI-WanAnimatePreprocess` pack (in Dockerfile; or
-install today via Manager → Install via Git URL, then restart) + download
-section 2c models (~20 GB — volume is tight, use `MODELS_LOCAL=true`).
+**2026-08-03 — Mix mode verified working end-to-end** (proof render:
+`test-assets/mc_animate_working_proof_s6.mp4`). The critical fix chain, found by
+the tuning harness (`scripts/mc_tuning/`, log `docs/MC_ANIMATE_TUNING.md`):
+bg frames must have the person region **blacked out** (`DrawMaskOnImage`) or the
+model reconstructs the original girl from the leaked pixels; mask grown 10px +
+blockified to the 32px latent grid; dedicated distill
+`lightx2v_I2V_14B_480p_cfg_step_distill_rank64` @1.2 (NOT the expert-pair
+distills); 6 steps; windowed mode (frame_window 77, context-options
+disconnected); clip-vision crop `center`. Measured on the 97-frame smoke:
+motion correlation 0.894 with zero lag; flicker ~66% above real footage is the
+open quality target (A/B queue in the tuning log).
 
-All three: Wan 2.2 A14B, 480×832 vertical, 81 frames/segment, 16 fps → RIFE ×2.
-**Generate at 480p vertical and upscale after (SeedVR2)** — 720p vertical chains
-are documented-unstable. Character LoRA slots ship bypassed; the Wan-arch
-character LoRA on the pod is `f1sher_000002400.safetensors`.
+Changed vs b-1: 5-LoRA stack replaced (the 5×@1.0 stack is the documented
+plastic-skin cause), NLF pose branch removed, empty prompts filled,
+RunningHub-only nodes replaced, long-reel crash fixed (frame cap = frames).
+Needs: `ComfyUI-WanAnimatePreprocess` pack (in Dockerfile) + section 2c models
++ the pod-side restore script `/workspace/refetch_local_models.sh` after any
+pod stop (container-disk models, ~4 min).
+
+All four: Wan 2.2 A14B, 480×832 vertical, **generate at 480p and upscale after
+(SeedVR2)** — 720p vertical is documented-unstable. Character LoRA slots ship
+bypassed; the Wan-arch character LoRA on the pod is `f1sher_000002400.safetensors`.
+Frame budgets differ per workflow: MC ANIMATE runs one continuous clip in 77-frame
+internal windows (`num_frames` and `frame_load_cap` must match, or long reels
+crash); MC SEQUENCE chains 81-frame segments.
 
 ## MC SHOT — motion + camera
 
