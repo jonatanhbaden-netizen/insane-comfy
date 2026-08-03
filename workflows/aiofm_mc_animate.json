@@ -1,5 +1,5 @@
 {
- "last_link_id": 371,
+ "last_link_id": 376,
  "nodes": [
   {
    "outputs": [
@@ -492,7 +492,7 @@
    "widgets_values": [
     1,
     1,
-    "disabled",
+    "center",
     "average",
     true,
     0,
@@ -774,8 +774,7 @@
     {
      "name": "INT",
      "links": [
-      320,
-      321
+      320
      ],
      "label": "INT",
      "type": "INT"
@@ -1339,7 +1338,8 @@
      "name": "image_urls",
      "label": "image_urls",
      "type": "STRING",
-     "localized_name": "image_urls"
+     "localized_name": "image_urls",
+     "links": []
     }
    ],
    "color": "#222",
@@ -1389,7 +1389,8 @@
     {
      "name": "FLOAT",
      "label": "FLOAT",
-     "type": "FLOAT"
+     "type": "FLOAT",
+     "links": []
     }
    ],
    "color": "#232",
@@ -1437,7 +1438,8 @@
     {
      "name": "WANVIDIMAGE_CLIPEMBEDS",
      "label": "WANVIDIMAGE_CLIPEMBEDS",
-     "type": "WANVIDIMAGE_CLIPEMBEDS"
+     "type": "WANVIDIMAGE_CLIPEMBEDS",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -1488,7 +1490,8 @@
     {
      "name": "WANVIDEOTEXTEMBEDS",
      "label": "WANVIDEOTEXTEMBEDS",
-     "type": "WANVIDEOTEXTEMBEDS"
+     "type": "WANVIDEOTEXTEMBEDS",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -1542,7 +1545,6 @@
      "name": "samples",
      "slot_index": 0,
      "links": [
-      232,
       367
      ],
      "label": "samples",
@@ -1553,12 +1555,13 @@
      "name": "denoised_samples",
      "label": "denoised_samples",
      "type": "LATENT",
-     "localized_name": "denoised_samples"
+     "localized_name": "denoised_samples",
+     "links": []
     }
    ],
    "color": "#222",
    "widgets_values": [
-    4,
+    6,
     1,
     5,
     993543213977658,
@@ -1613,7 +1616,7 @@
     {
      "shape": 7,
      "name": "context_options",
-     "link": 231,
+     "link": null,
      "label": "context_options",
      "type": "WANVIDCONTEXT",
      "localized_name": "context_options"
@@ -1869,7 +1872,8 @@
     {
      "name": "IMAGE",
      "label": "IMAGE",
-     "type": "IMAGE"
+     "type": "IMAGE",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -1942,7 +1946,8 @@
      "name": "mask",
      "label": "mask",
      "type": "MASK",
-     "localized_name": "mask"
+     "localized_name": "mask",
+     "links": []
     }
    ],
    "color": "#222",
@@ -2097,7 +2102,8 @@
     {
      "name": "WANVAE",
      "label": "WANVAE",
-     "type": "WANVAE"
+     "type": "WANVAE",
+     "links": []
     }
    ],
    "color": "#322",
@@ -2154,7 +2160,6 @@
     {
      "name": "face_images",
      "links": [
-      217,
       368
      ],
      "label": "face_images",
@@ -2172,13 +2177,15 @@
      "name": "bboxes",
      "label": "bboxes",
      "type": "BBOX",
-     "localized_name": "bboxes"
+     "localized_name": "bboxes",
+     "links": []
     },
     {
      "name": "face_bboxes",
      "label": "face_bboxes",
      "type": "BBOX,",
-     "localized_name": "face_bboxes"
+     "localized_name": "face_bboxes",
+     "links": []
     }
    ],
    "color": "#222",
@@ -2316,10 +2323,7 @@
    "outputs": [
     {
      "name": "IMAGE",
-     "links": [
-      249,
-      253
-     ],
+     "links": [],
      "label": "IMAGE",
      "type": "IMAGE"
     }
@@ -2365,9 +2369,7 @@
     },
     {
      "name": "face_images",
-     "links": [
-      214
-     ],
+     "links": [],
      "label": "face_images",
      "type": "IMAGE",
      "localized_name": "face_images"
@@ -2383,13 +2385,15 @@
      "name": "bboxes",
      "label": "bboxes",
      "type": "BBOX",
-     "localized_name": "bboxes"
+     "localized_name": "bboxes",
+     "links": []
     },
     {
      "name": "face_bboxes",
      "label": "face_bboxes",
      "type": "BBOX,",
-     "localized_name": "face_bboxes"
+     "localized_name": "face_bboxes",
+     "links": []
     }
    ],
    "color": "#222",
@@ -2474,7 +2478,8 @@
     {
      "name": "FLOAT",
      "label": "FLOAT",
-     "type": "FLOAT"
+     "type": "FLOAT",
+     "links": []
     }
    ],
    "color": "#232",
@@ -2576,7 +2581,8 @@
     {
      "name": "INT",
      "label": "INT",
-     "type": "INT"
+     "type": "INT",
+     "links": []
     }
    ],
    "color": "#1b4669",
@@ -2624,7 +2630,8 @@
     {
      "name": "INT",
      "label": "INT",
-     "type": "INT"
+     "type": "INT",
+     "links": []
     }
    ],
    "color": "#1b4669",
@@ -2672,7 +2679,8 @@
     {
      "name": "INT",
      "label": "INT",
-     "type": "INT"
+     "type": "INT",
+     "links": []
     }
    ],
    "color": "#1b4669",
@@ -2721,31 +2729,36 @@
      "name": "source_fps\ud83d\udfe8",
      "label": "source_fps\ud83d\udfe8",
      "type": "FLOAT",
-     "localized_name": "source_fps\ud83d\udfe8"
+     "localized_name": "source_fps\ud83d\udfe8",
+     "links": []
     },
     {
      "name": "source_frame_count\ud83d\udfe8",
      "label": "source_frame_count\ud83d\udfe8",
      "type": "INT",
-     "localized_name": "source_frame_count\ud83d\udfe8"
+     "localized_name": "source_frame_count\ud83d\udfe8",
+     "links": []
     },
     {
      "name": "source_duration\ud83d\udfe8",
      "label": "source_duration\ud83d\udfe8",
      "type": "FLOAT",
-     "localized_name": "source_duration\ud83d\udfe8"
+     "localized_name": "source_duration\ud83d\udfe8",
+     "links": []
     },
     {
      "name": "source_width\ud83d\udfe8",
      "label": "source_width\ud83d\udfe8",
      "type": "INT",
-     "localized_name": "source_width\ud83d\udfe8"
+     "localized_name": "source_width\ud83d\udfe8",
+     "links": []
     },
     {
      "name": "source_height\ud83d\udfe8",
      "label": "source_height\ud83d\udfe8",
      "type": "INT",
-     "localized_name": "source_height\ud83d\udfe8"
+     "localized_name": "source_height\ud83d\udfe8",
+     "links": []
     },
     {
      "name": "loaded_fps\ud83d\udfe6",
@@ -2769,7 +2782,8 @@
      "name": "loaded_duration\ud83d\udfe6",
      "label": "loaded_duration\ud83d\udfe6",
      "type": "FLOAT",
-     "localized_name": "loaded_duration\ud83d\udfe6"
+     "localized_name": "loaded_duration\ud83d\udfe6",
+     "links": []
     },
     {
      "name": "loaded_width\ud83d\udfe6",
@@ -2839,7 +2853,6 @@
     {
      "name": "pose_images",
      "links": [
-      359,
       365
      ],
      "label": "pose_images",
@@ -2966,7 +2979,8 @@
     {
      "name": "WANVIDEOMODEL",
      "label": "WANVIDEOMODEL",
-     "type": "WANVIDEOMODEL"
+     "type": "WANVIDEOMODEL",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -3127,7 +3141,8 @@
     {
      "name": "WANVIDCONTEXT",
      "label": "WANVIDCONTEXT",
-     "type": "WANVIDCONTEXT"
+     "type": "WANVIDCONTEXT",
+     "links": []
     }
    ],
    "color": "#222",
@@ -3191,8 +3206,8 @@
    "widgets_values": [
     "WanAnimate_relight_lora_fp16.safetensors",
     1.0,
-    "wan2.2_i2v_lightx2v_4steps_lora_v1_low_noise.safetensors",
-    1.0,
+    "lightx2v_I2V_14B_480p_cfg_step_distill_rank64_bf16.safetensors",
+    1.2,
     "none",
     1.0,
     "none",
@@ -3514,7 +3529,8 @@
      "name": "Filenames",
      "label": "Filenames",
      "type": "VHS_FILENAMES",
-     "localized_name": "Filenames"
+     "localized_name": "Filenames",
+     "links": []
     }
    ],
    "color": "#222",
@@ -4052,7 +4068,6 @@
     {
      "name": "image_embeds",
      "links": [
-      227,
       366
      ],
      "label": "image_embeds",
@@ -4066,7 +4081,7 @@
     480,
     161,
     true,
-    241,
+    77,
     "disabled",
     1,
     0,
@@ -4118,7 +4133,7 @@
      "label": "bg_images",
      "type": "IMAGE",
      "localized_name": "bg_images",
-     "link": 370
+     "link": 376
     },
     {
      "shape": 7,
@@ -4179,7 +4194,7 @@
       "name": "frame_window_size"
      },
      "name": "frame_window_size",
-     "link": 321,
+     "link": null,
      "label": "frame_window_size",
      "type": "INT",
      "localized_name": "frame_window_size"
@@ -4319,7 +4334,7 @@
    ],
    "color": "#222",
    "widgets_values": [
-    900
+    481
    ],
    "inputs": [],
    "flags": {},
@@ -4339,7 +4354,8 @@
     "Node name for S&R": "PrimitiveInt",
     "cnr_id": "comfy-core"
    },
-   "order": 43
+   "order": 43,
+   "title": "frame_load_cap \u2014 MUST equal num_frames (else crash on long reels)"
   },
   {
    "mode": 0,
@@ -4524,7 +4540,8 @@
     {
      "name": "IMAGE",
      "label": "IMAGE",
-     "type": "IMAGE"
+     "type": "IMAGE",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -4572,7 +4589,8 @@
     {
      "name": "IMAGE",
      "label": "IMAGE",
-     "type": "IMAGE"
+     "type": "IMAGE",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -4619,9 +4637,7 @@
    "outputs": [
     {
      "name": "WANVIDCONTEXT",
-     "links": [
-      231
-     ],
+     "links": [],
      "label": "WANVIDCONTEXT",
      "type": "WANVIDCONTEXT"
     }
@@ -4666,14 +4682,25 @@
   {
    "outputs": [
     {
+     "name": "FLOAT",
+     "type": "FLOAT",
+     "links": [],
+     "localized_name": "FLOAT"
+    },
+    {
      "name": "INT",
+     "type": "INT",
      "links": [
       327,
       332
      ],
-     "label": "INT",
-     "type": "INT",
      "localized_name": "INT"
+    },
+    {
+     "name": "BOOL",
+     "type": "BOOLEAN",
+     "links": [],
+     "localized_name": "BOOL"
     }
    ],
    "color": "#2a363b",
@@ -4989,7 +5016,8 @@
     {
      "name": "IMAGE",
      "label": "IMAGE",
-     "type": "IMAGE"
+     "type": "IMAGE",
+     "links": []
     }
    ],
    "color": "#2a363b",
@@ -5754,18 +5782,20 @@
      "name": "negative_text_embeds",
      "label": "negative_text_embeds",
      "type": "WANVIDEOTEXTEMBEDS",
-     "localized_name": "negative_text_embeds"
+     "localized_name": "negative_text_embeds",
+     "links": []
     },
     {
      "name": "positive_prompt",
      "label": "positive_prompt",
      "type": "STRING",
-     "localized_name": "positive_prompt"
+     "localized_name": "positive_prompt",
+     "links": []
     }
    ],
    "color": "#222",
    "widgets_values": [
-    "umt5_xxl_fp8_e4m3fn_scaled.safetensors",
+    "umt5-xxl-enc-fp8_e4m3fn.safetensors",
     "bf16",
     "a young woman performing to camera, natural skin texture with visible pores, realistic phone video, natural lighting",
     "\u8272\u8c03\u8273\u4e3d\uff0c\u8fc7\u66dd\uff0c\u9759\u6001\uff0c\u7ec6\u8282\u6a21\u7cca\u4e0d\u6e05\uff0c\u5b57\u5e55\uff0c\u98ce\u683c\uff0c\u4f5c\u54c1\uff0c\u753b\u4f5c\uff0c\u753b\u9762\uff0c\u9759\u6b62\uff0c\u6574\u4f53\u53d1\u7070\uff0c\u6700\u5dee\u8d28\u91cf\uff0c\u4f4e\u8d28\u91cf\uff0cJPEG\u538b\u7f29\u6b8b\u7559\uff0c\u4e11\u964b\u7684\uff0c\u6b8b\u7f3a\u7684\uff0c\u591a\u4f59\u7684\u624b\u6307\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u624b\u90e8\uff0c\u753b\u5f97\u4e0d\u597d\u7684\u8138\u90e8\uff0c\u7578\u5f62\u7684\uff0c\u6bc1\u5bb9\u7684\uff0c\u5f62\u6001\u7578\u5f62\u7684\u80a2\u4f53\uff0c\u624b\u6307\u878d\u5408\uff0c\u9759\u6b62\u4e0d\u52a8\u7684\u753b\u9762\uff0c\u6742\u4e71\u7684\u80cc\u666f\uff0c\u4e09\u6761\u817f\uff0c\u80cc\u666f\u4eba\u5f88\u591a\uff0c\u5012\u7740\u8d70",
@@ -5894,7 +5924,8 @@
      "name": "frame_count",
      "label": "frame_count",
      "type": "INT",
-     "localized_name": "frame_count"
+     "localized_name": "frame_count",
+     "links": []
     },
     {
      "name": "audio",
@@ -6076,9 +6107,7 @@
     {
      "name": "IMAGE",
      "links": [
-      220,
-      276,
-      282
+      220
      ],
      "label": "IMAGE",
      "type": "IMAGE",
@@ -6088,7 +6117,8 @@
      "name": "MASK",
      "label": "MASK",
      "type": "MASK",
-     "localized_name": "MASK"
+     "localized_name": "MASK",
+     "links": []
     }
    ],
    "color": "#14c758",
@@ -6186,10 +6216,10 @@
   {
    "id": 332,
    "type": "GetNode",
-   "mode": 4,
+   "mode": 0,
    "flags": {},
    "widgets_values": [
-    "\u00e8\u00a1\u00a5\u00e5\u00b8\u00a7\u00e5\u00e7\u00e5\u00be\u00e5"
+    "\u8865\u5e27\u540e\u7684\u56fe\u50cf"
    ],
    "inputs": [],
    "order": 0,
@@ -6211,24 +6241,25 @@
      "type": "IMAGE",
      "links": [
       369,
-      370
+      374
      ]
     }
    ],
-   "title": "MIX MODE: driving frames (un-bypass with mask node)"
+   "title": "MIX MODE driving frames (ACTIVE \u2014 bypass both for Move mode)"
   },
   {
    "id": 331,
    "type": "APersonMaskGenerator",
-   "mode": 4,
+   "mode": 0,
    "flags": {},
    "widgets_values": [
     true,
     false,
-    false,
-    false,
-    false,
-    0.1
+    true,
+    true,
+    true,
+    0.4,
+    true
    ],
    "inputs": [
     {
@@ -6256,11 +6287,11 @@
      "name": "masks",
      "type": "MASK",
      "links": [
-      371
+      372
      ]
     }
    ],
-   "title": "\ud83d\udd01 MIX MODE mask \u2014 un-bypass BOTH + wire to embeds (see Note)"
+   "title": "\ud83d\udd01 MIX MODE mask (ACTIVE) \u2014 original reel kept, only she is swapped"
   },
   {
    "id": 333,
@@ -6282,8 +6313,136 @@
    "color": "#432",
    "bgcolor": "#653",
    "widgets_values": [
-    "AIOFM ANIMATE \u2014 two modes\n\nMOVE MODE (default): your girl performs the driving video's motion in HER scene (from the reference image). Off-frame events: not possible \u2014 the model only knows pose+face from the driving clip.\n\n\ud83d\udd01 MIX MODE (the off-frame answer): un-bypass the two MIX MODE nodes. The original reel is kept 1:1 \u2014 background, camera moves, hands/objects entering from off-screen, ALL of it \u2014 and only the person is replaced with your girl. Pick reels that contain the events you want; they survive the swap. Relight LoRA (slot 0) matches her lighting to the scene.\n\nCHANGES vs the b-1 original:\n- 5-LoRA stack trimmed to relight + lightning-LOW. The old stack (FastWan+Pusa+HPS all @1.0) is the documented cause of plastic skin and identity drift. To restore: add them back in the LoRA stacker.\n- NLF pose branch removed (VitPose path was the active one).\n- Prompts filled (were empty \u2014 the model was flying blind).\n- Runs on the AIOFM pod: needs ComfyUI-WanAnimatePreprocess pack + Animate model + relight LoRA + clip_vision_h (see download script section 2c).\n\n481 frames @30fps = 16s per run. Context window 161/32 handles the length; expect identity softening past ~10s \u2014 plan a re-anchor cut or accept it."
+    "AIOFM ANIMATE \u2014 two modes\n\nMOVE MODE (bypass the two MIX nodes to use): your girl performs the driving video's motion in HER scene (from the reference image). Off-frame events: not possible \u2014 the model only knows pose+face from the driving clip.\n\n\ud83d\udd01 MIX MODE (DEFAULT \u2014 the off-frame answer): The original reel is kept 1:1 \u2014 background, camera moves, hands/objects entering from off-screen, ALL of it \u2014 and only the person is replaced with your girl. Pick reels that contain the events you want; they survive the swap. Relight LoRA (slot 0) matches her lighting to the scene.\n\nCHANGES vs the b-1 original:\n- 5-LoRA stack trimmed to relight + lightning-LOW. The old stack (FastWan+Pusa+HPS all @1.0) is the documented cause of plastic skin and identity drift. To restore: add them back in the LoRA stacker.\n- NLF pose branch removed (VitPose path was the active one).\n- Prompts filled (were empty \u2014 the model was flying blind).\n- Runs on the AIOFM pod: needs ComfyUI-WanAnimatePreprocess pack + Animate model + relight LoRA + clip_vision_h (see download script section 2c).\n\n481 frames @30fps = 16s per run. Context window 161/32 handles the length; expect identity softening past ~10s \u2014 plan a re-anchor cut or accept it."
    ]
+  },
+  {
+   "id": 334,
+   "type": "GrowMask",
+   "mode": 0,
+   "flags": {},
+   "pos": [
+    5150,
+    -2020
+   ],
+   "size": [
+    210,
+    80
+   ],
+   "order": 0,
+   "widgets_values": [
+    10,
+    true
+   ],
+   "inputs": [
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 372,
+     "localized_name": "mask"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      373
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "GrowMask",
+    "cnr_id": "comfy-core"
+   },
+   "title": "grow mask 10px (official replace recipe)"
+  },
+  {
+   "id": 335,
+   "type": "BlockifyMask",
+   "mode": 0,
+   "flags": {},
+   "pos": [
+    5150,
+    -1900
+   ],
+   "size": [
+    210,
+    60
+   ],
+   "order": 0,
+   "widgets_values": [
+    32
+   ],
+   "inputs": [
+    {
+     "name": "masks",
+     "type": "MASK",
+     "link": 373,
+     "localized_name": "masks"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "MASK",
+     "type": "MASK",
+     "links": [
+      371,
+      375
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "BlockifyMask",
+    "cnr_id": "comfyui-kjnodes"
+   },
+   "title": "blockify to 32px latent grid"
+  },
+  {
+   "id": 336,
+   "type": "DrawMaskOnImage",
+   "mode": 0,
+   "flags": {},
+   "pos": [
+    5150,
+    -1800
+   ],
+   "size": [
+    240,
+    90
+   ],
+   "order": 0,
+   "widgets_values": [
+    "0, 0, 0"
+   ],
+   "inputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "link": 374,
+     "localized_name": "image"
+    },
+    {
+     "name": "mask",
+     "type": "MASK",
+     "link": 375,
+     "localized_name": "mask"
+    }
+   ],
+   "outputs": [
+    {
+     "name": "image",
+     "type": "IMAGE",
+     "links": [
+      376
+     ]
+    }
+   ],
+   "properties": {
+    "Node name for S&R": "DrawMaskOnImage",
+    "cnr_id": "ComfyUI-WanAnimatePreprocess"
+   },
+   "title": "blackout person in bg (official recipe \u2014 stops identity leak)"
   }
  ],
  "extra": {
@@ -6523,14 +6682,6 @@
    222,
    2,
    "WANVIDEOTEXTEMBEDS"
-  ],
-  [
-   231,
-   247,
-   0,
-   222,
-   5,
-   "WANVIDCONTEXT"
   ],
   [
    233,
@@ -6893,14 +7044,6 @@
    "INT"
   ],
   [
-   321,
-   193,
-   0,
-   295,
-   12,
-   "INT"
-  ],
-  [
    323,
    205,
    0,
@@ -6911,7 +7054,7 @@
   [
    327,
    309,
-   0,
+   1,
    302,
    0,
    "*"
@@ -6951,7 +7094,7 @@
   [
    332,
    309,
-   0,
+   1,
    305,
    1,
    "INT"
@@ -7061,25 +7204,57 @@
    "IMAGE"
   ],
   [
-   370,
-   332,
-   0,
-   295,
-   5,
-   "IMAGE"
-  ],
-  [
    371,
-   331,
+   335,
    0,
    295,
    6,
    "MASK"
+  ],
+  [
+   372,
+   331,
+   0,
+   334,
+   0,
+   "MASK"
+  ],
+  [
+   373,
+   334,
+   0,
+   335,
+   0,
+   "MASK"
+  ],
+  [
+   374,
+   332,
+   0,
+   336,
+   0,
+   "IMAGE"
+  ],
+  [
+   375,
+   335,
+   0,
+   336,
+   1,
+   "MASK"
+  ],
+  [
+   376,
+   336,
+   0,
+   295,
+   5,
+   "IMAGE"
   ]
  ],
  "id": "b5a2dd9d-c8fe-4215-bc0c-63445680cbaa",
  "config": {},
  "version": 0.4,
- "last_node_id": 333,
+ "last_node_id": 336,
  "revision": 0
 }
