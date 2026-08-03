@@ -140,24 +140,37 @@ def run_cycle(a):
     report = {"tag": a.tag, "variant": a.set or [], "workflow": a.workflow,
               "started": time.strftime("%Y-%m-%d %H:%M"), "refs": {}}
 
+    # best-of-N identity gate, implemented HERE rather than in the graph:
+    # ComfyUI_FaceAnalysis is not installed on the pod and installing a node
+    # pack requires a ComfyUI restart, which would kill other sessions' running
+    # jobs on this shared GPU. Rendering N seeds and picking the highest ArcFace
+    # score gives the same outcome with the scorer we already have.
+    seed_nodes = [k for k, n in api.items() if "seed" in n["inputs"]
+                  and n["class_type"] in ("KSampler", "FaceDetailer", "DetailerForEach")]
     pids = {}
     for i, ref in enumerate(REFS):
-        g = json.loads(json.dumps(api))
-        g[li]["inputs"]["image"] = ref
-        g[si]["inputs"]["filename_prefix"] = f"h_{a.tag}_{i}"
-        try:
-            pids[ref] = http(f"{base}/prompt",
-                             json.dumps({"prompt": g, "client_id": "harness"}).encode())["prompt_id"]
-            print(f"queued [{i}] {ref}")
-        except urllib.error.HTTPError as e:
-            report["refs"][ref] = {"status": "queue_failed",
-                                   "detail": e.read().decode()[:400]}
-            print(f"QUEUE FAILED {ref}")
+        for s_i in range(a.seeds):
+            g = json.loads(json.dumps(api))
+            g[li]["inputs"]["image"] = ref
+            g[si]["inputs"]["filename_prefix"] = f"h_{a.tag}_{i}_{s_i}"
+            if s_i:                       # seed 0 keeps the graph's own seeds
+                for k in seed_nodes:
+                    g[k]["inputs"]["seed"] = int(g[k]["inputs"]["seed"]) + 1000 * s_i
+            try:
+                pids[(ref, s_i)] = http(
+                    f"{base}/prompt",
+                    json.dumps({"prompt": g, "client_id": "harness"}).encode())["prompt_id"]
+                print(f"queued [{i}.{s_i}] {ref}")
+            except urllib.error.HTTPError as e:
+                report["refs"].setdefault(ref, {})["status"] = "queue_failed"
+                report["refs"][ref]["detail"] = e.read().decode()[:400]
+                print(f"QUEUE FAILED {ref}")
 
     pending = dict(pids)
+    done = {}
     while pending:
         time.sleep(20)
-        for ref, pid in list(pending.items()):
+        for key, pid in list(pending.items()):
             try:
                 h = http(f"{base}/history/{pid}", timeout=30)
             except Exception:
@@ -166,24 +179,34 @@ def run_cycle(a):
                 continue
             st = list(h.values())[0]["status"].get("status_str")
             if st in ("success", "error"):
-                report["refs"].setdefault(ref, {})["status"] = st
-                del pending[ref]
-                print(f"  {st}: {ref}")
+                done[key] = st
+                del pending[key]
+                print(f"  {st}: {key[0]} seed{key[1]}")
+    for i, ref in enumerate(REFS):
+        oks = [s_i for (r, s_i), st in done.items() if r == ref and st == "success"]
+        report["refs"].setdefault(ref, {})["status"] = "success" if oks else "error"
+        report["refs"][ref]["seeds_ok"] = sorted(oks)
 
     outs = []
     for i, ref in enumerate(REFS):
         e = report["refs"].get(ref, {})
         if e.get("status") != "success":
             continue
-        dst = os.path.join(rundir, f"out_{i}.png")
-        try:
-            open(dst, "wb").write(http(f"{base}/view?filename=h_{a.tag}_{i}_00001_.png"
-                                       f"&type=output", timeout=240, raw=True))
-        except Exception as ex:
-            e["download_error"] = str(ex)[:120]
+        cands = []
+        for s_i in e.get("seeds_ok", [0]):
+            dst = os.path.join(rundir, f"out_{i}_s{s_i}.png")
+            try:
+                open(dst, "wb").write(
+                    http(f"{base}/view?filename=h_{a.tag}_{i}_{s_i}_00001_.png"
+                         f"&type=output", timeout=240, raw=True))
+                cands.append((s_i, dst))
+            except Exception as ex:
+                e["download_error"] = str(ex)[:120]
+        if not cands:
             continue
-        e["output"] = dst
-        outs.append((ref, dst))
+        e["candidates"] = {s_i: p for s_i, p in cands}
+        e["output"] = cands[0][1]      # provisional; identity may re-pick below
+        outs.append((ref, cands[0][1]))
 
     # local metrics need the reference pixels; pull them once from the pod
     for ref, dst in outs:
@@ -197,16 +220,28 @@ def run_cycle(a):
         report["refs"][ref]["metrics"] = local_metrics(rp, dst)
         report["refs"][ref]["ref_local"] = rp
 
-    ident = pod_identity(a.pod, a.token, [f"/workspace/output/h_{a.tag}_{i}_00001_.png"
-                                          for i, _ in enumerate(REFS)])
+    all_files = [f"/workspace/output/h_{a.tag}_{i}_{s_i}_00001_.png"
+                 for i, ref in enumerate(REFS)
+                 for s_i in report["refs"].get(ref, {}).get("seeds_ok", [])]
+    ident = pod_identity(a.pod, a.token, all_files) if all_files else {}
     if ident:
         by_file = {r["file"]: r for r in ident.get("results", [])}
         report["identity_bar"] = ident.get("pass_bar_mean_sim")
         for i, ref in enumerate(REFS):
-            r = by_file.get(f"h_{a.tag}_{i}_00001_.png")
-            if r:
-                report["refs"].setdefault(ref, {})["identity"] = r.get("mean_sim")
-                report["refs"][ref]["identity_verdict"] = r.get("verdict")
+            e = report["refs"].get(ref, {})
+            scored = [(by_file[f"h_{a.tag}_{i}_{s_i}_00001_.png"]["mean_sim"], s_i)
+                      for s_i in e.get("seeds_ok", [])
+                      if f"h_{a.tag}_{i}_{s_i}_00001_.png" in by_file]
+            if not scored:
+                continue
+            best_sim, best_seed = max(scored)
+            e["identity"] = best_sim
+            e["identity_all_seeds"] = {s_i: round(v, 4) for v, s_i in scored}
+            e["identity_verdict"] = by_file[
+                f"h_{a.tag}_{i}_{best_seed}_00001_.png"].get("verdict")
+            if e.get("candidates", {}).get(best_seed):
+                e["output"] = e["candidates"][best_seed]   # best-of-N selection
+                e["selected_seed"] = best_seed
     else:
         report["identity_note"] = "pod scorer unreachable — identity NOT measured this cycle"
 
@@ -282,6 +317,9 @@ if __name__ == "__main__":
     ap.add_argument("--workflow")
     ap.add_argument("--object-info")
     ap.add_argument("--tag", default="run")
+    ap.add_argument("--seeds", type=int, default=1,
+                    help="render N seeds per reference and keep the best by "
+                         "ArcFace identity (best-of-N gate). Costs N x GPU.")
     ap.add_argument("--set", action="append",
                     help="SELECTOR.field=value  (node key, id, or title substring)")
     ap.add_argument("--compare", nargs=2)
