@@ -83,4 +83,29 @@ original scene.
 **Correctness phase complete. Quality phase begins: B0 baseline battery with
 the working config, then measured A/B iterations.**
 
-*(next entries appended as results land)*
+### Loop suspended 2026-08-03 (pod stopped by user) — resume state
+
+Correctness phase: COMPLETE. Quality phase: baseline battery interrupted before
+completion; quality A/Bs not yet run.
+
+**Best measured state (S6, 97f smoke, ref01):** motion_corr 0.894, motion_lag 0,
+flicker 1.466 (real-footage reference ≈0.88), drift_slope -1.24, broken 2.
+Tracking is strong with zero phase error; temporal flicker ~66% above real
+footage is the primary quality gap.
+
+**Resume plan (one command each, in order):**
+1. `POD_ID=<pod> wsenv/bin/python newpod_setup.py` — restore models (~4 min;
+   refetch script now includes ALL 10 files incl. the distill LoRA).
+2. `POD_ID=<pod> wsenv/bin/python battery.py run B0` — baseline battery.
+3. A/B queue, one knob per tag, keep only if BOTH motion_corr and flicker hold:
+   - `run colormatch colormatch=mkl` (embeds colormatch; targets window-boundary
+     flicker + drift)
+   - `run vitposeH vitpose=vitpose_h_wholebody_model.onnx` (needs the H model +
+     its .bin in models/detection — 2.4 GB, HF Kijai/vitpose_comfy)
+   - `run steps8 steps=8` and distill 1.2→1.0 sweep
+   - relight-off-in-Move sanity check
+4. Long-sequence: window-boundary flicker localization on long_481 (correlate
+   flicker spikes with 77-frame window seams).
+
+Harness lives in the session scratchpad `mc/` (animate_api.py, metrics.py,
+battery.py) — network-hardened, pod-agnostic via POD_ID env.
