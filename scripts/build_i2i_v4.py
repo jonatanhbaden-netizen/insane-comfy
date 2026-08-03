@@ -595,8 +595,50 @@ def main():
     wire(m_dest, 0, munion, "destination", "MASK")
     wire(m_rend, 0, munion, "source", "MASK")
     wire(munion, 0, mfeather, "mask", "MASK")
+    # ---- EXPERIMENT 2: face-crop-scoped colour match --------------------
+    # Measured defect: face_neck_dE ~9 (target <=6) — the inserted face's
+    # colour/lighting does not match the surrounding original skin. A
+    # whole-frame ColorMatch cannot fix a LOCAL mismatch; this crops both
+    # frames around the face+hair mask WITH surrounding context (so the
+    # reference crop contains the host photo's own neck/jaw skin under the
+    # same light), matches there, and stitches back.
+    # One dial: cm_strength. 0.0 = identity (baseline).
+    CROP_ARGS = {"downscale_algorithm": "bilinear", "upscale_algorithm": "bicubic",
+                 "preresize": False, "mask_fill_holes": True, "mask_expand_pixels": 0,
+                 "mask_invert": False, "mask_blend_pixels": 16,
+                 "mask_hipass_filter": 0.1, "extend_for_outpainting": False,
+                 "context_from_mask_extend_factor": 1.5,
+                 "output_resize_to_target_size": False,
+                 "output_padding": 32, "device_mode": "gpu (much faster)"}
+    crop_r = mk(680, "InpaintCropImproved", [3420, 60], dict(CROP_ARGS),
+                "[colour] crop RENDER at face+context", [330, 120])
+    crop_r["outputs"] = [{"name": "stitcher", "type": "STITCHER", "links": [], "slot_index": 0},
+                         {"name": "cropped_image", "type": "IMAGE", "links": [], "slot_index": 1},
+                         {"name": "cropped_mask", "type": "MASK", "links": [], "slot_index": 2}]
+    crop_o = mk(681, "InpaintCropImproved", [3420, 200], dict(CROP_ARGS),
+                "[colour] crop ORIGINAL at the same region", [330, 120])
+    crop_o["outputs"] = [{"name": "stitcher", "type": "STITCHER", "links": [], "slot_index": 0},
+                         {"name": "cropped_image", "type": "IMAGE", "links": [], "slot_index": 1},
+                         {"name": "cropped_mask", "type": "MASK", "links": [], "slot_index": 2}]
+    cmatch2 = mk(682, "ColorMatch", [3760, 60],
+                 {"method": "mkl", "strength": 0.0, "multithread": True},
+                 "◆ DIAL cm_strength (0 = baseline; try 0.30/0.50/0.70)")
+    cmatch2["outputs"] = [{"name": "image", "type": "IMAGE", "links": [], "slot_index": 0}]
+    stitch2 = mk(683, "InpaintStitchImproved", [3760, 200], None,
+                 "[colour] stitch matched face back")
+    stitch2["outputs"] = [{"name": "image", "type": "IMAGE", "links": [], "slot_index": 0}]
+
+    wire(edet, 0, crop_r, "image", "IMAGE")
+    wire(mfeather, 0, crop_r, "mask", "MASK")
+    wire(dest, 0, crop_o, "image", "IMAGE")
+    wire(mfeather, 0, crop_o, "mask", "MASK")
+    wire(crop_o, 1, cmatch2, "image_ref", "IMAGE")      # 1 = cropped_image
+    wire(crop_r, 1, cmatch2, "image_target", "IMAGE")   # 1 = cropped_image
+    wire(crop_r, 0, stitch2, "stitcher", "STITCHER")    # 0 = stitcher
+    wire(cmatch2, 0, stitch2, "inpainted_image", "IMAGE")
+
     wire(dest, 0, comp, "destination", "IMAGE")
-    wire(edet, 0, comp, "source", "IMAGE")
+    wire(stitch2, 0, comp, "source", "IMAGE")
     wire(mfeather, 0, comp, "mask", "MASK")
 
     face = nodes[553]
