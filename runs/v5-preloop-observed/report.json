@@ -1,0 +1,54 @@
+{
+ "tag": "v5-preloop-observed",
+ "note": "measured from renders produced BEFORE the loop existed; single reference (IMG_2330) only \u2014 not a substitute for a real 5-ref baseline",
+ "refs": {
+  "v5_full.png": {
+   "desc": "v5 full chain incl. POST",
+   "metrics": {
+    "skin_hf_energy": 7.9093,
+    "skin_hf_ref": 5.3157,
+    "skin_hf_ratio": 1.4879,
+    "grain_ratio": 3.368,
+    "seam_gradient": 4.1534,
+    "face_neck_dE": 2.215,
+    "laplacian_var": 443.7,
+    "flags": [
+     "skin_hf_ratio=1.4879 HIGH \u2192 over-detailed / crunchy",
+     "grain_ratio=3.368 HIGH \u2192 face noisier than host photo",
+     "seam_gradient=4.1534 HIGH \u2192 visible boundary edge"
+    ]
+   }
+  },
+  "v5c.png": {
+   "desc": "v5 chain, POST bypassed",
+   "metrics": {
+    "skin_hf_energy": 6.5066,
+    "skin_hf_ref": 5.3157,
+    "skin_hf_ratio": 1.224,
+    "grain_ratio": 1.5346,
+    "seam_gradient": -1.3949,
+    "face_neck_dE": 8.918,
+    "laplacian_var": 365.6,
+    "flags": [
+     "grain_ratio=1.5346 HIGH \u2192 face noisier than host photo",
+     "face_neck_dE=8.918 HIGH \u2192 face/neck colour mismatch"
+    ]
+   }
+  },
+  "v43face_r1.png": {
+   "desc": "v4.3 face-detailer output only",
+   "metrics": {
+    "skin_hf_energy": 4.2859,
+    "skin_hf_ref": 5.3157,
+    "skin_hf_ratio": 0.8063,
+    "grain_ratio": 1.0952,
+    "seam_gradient": 1.1476,
+    "face_neck_dE": 23.486,
+    "laplacian_var": 176.89,
+    "flags": [
+     "face_neck_dE=23.486 HIGH \u2192 face/neck colour mismatch"
+    ]
+   }
+  }
+ }
+}

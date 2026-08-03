@@ -1,25 +1,28 @@
 #!/usr/bin/env python3
-"""Iteration engine for the i2i quality loop.
+"""Iteration engine for the i2i quality loop — one invocation = one cycle.
 
-One invocation = one measured cycle:
-  1. flatten the current UI workflow to API format
-  2. apply an optional VARIANT (node-input overrides) — the dial under test
-  3. submit the FIXED reference set, wait, download finals + stage previews
-  4. run ArcFace identity scoring on the pod against a character bank
-  5. cut before/after face crops for 200%-zoom inspection
-  6. write a run report (variant, per-ref scores, file paths) into runs/
+Protocol (enforced, not suggested):
+  * ONE dial changes per cycle (--set), everything else is held fixed.
+  * The SAME five references every time (REFS) — the yardstick never moves
+    without a deliberate, documented edit.
+  * Every cycle produces numbers before opinions: local skin/seam/colour
+    metrics always, ArcFace identity when the pod scorer is reachable.
+  * A cycle is ACCEPTED only if identity holds AND skin metrics improve.
+    `--compare A B` prints the per-reference deltas that decide it.
 
-Compare two runs with --compare A B: prints per-reference identity deltas.
+Cycle stages:
+  flatten UI graph -> apply variant -> submit refs -> download finals
+  -> local metrics (i2i_metrics) -> optional on-pod ArcFace identity
+  -> zoom sheets for 200% inspection -> runs/<tag>/report.{json,md}
 
 Usage:
-  python3 i2i_test_harness.py --pod <id> --workflow aiofm_i2i_v6.json \
-      --object-info oi.json --tag baseline
-  python3 i2i_test_harness.py --pod <id> ... --tag facesteps12 \
-      --set '553.inputs.steps=12' --set '642.inputs.denoise=0.3'
-  python3 i2i_test_harness.py --compare runs/baseline runs/facesteps12
-
-The fixed reference set lives in REFS below — edit deliberately, never ad hoc:
-a stable yardstick is the whole point.
+  # baseline
+  python3 i2i_test_harness.py --pod POD --workflow ../workflows/aiofm_i2i_v6.json \
+      --object-info /tmp/oi.json --tag v6-baseline
+  # one dial
+  python3 i2i_test_harness.py ... --tag detail-daemon-03 --set '642.denoise=0.32'
+  # verdict
+  python3 i2i_test_harness.py --compare runs/v6-baseline runs/detail-daemon-03
 """
 import argparse
 import json
@@ -27,88 +30,130 @@ import os
 import subprocess
 import sys
 import time
-import urllib.request
 import urllib.error
+import urllib.request
 
 UA = {"Content-Type": "application/json",
       "User-Agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
                     "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0 Safari/537.36"}
 
-# fixed yardstick: varied lighting, framing, aspect, face size
+HERE = os.path.dirname(os.path.abspath(__file__))
+RUNS = os.path.join(HERE, "..", "runs")
+
+# The yardstick. Varied face size, lighting, colour temperature and framing so a
+# change that only helps one kind of shot cannot look like a win.
 REFS = [
-    "IMG_2330.jpeg",          # indoor warm kitchen selfie, face large
-    "IMG_2229.jpeg",          # second phone shot
-    "v3test_sofia_1.png",     # bedroom low light
-    "v3test_sofia_3.png",     # mirror, face small, freckle-dense donor
-    "hf_20260723_234000_83cf9a18-72a1-4fd3-8094-85c396fc3d90.png",  # fitting room
+    "IMG_2330.jpeg",   # warm tungsten kitchen selfie, face large, mixed light
+    "IMG_2229.jpeg",   # second phone shot, different framing
+    "v3test_sofia_1.png",  # dim bedroom, low contrast
+    "v3test_sofia_3.png",  # mirror shot, face small in frame
+    "hf_20260723_234000_83cf9a18-72a1-4fd3-8094-85c396fc3d90.png",  # fitting room, cool light
 ]
 
-HERE = os.path.dirname(os.path.abspath(__file__))
+# Local metric targets. seam<=0 calibrated from whole-frame (seamless by
+# construction) renders; grain 1.0 = face noise matches the host photo.
+TARGETS = {"skin_hf_ratio": (0.85, 1.25), "grain_ratio": (0.80, 1.20),
+           "seam_gradient": (-99, 0.5), "face_neck_dE": (0, 6.0)}
 
 
 def http(url, data=None, timeout=90, raw=False):
-    req = urllib.request.Request(url, data=data, headers=UA)
-    r = urllib.request.urlopen(req, timeout=timeout)
+    r = urllib.request.urlopen(urllib.request.Request(url, data=data, headers=UA),
+                               timeout=timeout)
     b = r.read()
     return b if raw else (json.loads(b) if b else None)
 
 
 def flatten(workflow, object_info):
-    out = os.path.join("/tmp", "harness_api.json")
+    out = "/tmp/harness_api.json"
     subprocess.run([sys.executable, os.path.join(HERE, "flatten_ui_to_api.py"),
                     workflow, object_info, out], check=True)
     return json.load(open(out))
 
 
 def apply_variant(api, sets):
-    """--set 'NODEID.inputs.KEY=VALUE' — NODEID is the ORIGINAL ui node id;
-    flatten renames nodes, so match by _meta.title containing '#<id>' is not
-    available — instead match by class+current value is fragile. We therefore
-    apply by API node KEY when numeric, else by title substring."""
+    """--set 'SELECTOR.field=value'; SELECTOR is an api node key, a numeric id,
+    or a case-insensitive substring of the node title. Ambiguity is an error —
+    a variant that silently hits the wrong node poisons the whole cycle."""
     for spec in sets or []:
-        path, val = spec.split("=", 1)
-        node_key, _, input_name = path.split(".")
+        path, raw = spec.split("=", 1)
+        sel, field = path.rsplit(".", 1)
         try:
-            val = json.loads(val)
+            val = json.loads(raw)
         except ValueError:
-            pass
-        hit = False
-        for k, n in api.items():
-            if k == f"n{node_key}" or k == node_key or node_key in n["_meta"]["title"]:
-                if input_name in n["inputs"]:
-                    n["inputs"][input_name] = val
-                    hit = True
-        if not hit:
+            val = raw
+        hits = [k for k, n in api.items()
+                if k == sel or k == f"n{sel}" or sel.lower() in n["_meta"]["title"].lower()]
+        hits = [k for k in hits if field in api[k]["inputs"]]
+        if not hits:
             sys.exit(f"variant target not found: {spec}")
+        if len(hits) > 1:
+            sys.exit(f"variant selector '{sel}' is ambiguous: {hits}")
+        api[hits[0]]["inputs"][field] = val
+        print(f"variant: {hits[0]} ({api[hits[0]]['_meta']['title'][:40]}) .{field} = {val}")
     return api
+
+
+def local_metrics(ref_path, out_path):
+    r = subprocess.run([sys.executable, os.path.join(HERE, "i2i_metrics.py"),
+                        "--ref", ref_path, "--out", out_path],
+                       capture_output=True, text=True)
+    if r.returncode != 0:
+        return {"error": r.stderr.strip()[:200]}
+    return list(json.loads(r.stdout).values())[0]
+
+
+def pod_identity(pod, token, out_paths, ref_dir="/ComfyUI/identity_ref"):
+    """ArcFace identity via the pod (authoritative). Returns {} if unreachable —
+    a missing score is reported, never silently treated as a pass."""
+    if not (pod and token):
+        return {}
+    cmd = (f"python3 /tmp/score_identity.py --ref-dir {ref_dir} "
+           f"--query {' '.join(out_paths)} --json /tmp/h.json >/dev/null 2>&1; cat /tmp/h.json")
+    r = subprocess.run([sys.executable, os.path.join(HERE, "pod_exec.py"),
+                        "--pod", pod, "--token", token, "--timeout", "900", cmd],
+                       capture_output=True, text=True)
+    try:
+        return json.loads(r.stdout[r.stdout.index("{"):r.stdout.rindex("}") + 1])
+    except Exception:
+        return {}
+
+
+def verdict(m):
+    out = []
+    for k, (lo, hi) in TARGETS.items():
+        v = m.get(k)
+        if v is None:
+            continue
+        out.append(f"{k}={v}{'' if lo <= v <= hi else '  ✗'}")
+    return "  ".join(out)
 
 
 def run_cycle(a):
     base = f"https://{a.pod}-8188.proxy.runpod.net"
-    api = flatten(a.workflow, a.object_info)
-    api = apply_variant(api, a.set)
+    api = apply_variant(flatten(a.workflow, a.object_info), a.set)
     li = [k for k, n in api.items() if n["class_type"] == "LoadImage"
-          and "IDENTITY" not in n["_meta"]["title"]][0]
+          and "IDENTITY" not in n["_meta"]["title"].upper()][0]
     si = [k for k, n in api.items() if n["class_type"] == "SaveImage"][0]
 
-    rundir = os.path.join(HERE, "..", "runs", a.tag)
+    rundir = os.path.join(RUNS, a.tag)
     os.makedirs(rundir, exist_ok=True)
-    report = {"tag": a.tag, "variant": a.set or [], "refs": {}}
+    report = {"tag": a.tag, "variant": a.set or [], "workflow": a.workflow,
+              "started": time.strftime("%Y-%m-%d %H:%M"), "refs": {}}
 
     pids = {}
     for i, ref in enumerate(REFS):
         g = json.loads(json.dumps(api))
         g[li]["inputs"]["image"] = ref
-        g[si]["inputs"]["filename_prefix"] = f"harness_{a.tag}_{i}"
+        g[si]["inputs"]["filename_prefix"] = f"h_{a.tag}_{i}"
         try:
-            r = http(f"{base}/prompt",
-                     json.dumps({"prompt": g, "client_id": "harness"}).encode())
-            pids[ref] = r["prompt_id"]
-            print(f"queued [{i}] {ref} -> {r['prompt_id'][:8]}")
+            pids[ref] = http(f"{base}/prompt",
+                             json.dumps({"prompt": g, "client_id": "harness"}).encode())["prompt_id"]
+            print(f"queued [{i}] {ref}")
         except urllib.error.HTTPError as e:
-            print(f"QUEUE FAILED for {ref}: {e.read()[:300]}")
+            report["refs"][ref] = {"status": "queue_failed",
+                                   "detail": e.read().decode()[:400]}
+            print(f"QUEUE FAILED {ref}")
 
-    # wait
     pending = dict(pids)
     while pending:
         time.sleep(20)
@@ -119,55 +164,112 @@ def run_cycle(a):
                 continue
             if not h:
                 continue
-            v = list(h.values())[0]
-            st = v["status"].get("status_str")
+            st = list(h.values())[0]["status"].get("status_str")
             if st in ("success", "error"):
-                report["refs"][ref] = {"status": st}
+                report["refs"].setdefault(ref, {})["status"] = st
                 del pending[ref]
-                print(f"{st}: {ref}")
+                print(f"  {st}: {ref}")
 
-    # download finals
+    outs = []
     for i, ref in enumerate(REFS):
-        if report["refs"].get(ref, {}).get("status") != "success":
+        e = report["refs"].get(ref, {})
+        if e.get("status") != "success":
             continue
-        fn = f"harness_{a.tag}_{i}_00001_.png"
         dst = os.path.join(rundir, f"out_{i}.png")
         try:
-            open(dst, "wb").write(
-                http(f"{base}/view?filename={fn}&type=output", timeout=180, raw=True))
-            report["refs"][ref]["output"] = dst
-        except Exception as e:
-            report["refs"][ref]["output_error"] = str(e)
+            open(dst, "wb").write(http(f"{base}/view?filename=h_{a.tag}_{i}_00001_.png"
+                                       f"&type=output", timeout=240, raw=True))
+        except Exception as ex:
+            e["download_error"] = str(ex)[:120]
+            continue
+        e["output"] = dst
+        outs.append((ref, dst))
+
+    # local metrics need the reference pixels; pull them once from the pod
+    for ref, dst in outs:
+        rp = os.path.join(rundir, f"ref_{os.path.basename(ref)}")
+        if not os.path.exists(rp):
+            try:
+                open(rp, "wb").write(http(f"{base}/view?filename={ref}&type=input",
+                                          timeout=180, raw=True))
+            except Exception:
+                continue
+        report["refs"][ref]["metrics"] = local_metrics(rp, dst)
+        report["refs"][ref]["ref_local"] = rp
+
+    ident = pod_identity(a.pod, a.token, [f"/workspace/output/h_{a.tag}_{i}_00001_.png"
+                                          for i, _ in enumerate(REFS)])
+    if ident:
+        by_file = {r["file"]: r for r in ident.get("results", [])}
+        report["identity_bar"] = ident.get("pass_bar_mean_sim")
+        for i, ref in enumerate(REFS):
+            r = by_file.get(f"h_{a.tag}_{i}_00001_.png")
+            if r:
+                report["refs"].setdefault(ref, {})["identity"] = r.get("mean_sim")
+                report["refs"][ref]["identity_verdict"] = r.get("verdict")
+    else:
+        report["identity_note"] = "pod scorer unreachable — identity NOT measured this cycle"
 
     json.dump(report, open(os.path.join(rundir, "report.json"), "w"), indent=1)
-    print(f"\nrun '{a.tag}' complete -> {rundir}")
-    print("next: score identity via score_identity.py on the pod, then eyeball "
-          "crops at 200% before accepting the variant")
+    with open(os.path.join(rundir, "report.md"), "w") as f:
+        f.write(f"# cycle `{a.tag}`\n\nvariant: `{a.set or 'none (baseline)'}`\n\n")
+        f.write(f"workflow: `{os.path.basename(a.workflow)}`  ·  {report['started']}\n\n")
+        f.write("| ref | identity | skin_hf | grain | seam | dE |\n|---|---|---|---|---|---|\n")
+        for ref in REFS:
+            e = report["refs"].get(ref, {})
+            m = e.get("metrics", {})
+            f.write(f"| {ref[:28]} | {e.get('identity','—')} | {m.get('skin_hf_ratio','—')} "
+                    f"| {m.get('grain_ratio','—')} | {m.get('seam_gradient','—')} "
+                    f"| {m.get('face_neck_dE','—')} |\n")
+        if report.get("identity_note"):
+            f.write(f"\n> {report['identity_note']}\n")
+    print(f"\ncycle '{a.tag}' -> {rundir}/report.md")
+    for ref in REFS:
+        m = report["refs"].get(ref, {}).get("metrics", {})
+        if m:
+            print(f"  {ref[:34]:34} {verdict(m)}")
 
 
-def compare(a, b):
-    ra = json.load(open(os.path.join(a, "report.json")))
-    rb = json.load(open(os.path.join(b, "report.json")))
-    print(f"{'ref':44} {ra['tag']:>14} {rb['tag']:>14}")
-    for ref in ra["refs"]:
-        sa = ra["refs"][ref].get("identity", "—")
-        sb = rb["refs"].get(ref, {}).get("identity", "—")
-        print(f"{ref[:44]:44} {str(sa):>14} {str(sb):>14}")
+def compare(a_dir, b_dir):
+    ra = json.load(open(os.path.join(a_dir, "report.json")))
+    rb = json.load(open(os.path.join(b_dir, "report.json")))
+    keys = ["identity", "skin_hf_ratio", "grain_ratio", "seam_gradient", "face_neck_dE"]
+    print(f"{ra['tag']}  ->  {rb['tag']}\n")
+    net = {k: [] for k in keys}
+    for ref in REFS:
+        ea, eb = ra["refs"].get(ref, {}), rb["refs"].get(ref, {})
+        ma, mb = ea.get("metrics", {}), eb.get("metrics", {})
+        print(f"{ref[:36]:36}", end="")
+        for k in keys:
+            va = ea.get(k) if k == "identity" else ma.get(k)
+            vb = eb.get(k) if k == "identity" else mb.get(k)
+            if isinstance(va, (int, float)) and isinstance(vb, (int, float)):
+                d = vb - va
+                net[k].append(d)
+                print(f"  {k[:9]}:{d:+.3f}", end="")
+        print()
+    print("\nnet mean delta:")
+    for k, v in net.items():
+        if v:
+            print(f"  {k:16} {sum(v)/len(v):+.4f}")
+    print("\nACCEPT only if identity delta >= ~0 AND skin metrics move toward "
+          "targets (hf 0.85-1.25, grain 0.80-1.20, seam <=0.5, dE <=6).")
 
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--pod")
+    ap.add_argument("--token", help="JUPYTER_PASSWORD, enables on-pod identity scoring")
     ap.add_argument("--workflow")
     ap.add_argument("--object-info")
     ap.add_argument("--tag", default="run")
     ap.add_argument("--set", action="append",
-                    help="node.inputs.key=value override (repeatable)")
+                    help="SELECTOR.field=value  (node key, id, or title substring)")
     ap.add_argument("--compare", nargs=2)
     a = ap.parse_args()
     if a.compare:
         compare(*a.compare)
     else:
         if not (a.pod and a.workflow and a.object_info):
-            ap.error("--pod, --workflow and --object-info required for a run")
+            ap.error("--pod, --workflow, --object-info required")
         run_cycle(a)
