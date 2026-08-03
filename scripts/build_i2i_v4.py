@@ -379,13 +379,16 @@ def main():
     tpost = mk(622, "PrimitiveStringMultiline", [X + 380, 1480], [QWEN_TEMPLATE_POST],
                "[template] swap post — add edits / which person at the end", [420, 160])
     tpost["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
-    cat1 = mk(623, "StringConcatenate", [X + 760, 1330], [""], "pre+character")
+    cat1 = mk(623, "StringConcatenate", [X + 760, 1330],
+                {"delimiter": ""}, "pre+character")
     cat1["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
-    cat2 = mk(624, "StringConcatenate", [X + 760, 1440], [""], "+post = swap instruction")
+    cat2 = mk(624, "StringConcatenate", [X + 760, 1440],
+                {"delimiter": ""}, "+post = swap instruction")
     cat2["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
     psuf = mk(625, "PrimitiveStringMultiline", [X + 380, 1660], [POSITIVE_SUFFIX], "[template] positive suffix")
     psuf["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
-    cat3 = mk(626, "StringConcatenate", [X + 760, 1550], [""], "character+suffix = main positive")
+    cat3 = mk(626, "StringConcatenate", [X + 760, 1550],
+                {"delimiter": ""}, "character+suffix = main positive")
     cat3["outputs"] = [{"name": "STRING", "type": "STRING", "links": [], "slot_index": 0}]
 
     idphoto = mk(650, "LoadImage", [X, 470], ["emma_face_ref.png", "image"],
