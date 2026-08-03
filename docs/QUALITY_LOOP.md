@@ -92,6 +92,23 @@ first five-reference baseline is cycle 0 of the loop.
 
 ---
 
+## Graph discipline
+
+`aiofm_i2i_v6.json` is the **frozen baseline graph**. Experiments get their own
+file (`v7`, `v8`, …) so that a cycle changes exactly one thing and the baseline
+stays reproducible. An experiment graph must be output-identical to its parent
+at the dial's neutral value — v7 at `hf_attenuation = 0.0` renders exactly what
+v6 renders, which is what makes the comparison honest.
+
+**Serialization law (learned the hard way, 2026-08-03):** ComfyUI keeps a
+placeholder slot in `widgets_values` for *every* widget-backed input, including
+ones converted to links. Emitting only the unlinked widgets shifts every later
+value out of position — the v6 `StringConcatenate` nodes shipped a 1-element
+array where the class needs 3, so `delimiter` fell off the end and every run
+died with "Required input is missing: delimiter". The builder now emits full
+placeholder arrays; `flatten_ui_to_api.py` enforces the same rule when reading.
+Any new node built by hand must obey it.
+
 ## Experiment queue
 
 Ranked by (expected joint gain on skin + identity) ÷ (GPU cost). One per cycle.
@@ -99,7 +116,8 @@ Sources verified live 2026-08-03; full research in the session record.
 
 | # | experiment | change | why it is high leverage | cost |
 |---|---|---|---|---|
-| 1 | **Grain transplant** | after the composite, frequency-separate the untouched original, blend its HF layer over the face region at matched amplitude (RES4LYF Freq-Sep LAB / spacepxl Image-Filters) | attacks the measured `grain_ratio` 1.5 directly, with the camera's *own* noise instead of synthetic grain; a continuous noise field across the seam also suppresses the boundary | ~2h build, <1s/frame |
+| 1 | **Grain matching** (BUILT — `workflows/aiofm_i2i_v7.json`) | one dial `hf_attenuation`: blend the composited face toward its own low-pass, inside the face mask only. Sweep 0.20 / 0.35 / 0.50 against the v6 baseline | attacks the measured `grain_ratio` 1.5 directly. Deliberately the simple form first — fully understood semantics, one variable. If attenuation alone overshoots `skin_hf_ratio` downward, escalate to 1b | built, needs 1 cycle |
+| 1b | **Grain transplant** (escalation if 1 trades skin for grain) | frequency-separate the untouched original and recombine its HF over the face's low-pass at partial strength — RES4LYF `Frequency Separation Hard Light LAB` is already installed on the pod (verify its 3-in/3-out semantics on a throwaway graph first) | the face then carries the camera's *own* noise — same ISO, same luminance dependence — which synthetic grain can never match | ~2h build |
 | 2 | **Face-crop-scoped ColorMatch** | wrap the finish in Inpaint-CropAndStitch, ColorMatch on the face crop against its surrounding skin (strength 0.4–0.6) | attacks the measured `face_neck_dE` ≈ 9; whole-frame stats can't fix a local mismatch | ~1–2h |
 | 3 | **Best-of-4 identity gate** | batch the detailer over 4 seeds, `FaceEmbedDistance` each vs the identity photo, select argmax | raises worst-case identity without touching any dial that costs skin; also gives per-seed identity variance | 4× detailer only |
 | 4 | **Character LoRA retrain (rank 16, Z-Image Base / de-turbo adapter, optional ArcFace anchor)** | replace the fried rank-32 checkpoint | the current LoRA is the hard ceiling on identity — it produces noise at strength 1.0, so identity can never be pushed | ~1 GPU-day |
